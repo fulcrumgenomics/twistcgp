@@ -1,0 +1,15 @@
+repository_type: pipeline
+
+nf_core_version: 3.2.1
+
+lint: {}
+
+template:
+  org: nf-core
+  name: twistcgp
+  description: This pipeline analyses Twist Oncology Panel data
+  author: Zach Norgaard
+  version: 1.0.0dev
+  force: true
+  outdir: .
+  is_nfcore: true
