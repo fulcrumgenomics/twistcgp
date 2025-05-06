@@ -2,14 +2,173 @@ repository_type: pipeline
 
 nf_core_version: 3.2.1
 
-lint: {}
+lint:
+  files_unchanged:
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
+    - LICENSE
+    - .prettierignore
+    - .prettierignore
+    - .prettierignore
+    - .github/CONTRIBUTING.md
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .prettierignore
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
+    - LICENSE
+    - .prettierignore
+    - .prettierignore
+    - .prettierignore
+    - .github/CONTRIBUTING.md
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .prettierignore
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-twistcgp_logo_light.png
+    - docs/images/nf-core-twistcgp_logo_light.png
+    - docs/images/nf-core-twistcgp_logo_dark.png
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/CONTRIBUTING.md
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - assets/email_template.txt
+    - docs/README.md
+  nextflow_config: false
+  multiqc_config:
+    - report_comment
+  files_exist:
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - conf/igenomes.config
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - CITATIONS.md
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - .editorconfig
+    - .prettierignore
+    - .prettierrc.yml
+    - CITATIONS.md
+    - CHANGELOG.md
+    - LICENSE
+    - assets/email_template.html
+    - assets/sendmail_template.txt
+    - assets/email_template.txt
+    - docs/output.md
+    - docs/README.md
+    - docs/usage.md
+    - conf/test.config
+    - conf/test_full.config
+    - .github/workflows/ci.yml
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/CONTRIBUTING.md
+    - .github/.dockstore.yml
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting_comment.yml
+    - .github/workflows/linting.yml
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - .editorconfig
+    - .prettierignore
+    - .prettierrc.yml
+    - CITATIONS.md
+    - CHANGELOG.md
+    - LICENSE
+    - assets/email_template.html
+    - assets/sendmail_template.txt
+    - assets/email_template.txt
+    - docs/output.md
+    - docs/README.md
+    - docs/usage.md
+    - conf/test.config
+    - conf/test_full.config
+    - .github/workflows/ci.yml
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-twistcgp_logo_light.png
+    - docs/images/nf-core-twistcgp_logo_light.png
+    - docs/images/nf-core-twistcgp_logo_dark.png
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/workflows/awstest.yml
+    - .github/workflows/awsfulltest.yml
+  readme:
+    - nextflow_badge
+    - nextflow_badge
+    - nextflow_badge
+    - nextflow_badge
+  included_configs: false
 
 template:
-  org: nf-core
+  org: fulcrumgenomics
   name: twistcgp
-  description: This pipeline analyses Twist Oncology Panel data
+  description: a bioinformatics pipeline that...
   author: Zach Norgaard
   version: 1.0.0dev
   force: true
   outdir: .
-  is_nfcore: true
+  skip_features:
+    - github
+    - ci
+    - github_badges
+    - igenomes
+    - nf_core_configs
+    - github
+    - citations
+    - ci
+    - igenomes
+    - code_linters
+    - citations
+    - gitpod
+    - codespaces
+    - changelog
+    - license
+    - email
+    - adaptivecard
+    - slackreport
+    - documentation
+    - test_config
+    - seqera_platform
+    - rocrate
+    - vscode
+  is_nfcore: false

@@ -1,0 +1,31 @@
+name: twistcgp
+version: 1.0.0dev
+description: a bioinformatics pipeline that...
+author: Zach Norgaard
+org: fulcrumgenomics
+outdir: .
+is_nfcore: false
+skip_features:
+    - github
+    - ci
+    - github_badges
+    - igenomes
+    - nf_core_configs
+    - github
+    - citations
+    - ci
+    - igenomes
+    - code_linters
+    - citations
+    - gitpod
+    - codespaces
+    - changelog
+    - license
+    - email
+    - adaptivecard
+    - slackreport
+    - documentation
+    - test_config
+    - seqera_platform
+    - rocrate
+    - vscode
