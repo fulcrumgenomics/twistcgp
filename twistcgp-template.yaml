@@ -21,5 +21,4 @@ skip_features:
     - rocrate
     - seqera_platform
     - slackreport
-    - test_config
     - vscode
