@@ -148,7 +148,6 @@ template:
   - changelog
   - ci
   - citations
-  - code_linters
   - codespaces
   - documentation
   - email

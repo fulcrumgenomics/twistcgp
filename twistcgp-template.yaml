@@ -10,7 +10,6 @@ skip_features:
     - changelog
     - ci
     - citations
-    - code_linters
     - codespaces
     - documentation
     - email
