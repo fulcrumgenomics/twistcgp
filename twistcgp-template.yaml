@@ -8,6 +8,7 @@ is_nfcore: false
 skip_features:
   - adaptivecard
   - changelog
+  - ci
   - citations
   - codespaces
   - documentation

@@ -135,6 +135,9 @@
         },
         {
             "$ref": "#/$defs/generic_options"
+        },
+        {
+            "$ref": "#/$defs/institutional_config_options"
         }
     ]
 }

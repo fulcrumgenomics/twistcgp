@@ -1,4 +1,6 @@
 name: nf-core CI
+# NB: This file has been modified from the nf-core template to trigger for more events.
+#     If this file were named "ci.yml" it must exactly match the nf-core template or the nf-core linting action will fail.
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
 on:
   push:
