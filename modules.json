@@ -1,6 +1,6 @@
 {
-    "name": "nf-core/twistcgp",
-    "homePage": "https://github.com/nf-core/twistcgp",
+    "name": "fulcrumgenomics/twistcgp",
+    "homePage": "https://github.com/fulcrumgenomics/twistcgp",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
