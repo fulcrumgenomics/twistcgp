@@ -6,26 +6,22 @@ org: fulcrumgenomics
 outdir: .
 is_nfcore: false
 skip_features:
-    - github
-    - ci
-    - github_badges
-    - igenomes
-    - nf_core_configs
-    - github
-    - citations
-    - ci
-    - igenomes
-    - code_linters
-    - citations
-    - gitpod
-    - codespaces
-    - changelog
-    - license
-    - email
     - adaptivecard
-    - slackreport
+    - changelog
+    - ci
+    - citations
+    - code_linters
+    - codespaces
     - documentation
-    - test_config
-    - seqera_platform
+    - email
+    - github
+    - github_badges
+    - gitpod
+    - igenomes
+    - license
+    - nf_core_configs
     - rocrate
+    - seqera_platform
+    - slackreport
+    - test_config
     - vscode
