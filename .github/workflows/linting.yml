@@ -1,4 +1,6 @@
 name: nf-core linting
+# NB: this file has been modified to never run the `nf-core pipeline lint --release` check
+#     to account for main + feature branch development (no dev branch)
 # This workflow is triggered on pushes and PRs to the repository.
 # It runs the `nf-core pipelines lint` and markdown lint tests to ensure
 # that the code meets the nf-core guidelines.
