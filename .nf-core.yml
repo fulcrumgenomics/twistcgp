@@ -139,7 +139,6 @@ repository_type: pipeline
 template:
   author: Zach Norgaard
   description: a bioinformatics pipeline that...
-  force: false
   is_nfcore: false
   name: twistcgp
   org: fulcrumgenomics
@@ -161,6 +160,5 @@ template:
     - rocrate
     - seqera_platform
     - slackreport
-    - test_config
     - vscode
   version: 1.0.0dev
