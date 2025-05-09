@@ -28,7 +28,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_twis
 workflow FULCRUMGENOMICS_TWISTCGP {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    ch_samplesheet // channel: samplesheet read in from --input
 
     main:
 
@@ -36,7 +36,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     // WORKFLOW: Run pipeline
     //
     TWISTCGP (
-        samplesheet
+        ch_samplesheet
     )
     emit:
     multiqc_report = TWISTCGP.out.multiqc_report // channel: /path/to/multiqc_report.html
