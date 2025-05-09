@@ -29,6 +29,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    adapters_fasta // optional path to adapter sequences
 
     main:
 
@@ -36,7 +37,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     // WORKFLOW: Run pipeline
     //
     TWISTCGP (
-        ch_samplesheet
+        ch_samplesheet,
+        adapters_fasta
     )
     emit:
     multiqc_report = TWISTCGP.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -66,7 +68,8 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     FULCRUMGENOMICS_TWISTCGP (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
+        params.adapters_fasta
     )
     //
     // SUBWORKFLOW: Run completion tasks
