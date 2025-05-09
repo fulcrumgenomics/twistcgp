@@ -1,0 +1,124 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "alignbam"
+description: Aligns an unmapped BAM to a reference genome
+keywords:
+  - fgbio
+  - samtools
+  - zipperbams
+  - mem
+  - bwa
+  - bwa-mem2
+  - alignment
+  - map
+  - bam
+tools:
+  - bwa:
+      description: |
+        BWA-mem2 is a software package for mapping DNA sequences against
+        a large reference genome, such as the human genome.
+      homepage: https://github.com/bwa-mem2/bwa-mem2
+      documentation: http://www.htslib.org/doc/samtools.html
+      arxiv: arXiv:1303.3997
+      licence: ["MIT"]
+      identifier: "biotools:bwa-mem2"
+  - fgbio:
+      description: A set of tools for working with genomic and high throughput sequencing data, including UMIs
+      homepage: http://fulcrumgenomics.github.io/fgbio/
+      documentation: http://fulcrumgenomics.github.io/fgbio/tools/latest/
+      tool_dev_url: https://github.com/fulcrumgenomics/fgbio
+      doi: "10.5281/zenodo.15161093"
+      licence: ["MIT"]
+  - samtools:
+      description: |
+        SAMtools is a set of utilities for interacting with and post-processing
+        short DNA sequence read alignments in the SAM, BAM and CRAM formats, written by Heng Li.
+        These files are generated as output by short read aligners like BWA.
+      homepage: http://www.htslib.org/
+      documentation: http://www.htslib.org/doc/samtools.html
+      doi: 10.1093/bioinformatics/btp352
+      licence: ["MIT"]
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', single_end:false ]
+    - unmapped_bam:
+        type: file
+        description: the unmapped BAM/SAM/CRAM file.
+        pattern: "*.{bam,cram,sam}"
+  - - meta2:
+        type: map
+        description: |
+          Groovy Map containing reference information
+          e.g. [ id:'test' ]
+    - fasta:
+        type: file
+        description: FASTA reference file
+        pattern: "*.{fasta,fa}"
+  - - meta3:
+        type: map
+        description: |
+          Groovy Map containing reference genome meta information
+          e.g. [ id:'test' ]
+    - fasta_fai:
+        type: file
+        description: FASTA reference index file
+        pattern: "*.fai"
+  - - meta4:
+        type: map
+        description: |
+          Groovy Map containing reference genome meta information
+          e.g. [ id:'test' ]
+    - dict:
+        type: file
+        description: Reference sequence dictionary
+        pattern: ".dict file containing reference sequence dictionary"
+  - - meta5:
+        type: map
+        description: |
+          Groovy Map containing reference genome meta information
+          e.g. [ id:'test' ]
+    - bwa_dir:
+        type: file
+        description: BWA genome index files
+        pattern: "Directory containing BWA index *.{amb,ann,bwt,pac,sa}"
+  - - sort_type:
+        type: string
+        description: True to sort the output in template-coordinate order, otherwise don't sort
+        pattern: "{none,template-coordinate,coordinate}"
+
+
+output:
+  - bam:
+    - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1', single_end:false ]`
+    - "*.bam":
+        type: file
+        description: Optionally sorted aligned BAM file
+        pattern: "*.bam"
+  - bai:
+    - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1', single_end:false ]`
+    - "*.bai":
+        type: file
+        description: Optional BAI file output if sort_type == coordinate
+        pattern: "*.{bai}"
+  - versions:
+    - "versions.yml":
+        type: file
+        description: File containing software versions
+        pattern: "versions.yml"
+
+authors:
+  - "@znorgaard"
+maintainers:
+  - "@znorgaard"
