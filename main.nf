@@ -67,9 +67,10 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
+    adapters_fasta = params.adapters_fasta ? params.adapters_fasta : []
     FULCRUMGENOMICS_TWISTCGP (
         PIPELINE_INITIALISATION.out.samplesheet,
-        params.adapters_fasta
+        adapters_fasta
     )
     //
     // SUBWORKFLOW: Run completion tasks

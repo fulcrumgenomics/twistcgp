@@ -39,13 +39,14 @@ workflow TWISTCGP {
     // MODULE: Run fastp
     //
     // Always output filtered and discarded read FASTQs, never output a merged fastq
-    FASTP(ch_samplesheet, adapters_fasta, true, true, false)
+    FASTP(ch_samplesheet, adapters_fasta, false, true, false)
     ch_multiqc_files = ch_multiqc_files.mix(FASTP.out.json.collect { it[1] })
     ch_versions = ch_versions.mix(FASTP.out.versions.first())
 
     //
     // MODULE: Run fastqtobam
     //
+    FASTP.out.reads.view()
     FGBIO_FASTQTOBAM(FASTP.out.reads)
     ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
 
