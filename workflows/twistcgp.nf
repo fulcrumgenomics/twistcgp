@@ -22,6 +22,11 @@ workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     adapters_fasta // optional path to adapter sequences
+    _ch_bwa
+    _ch_dict
+    _ch_fasta
+    _ch_fasta_fai
+
 
     main:
 
