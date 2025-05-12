@@ -46,7 +46,6 @@ workflow TWISTCGP {
     //
     // MODULE: Run fastqtobam
     //
-    FASTP.out.reads.view()
     FGBIO_FASTQTOBAM(FASTP.out.reads)
     ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
 
