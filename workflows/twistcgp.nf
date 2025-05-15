@@ -12,6 +12,8 @@ include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipe
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 
+include { ALIGNBAM } from '../modules/local/alignbam'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -22,11 +24,10 @@ workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     adapters_fasta // optional path to adapter sequences
-    _ch_bwa
-    _ch_dict
-    _ch_fasta
-    _ch_fasta_fai
-
+    ch_bwa
+    ch_dict
+    ch_fasta
+    ch_fasta_fai
 
     main:
 
@@ -53,6 +54,11 @@ workflow TWISTCGP {
     //
     FGBIO_FASTQTOBAM(FASTP.out.reads)
     ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
+
+    //
+    // MODULE: Run ALIGNBAM
+    //
+    ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
     // Collate and save software versions

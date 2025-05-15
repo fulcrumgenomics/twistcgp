@@ -90,33 +90,32 @@ input:
         description: True to sort the output in template-coordinate order, otherwise don't sort
         pattern: "{none,template-coordinate,coordinate}"
 
-
 output:
   - bam:
-    - meta:
-        type: map
-        description: |
-          Groovy Map containing sample information
-          e.g. `[ id:'sample1', single_end:false ]`
-    - "*.bam":
-        type: file
-        description: Optionally sorted aligned BAM file
-        pattern: "*.bam"
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.bam":
+          type: file
+          description: Optionally sorted aligned BAM file
+          pattern: "*.bam"
   - bai:
-    - meta:
-        type: map
-        description: |
-          Groovy Map containing sample information
-          e.g. `[ id:'sample1', single_end:false ]`
-    - "*.bai":
-        type: file
-        description: Optional BAI file output if sort_type == coordinate
-        pattern: "*.{bai}"
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.bai":
+          type: file
+          description: Optional BAI file output if sort_type == coordinate
+          pattern: "*.{bai}"
   - versions:
-    - "versions.yml":
-        type: file
-        description: File containing software versions
-        pattern: "versions.yml"
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
 
 authors:
   - "@znorgaard"
