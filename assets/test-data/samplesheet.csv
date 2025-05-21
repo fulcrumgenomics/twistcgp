@@ -1,5 +1,5 @@
 sample,fastq_1,fastq_2
-ILLUMINA_PAIRED_END,assets/fastq/Illumina_TestReads_R1_001.fastq.gz,assets/fastq/Illumina_TestReads_R2_001.fastq.gz
-ILLUMINA_SINGLE_END,assets/fastq/Illumina_TestReads_R1_001.fastq.gz
-MGI_PAIRED_END,assets/fastq/MGI_TestReads_1.fq.gz,assets/fastq/MGI_TestReads_2.fq.gz
-MGI_SINGLE_END,assets/fastq/MGI_TestReads_1.fq.gz
+ILLUMINA_PAIRED_END,assets/test-data/fastq/Illumina_TestReads_R1_001.fastq.gz,assets/test-data/fastq/Illumina_TestReads_R2_001.fastq.gz
+ILLUMINA_SINGLE_END,assets/test-data/fastq/Illumina_TestReads_R1_001.fastq.gz
+MGI_PAIRED_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz,assets/test-data/fastq/MGI_TestReads_2.fq.gz
+MGI_SINGLE_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz
