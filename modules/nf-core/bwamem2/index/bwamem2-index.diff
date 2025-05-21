@@ -1,0 +1,19 @@
+Changes in component 'nf-core/bwamem2/index'
+'modules/nf-core/bwamem2/index/environment.yml' is unchanged
+'modules/nf-core/bwamem2/index/meta.yml' is unchanged
+Changes in 'bwamem2/index/main.nf':
+--- modules/nf-core/bwamem2/index/main.nf
++++ modules/nf-core/bwamem2/index/main.nf
+@@ -27,7 +27,7 @@
+     bwa-mem2 \\
+         index \\
+         $args \\
+-        $fasta -p bwamem2/${prefix}
++        -p bwamem2/${prefix} $fasta
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+
+'modules/nf-core/bwamem2/index/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/bwamem2/index/tests/main.nf.test' is unchanged
+************************************************************
