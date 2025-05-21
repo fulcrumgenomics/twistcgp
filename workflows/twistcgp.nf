@@ -24,13 +24,12 @@ workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     adapters_fasta // optional path to adapter sequences
-    ch_bwa
-    ch_dict
-    ch_fasta
-    ch_fasta_fai
+    ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
+    ch_dict // channel: val(reference meta), path(reference .dict file)
+    ch_fasta // channel: val(reference meta), path(reference FASTA file)
+    ch_fasta_fai // channle: val(reference meat), path(reference .fai file)
 
     main:
-
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
     //
