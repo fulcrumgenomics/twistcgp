@@ -3,6 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
@@ -20,6 +21,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twis
 workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    adapters_fasta // optional path to adapter sequences
 
     main:
 
@@ -34,9 +36,17 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
+    // MODULE: Run fastp
+    //
+    // Always output filtered and discarded read FASTQs, never output a merged fastq
+    FASTP(ch_samplesheet, adapters_fasta, false, true, false)
+    ch_multiqc_files = ch_multiqc_files.mix(FASTP.out.json.collect { it[1] })
+    ch_versions = ch_versions.mix(FASTP.out.versions.first())
+
+    //
     // MODULE: Run fastqtobam
     //
-    FGBIO_FASTQTOBAM(ch_samplesheet)
+    FGBIO_FASTQTOBAM(FASTP.out.reads)
     ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
 
     //
