@@ -57,7 +57,7 @@ workflow TWISTCGP {
     //
     // MODULE: Run ALIGNBAM
     //
-    ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
+    ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
 
     //
     // Collate and save software versions
