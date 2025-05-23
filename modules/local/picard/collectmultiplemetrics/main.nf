@@ -10,7 +10,7 @@ process PICARD_COLLECTMULTIPLEMETRICS {
     input:
     tuple val(meta), path(bam), path(bai)
     tuple val(ref_meta), path(fasta)
-    tuple val(ref_meta2), path(fai)
+    tuple val(ref_meta1), path(fai)
 
     output:
     tuple val(meta), path("*metrics.txt"), emit: metrics
