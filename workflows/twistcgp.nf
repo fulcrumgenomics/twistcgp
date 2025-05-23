@@ -65,6 +65,7 @@ workflow TWISTCGP {
     // MODULE: PICARD_MARKDUPLICATES
     //
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
+    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
     //
