@@ -53,7 +53,6 @@ input:
         description: FASTA reference index file
         pattern: "*.fai"
 
-
 output:
   - metrics:
       - meta:
