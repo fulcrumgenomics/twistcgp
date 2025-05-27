@@ -14,6 +14,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/local/picard/collectmultiplemetrics'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,6 +68,13 @@ workflow TWISTCGP {
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+
+    //
+    // MODULE: PICARD_COLLECTMULTIPLEMETRICS
+    //
+    PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
+    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { it[1] })
+    ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
 
     //
     // Collate and save software versions

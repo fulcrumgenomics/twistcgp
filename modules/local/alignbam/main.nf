@@ -18,6 +18,7 @@ process ALIGNBAM {
     output:
     tuple val(meta), path("*.mapped.bam"), emit: bam
     tuple val(meta), path("*.mapped.bam.bai"), emit: bai, optional: true
+    tuple val(meta), path("*.mapped.bam"), path("*.mapped.bam.bai"), emit: bam_bai, optional: true
     path "versions.yml", emit: versions
 
     when:
