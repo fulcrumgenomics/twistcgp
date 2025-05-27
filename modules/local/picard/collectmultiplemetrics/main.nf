@@ -38,6 +38,7 @@ process PICARD_COLLECTMULTIPLEMETRICS {
         ${args} \\
         --INPUT ${bam} \\
         --FILE_EXTENSION ".txt" \\
+        --PROGRAM null \\
         --PROGRAM CollectAlignmentSummaryMetrics \\
         --PROGRAM CollectBaseDistributionByCycle \\
         --PROGRAM CollectGcBiasMetrics \\
