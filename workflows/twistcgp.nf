@@ -14,6 +14,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { PERBASE } from '../modules/local/perbase'
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/local/picard/collectmultiplemetrics'
 
 /*
@@ -26,6 +27,7 @@ workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     adapters_fasta // optional path to adapter sequences
+    bed // optional path to panel targets BED file
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
@@ -75,6 +77,13 @@ workflow TWISTCGP {
     PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
+
+
+    //
+    // MODULE: PERBASE
+    //
+    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai, bed)
+
 
     //
     // Collate and save software versions

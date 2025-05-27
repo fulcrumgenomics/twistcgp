@@ -40,9 +40,11 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     adapters_fasta = params.adapters_fasta ? params.adapters_fasta : []
+    bed = params.bed ? params.bed : []
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         adapters_fasta,
+        bed,
     )
     //
     // SUBWORKFLOW: Run completion tasks
@@ -66,6 +68,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
     adapters_fasta // optional path to adapter sequences
+    bed // otpional path to panel targets BED file
 
     main:
     // Initialize fasta file with meta map:
@@ -94,6 +97,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     TWISTCGP(
         ch_samplesheet,
         adapters_fasta,
+        bed,
         bwa,
         dict,
         fasta,
