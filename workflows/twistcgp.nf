@@ -7,6 +7,7 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
+include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -75,6 +76,12 @@ workflow TWISTCGP {
     PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
+
+    //
+    // MODULE: PERBASE
+    //
+    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.groupTuple(ch_fasta_fai))
+    ch_versions = ch_versions.mix(PERBASE.out.versions.first())
 
     //
     // Collate and save software versions
