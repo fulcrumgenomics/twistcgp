@@ -1,11 +1,11 @@
 process PERBASE {
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_high_cpu'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/perbase:0.10.2--h15397dd_0':
-        'biocontainers/perbase:0.10.2--h15397dd_0' }"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+        ? 'https://depot.galaxyproject.org/singularity/perbase:0.10.2--h15397dd_0'
+        : 'biocontainers/perbase:0.10.2--h15397dd_0'}"
 
     input:
     tuple val(meta), path(bam), path(index)
@@ -15,7 +15,7 @@ process PERBASE {
 
     output:
     tuple val(meta), path("*.tsv.gz"), emit: tsv
-    path "versions.yml"              , emit: versions
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,10 +28,10 @@ process PERBASE {
     """
     perbase \\
         base-depth \\
-        $bam \\
-        $args \\
-        $reference \\
-        --threads $task.cpus \\
+        ${bam} \\
+        ${args} \\
+        ${reference} \\
+        --threads ${task.cpus} \\
         --bgzip \\
         ${bed_arg} \\
         --output ${prefix}.tsv.gz
