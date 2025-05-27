@@ -80,7 +80,7 @@ workflow TWISTCGP {
     //
     // MODULE: PERBASE
     //
-    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.groupTuple(ch_fasta_fai))
+    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.join(ch_fasta_fai))
     ch_versions = ch_versions.mix(PERBASE.out.versions.first())
 
     //
