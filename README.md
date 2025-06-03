@@ -14,7 +14,7 @@
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
-1. Mark Duplicates ([`picard MarkDuplicates`](hhttps://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
+1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Collect Metrics ([`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
 1. Present QC ([`MultiQC`](http://multiqc.info/))
 
