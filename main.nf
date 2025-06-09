@@ -40,10 +40,13 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     adapters_fasta = params.adapters_fasta ? params.adapters_fasta : []
+    ch_bed = channel.of(tuple([], file(params.bed)))
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
-        adapters_fasta,
+        ch_bed,
+        adapters_fasta
     )
+
     //
     // SUBWORKFLOW: Run completion tasks
     //
@@ -65,6 +68,7 @@ workflow {
 workflow FULCRUMGENOMICS_TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    ch_bed // channel: tuple of meta and bed file read in from --bed
     adapters_fasta // optional path to adapter sequences
 
     main:
@@ -93,6 +97,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     TWISTCGP(
         ch_samplesheet,
+        ch_bed,
         adapters_fasta,
         bwa,
         dict,

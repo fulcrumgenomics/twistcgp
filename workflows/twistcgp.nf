@@ -14,6 +14,7 @@ include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
+include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 
 include { ALIGNBAM } from '../modules/local/alignbam'
 
@@ -26,11 +27,12 @@ include { ALIGNBAM } from '../modules/local/alignbam'
 workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+    ch_bed // channel: tuple of meta and bed file read in from --bed
     adapters_fasta // optional path to adapter sequences
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
-    ch_fasta_fai // channle: val(reference meat), path(reference .fai file)
+    ch_fasta_fai // channel: val(reference meat), path(reference .fai file)
 
     main:
     ch_versions = Channel.empty()
@@ -69,6 +71,20 @@ workflow TWISTCGP {
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+
+    //
+    // CNVKIT_BATCH
+    //
+    ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map {meta, bam -> tuple(meta, bam, [])}
+    CNVKIT_BATCH(
+        ch_cnv_bam_pair,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_bed,
+        tuple([], []), // TODO: Can we provide a reference as input so we don't regenerate every time?
+        [] // TODO: Generate a Panel of Normals
+    )
+    ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
     //
     // MODULE: PICARD_COLLECTMULTIPLEMETRICS
