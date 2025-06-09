@@ -1,47 +1,68 @@
-# fulcrumgenomics/twistcgp
+# twistcgp
 
 ## Introduction
 
-**fulcrumgenomics/twistcgp** is a bioinformatics pipeline that ...
-
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
+**twistcgp** is a bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) OncoProfiler product for targeted enrichment of oncology genes.
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+
+### Pipeline Steps
+
+1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
+1. Read QC [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
+1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
+1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
+1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
+1. Collect Metrics ([`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
+1. Present QC ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
 > [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.
+> Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `nextflow run twistcpg/main.nf -profile "test,[docker|singularity|conda]" --outdir ./results` before running the workflow on actual data.
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
+For a full list of available options run `nextflow run twistcpg/main.nf --help --show_hidden`.
+
+### Prepare a Samplesheet
 
 First, prepare a samplesheet with your input data that looks as follows:
 
-`samplesheet.csv`:
-
-```csv
+```text
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+ILLUMINA_PAIRED_END,assets/test-data/fastq/Illumina_TestReads_R1_001.fastq.gz,assets/test-data/fastq/Illumina_TestReads_R2_001.fastq.gz
+MGI_SINGLE_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+The sample column provides a unique identifier for the given sample.
 
--->
+### Obtain a Genome
+
+The OncoProfiler panel was designed using the hg38 reference genome FASTA file which can be obtained from [UCSC](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/).
+
+### (Optionally) Pre-Generate a Genome Index
+
+Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
+Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
+
+Additionally, the genome index can be saved to the output directory for future use by supplying the `--save_reference` parameter.
+
+### (Optionally) Provide Adapter Sequences
+
+If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `fastp` to trim those sequences prior to alignment.
+The adapter sequences can be supplied to the pipeline using the `--adapters_fasta` parameter.
+
+### Run the Pipeline
 
 Now, you can run the pipeline using:
 
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
-
 ```bash
-nextflow run fulcrumgenomics/twistcgp \
-   -profile <docker/singularity/.../institute> \
+nextflow run twistcgp/main.nf \
+   -profile <docker/singularity/conda> \
+   --fasta hg38.fa \
    --input samplesheet.csv \
    --outdir <OUTDIR>
 ```
@@ -51,15 +72,12 @@ nextflow run fulcrumgenomics/twistcgp \
 
 ## Credits
 
-fulcrumgenomics/twistcgp was originally written by Zach Norgaard.
+twistcgp was originally written by Zach Norgaard of [Fulcrum Genomics](https://fulcrumgenomics.com/).
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
-
-## Contributions and Support
-
-If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
+- Nils Homer
+- Tim Dunn
 
 ## Citations
 
