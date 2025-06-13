@@ -27,8 +27,9 @@ include { ALIGNBAM } from '../modules/local/alignbam'
 workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
-    ch_bed // channel: tuple of meta and bed file read in from --bed
+    bed // channel: tuple of meta and bed file read in from --bed
     adapters_fasta // optional path to adapter sequences
+    pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
@@ -75,14 +76,16 @@ workflow TWISTCGP {
     //
     // CNVKIT_BATCH
     //
+    // Currently the pipeline does not support matched tumor-normal analysis, so an empty
+    //   list is supplied for the normal BAM.
     ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map {meta, bam -> tuple(meta, bam, [])}
     CNVKIT_BATCH(
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_bed,
-        tuple([], []), // TODO: Can we provide a reference as input so we don't regenerate every time?
-        [] // TODO: Generate a Panel of Normals
+        bed,
+        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 

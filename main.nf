@@ -39,12 +39,14 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    adapters_fasta = params.adapters_fasta ? params.adapters_fasta : []
-    ch_bed = channel.of(tuple([], file(params.bed)))
+    adapters_fasta = params.adapters_fasta ? file(params.adapters_fasta) : []
+    pon_cnn = params.pon_cnn ? file(params.pon_cnn) : []
+    bed = tuple([], file(params.bed))
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
-        ch_bed,
-        adapters_fasta
+        bed,
+        adapters_fasta,
+        pon_cnn
     )
 
     //
@@ -68,8 +70,9 @@ workflow {
 workflow FULCRUMGENOMICS_TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
-    ch_bed // channel: tuple of meta and bed file read in from --bed
+    bed // tuple of meta and bed file read in from --bed
     adapters_fasta // optional path to adapter sequences
+    pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
 
     main:
     // Initialize fasta file with meta map:
@@ -97,8 +100,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     TWISTCGP(
         ch_samplesheet,
-        ch_bed,
+        bed,
         adapters_fasta,
+        pon_cnn,
         bwa,
         dict,
         fasta,

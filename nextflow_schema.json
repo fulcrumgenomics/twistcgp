@@ -30,6 +30,13 @@
                     "mimetype": "fasta",
                     "description": "Path to FASTA file containing adapter sequences to be trimmed"
                 },
+                "pon_cnn": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.cnn?$",
+                    "format": "file-path",
+                    "mimetype": "cnn",
+                    "description": "Panel of normal reference to use for CNV calling with CNVkit."
+                },
                 "bed": {
                     "type": "string",
                     "pattern": "^\\S+\\.bed$",
