@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**twistcgp** is a bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) OncoProfiler product for targeted enrichment of oncology genes.
+**twistcgp** is a bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) TwistCGP product for targeted enrichment of cancer-associated genes.
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
@@ -10,7 +10,7 @@
 ### Pipeline Steps
 
 1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
-1. Read QC [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
@@ -41,12 +41,13 @@ The sample column provides a unique identifier for the given sample.
 
 ### Obtain a Genome
 
-The OncoProfiler panel was designed using the hg38 reference genome FASTA file which can be obtained from [UCSC](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/).
+The TwistCGP panel was designed using the hg38 Genome in a Bottle (GIAB) reference genome FASTA file which can be obtained from [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta.gz).
 
 ### (Optionally) Pre-Generate a Genome Index
 
 Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
 Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
+See [docs/bwamem2_index.md](/docs/bwamem2_index.md) for details.
 
 Additionally, the genome index can be saved to the output directory for future use by supplying the `--save_reference` parameter.
 
