@@ -9,13 +9,13 @@ include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
+include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 
 include { ALIGNBAM } from '../modules/local/alignbam'
-include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/local/picard/collectmultiplemetrics'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
