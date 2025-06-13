@@ -11,6 +11,7 @@ You may use BAM files processed with this pipeline.
 1. [Build a reference `.cnn` file](https://cnvkit.readthedocs.io/en/stable/quickstart.html#build-a-reference-from-normal-samples-and-infer-tumor-copy-ratios)
 
 You will need:
+
 - BED file for the panel
 - reference genome fasta file, [GIAB hg38 corrected fasta.gz](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta.gz)
 - aligned BAM files for your PON samples
