@@ -67,10 +67,6 @@ process CNVKIT_BATCH {
             fasta_args = ""
             normal_args = ""
         }
-    } else {
-        if (!reference_exists) {
-            normal_args = "--normal"
-        }
     }
 
     // generation of panel of normals
@@ -80,6 +76,13 @@ process CNVKIT_BATCH {
         def pon_input = normal.join(' ')
         normal_args = "--normal $pon_input"
         tumor_out = ""
+    }
+
+    // tumor_only mode and no reference
+    // generate a "flat" reference which assumes equal coverage
+    // by passing '--normal' without any files
+    if (!reference_exists){
+        normal_args = normal_args ?: "--normal"
     }
 
     def target_args = targets && !reference_exists ? "--targets $targets" : ""
