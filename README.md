@@ -57,6 +57,13 @@ Additionally, the genome index can be saved to the output directory for future u
 If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `fastp` to trim those sequences prior to alignment.
 The adapter sequences can be supplied to the pipeline using the `--adapters_fasta` parameter.
 
+### (Optionally) Provide a Panel of Normal Reference for CNV Calling
+
+You may supply a Panel of Normal (PON) reference `.cnn` file for use with [CNVkit](https://cnvkit.readthedocs.io/en/stable/index.html).
+For details on how to generate this file see [docs/cnvkit_pon.md](/docs/cnvkit_pon.md).
+
+If you do not supply a PON reference, a "flat" reference will be used which assumes equal coverage across the panel regions.
+
 ### Run the Pipeline
 
 Now, you can run the pipeline using:
