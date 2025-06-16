@@ -14,6 +14,7 @@
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
+1. Variant Calling on local assembly of haplotypes ([`gatk4/mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
 1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
