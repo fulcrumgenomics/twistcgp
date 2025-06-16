@@ -27,7 +27,7 @@ include { ALIGNBAM } from '../modules/local/alignbam'
 workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
-    bed // channel: tuple of meta and bed file read in from --bed
+    baits_bed // channel: tuple of meta and bed file read in from --baits_bed
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
@@ -83,7 +83,7 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        bed,
+        baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
         tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
         false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
