@@ -1,7 +1,7 @@
 # Generate a Panel of Normals Reference for CNV Calling
 
 You may want to generate a Panel of Normals (PON) for use in CNV Calling.
-The input samples to this process should be BAM files aligned using the same methodology as your experimental samples.
+The input samples to this process should be BAM files produced using the same methodology as your experimental samples.
 You may use BAM files processed with this pipeline.
 
 ## Steps
