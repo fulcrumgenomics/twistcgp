@@ -20,6 +20,8 @@ include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { ALIGNBAM } from '../modules/local/alignbam'
 include {PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 
+include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/local/picard/collectmultiplemetrics'
+include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -37,6 +39,10 @@ workflow TWISTCGP {
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
+    germline_resource //optional path to germline_resource VCF
+    germline_resource_tbi //optional path to germline_resource index
+    pon //optional path to panel_of_normals VCF
+    pon_tbi //optional path to panel_of_normals VCF index
 
     main:
     ch_versions = Channel.empty()
@@ -68,6 +74,13 @@ workflow TWISTCGP {
     //
     ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
     ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
+
+    //
+    // MODULE: GATK4/MUTECT2
+    //
+    ch_bams_and_intervals = ALIGNBAM.out.bam_bai.combine(intervals)
+    GATK4_MUTECT2(ch_bams_and_intervals, ch_fasta, ch_fasta_fai, ch_dict, germline_resource, germline_resource_tbi, pon, pon_tbi)
+    ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
     // MODULE: PICARD_MARKDUPLICATES
