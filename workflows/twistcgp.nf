@@ -33,7 +33,7 @@ workflow TWISTCGP {
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
-    ch_fasta_fai // channel: val(reference meat), path(reference .fai file)
+    ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
 
     main:
     ch_versions = Channel.empty()
