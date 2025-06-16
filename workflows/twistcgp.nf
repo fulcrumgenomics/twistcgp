@@ -6,6 +6,7 @@
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
@@ -38,6 +39,10 @@ workflow TWISTCGP {
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
+    germline_resource //optional path to germline_resource VCF
+    germline_resource_tbi //optional path to germline_resource index
+    pon //optional path to panel_of_normals VCF
+    pon_tbi //optional path to panel_of_normals VCF index
 
     main:
     ch_versions = Channel.empty()
@@ -69,6 +74,13 @@ workflow TWISTCGP {
     //
     ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
     ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
+
+    //
+    // MODULE: GATK4/MUTECT2
+    //
+    ch_bams_and_intervals = ALIGNBAM.out.bam_bai.combine(intervals)
+    GATK4_MUTECT2(ch_bams_and_intervals, ch_fasta, ch_fasta_fai, ch_dict, germline_resource, germline_resource_tbi, pon, pon_tbi)
+    ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
     // MODULE: PICARD_MARKDUPLICATES
