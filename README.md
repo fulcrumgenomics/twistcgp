@@ -16,7 +16,7 @@
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
-1. Collect Metrics ([`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
+1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
 1. Present QC ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
@@ -43,6 +43,17 @@ The sample column provides a unique identifier for the given sample.
 ### Obtain a Genome
 
 The TwistCGP panel was designed using the hg38 Genome in a Bottle (GIAB) reference genome FASTA file which can be obtained from [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta.gz).
+
+### Obtain list of Baits & Targets
+
+You will need a BED or Interval List file for (1) the panel baits and (2) the panel targets.
+
+> [!NOTE]
+> If you lack the baits file, you can provide the panel targets for both arguments.
+> Providing the targets as the baits will invalidate the bait specific metrics in the picard `HsMetrics`.
+> Additionally, CNV calls from CNVkit may be noiser due to inaccurate modeling of bait locations.
+
+The TwistCGP baits and targets files are available from Twist after purchasing the TwistCGP product.
 
 ### (Optionally) Pre-Generate a Genome Index
 
@@ -73,6 +84,8 @@ nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \
    --input samplesheet.csv \
+   --baits baits.bed \
+   --targets targets.bed \
    --outdir <OUTDIR>
 ```
 
