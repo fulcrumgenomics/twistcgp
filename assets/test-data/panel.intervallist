@@ -1,0 +1,3 @@
+@HD	VN:1.6	SO:coordinate
+@SQ	SN:chr_fake	LN:50	M5:2383a7064f59ec85ab162c86c19fb0e4	UR:file:///Users/znorgaard/clients/twist/git/twistcgp/assets/test-data/reference.fa
+chr_fake	1	50	+	gene_fake
