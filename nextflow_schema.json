@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "outdir", "baits_bed"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -29,6 +29,21 @@
                     "format": "file-path",
                     "mimetype": "fasta",
                     "description": "Path to FASTA file containing adapter sequences to be trimmed"
+                },
+                "pon_cnn": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.cnn?$",
+                    "format": "file-path",
+                    "mimetype": "cnn",
+                    "description": "Panel of normal reference to use for CNV calling with CNVkit."
+                },
+                "baits_bed": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.bed$",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "bed",
+                    "description": "Path to BED file containing location of baits."
                 },
                 "outdir": {
                     "type": "string",

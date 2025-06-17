@@ -11,6 +11,12 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
                     },
+                    "cnvkit/batch": {
+                        "branch": "master",
+                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/cnvkit/batch/cnvkit-batch.diff"
+                    },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "d082103d7976a2804f21225446cc110cbd822f4c",
