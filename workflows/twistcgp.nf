@@ -10,6 +10,7 @@ include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
+include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -17,6 +18,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twis
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 
 include { ALIGNBAM } from '../modules/local/alignbam'
+include {PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +29,8 @@ include { ALIGNBAM } from '../modules/local/alignbam'
 workflow TWISTCGP {
     take:
     ch_samplesheet // channel: samplesheet read in from --input
-    baits_bed // channel: tuple of meta and bed file read in from --baits_bed
+    baits // channel: tuple of meta and baits region file read in from --baits
+    targets // channel: tuple of meta and targets region file read in from --targets
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
@@ -78,12 +81,17 @@ workflow TWISTCGP {
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
     //   list is supplied for the normal BAM.
-    ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map {meta, bam -> tuple(meta, bam, [])}
+    baits_are_bed = baits[1].getExtension() == "bed"
+    if (!baits_are_bed) {
+        PICARD_INTERVALLISTTOBED(baits)
+    }
+    ch_baits_bed = baits_are_bed ? baits : PICARD_INTERVALLISTTOBED.out.bed
+    ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
     CNVKIT_BATCH(
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
+        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
         tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
         false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
@@ -95,6 +103,16 @@ workflow TWISTCGP {
     PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
+
+    //
+    // MODULE: PICARD_COLLECTHSMETRICS
+    //
+    ch_bam_and_regions = PICARD_MARKDUPLICATES.out.bam
+        .join(PICARD_MARKDUPLICATES.out.bai)
+        .map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
+    PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_dict)
+    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { it[1] })
+    ch_versions = ch_versions.mix(PICARD_COLLECTHSMETRICS.out.versions.first())
 
     //
     // MODULE: PERBASE
