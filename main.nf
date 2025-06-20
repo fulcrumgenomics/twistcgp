@@ -121,10 +121,10 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     // WORKFLOW: build indexes if needed
     //
-
-    PREPARE_GENOME(fasta)
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
     PREPARE_ANNOTATION_DB(snpeff_genome_info)
+    def msisensorpro = true
+    PREPARE_GENOME(fasta, msisensorpro)
 
     // Gather built indices or get them from the params
     // Built from the fasta file:
@@ -157,6 +157,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
             ? Channel.fromPath(params.pon_tbi).collect()
             : PREPARE_INDICES.out.ch_pon_tbi)
         : Channel.value([[id: "pon_tbi"], []])
+    msi_scan = params.msisensor_scan
+        ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
+        : PREPARE_GENOME.out.msi_scan
 
     // WORKFLOW: Run pipeline
     //
@@ -164,6 +167,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_samplesheet,
         baits,
         targets,
+        msisensorpro,
         adapters_fasta,
         pon_cnn,
         bwa,
@@ -179,6 +183,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_snpeff_cache,
         tmb_mutect2_config,
         tmb_snpeff_config,
+        msi_scan,
     )
 
     emit:
