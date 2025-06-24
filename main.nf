@@ -123,7 +123,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
     PREPARE_ANNOTATION_DB(snpeff_genome_info)
-    def msisensorpro = true
+    msisensorpro = params.msisensor_pro_licensed
     PREPARE_GENOME(fasta, msisensorpro)
 
     // Gather built indices or get them from the params
