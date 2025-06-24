@@ -1,0 +1,39 @@
+Changes in component 'nf-core/picard/collecthsmetrics'
+'modules/nf-core/picard/collecthsmetrics/environment.yml' is unchanged
+Changes in 'picard/collecthsmetrics/meta.yml':
+--- modules/nf-core/picard/collecthsmetrics/meta.yml
++++ modules/nf-core/picard/collecthsmetrics/meta.yml
+@@ -65,6 +65,15 @@
+         description: |
+           Groovy Map containing reference information
+           e.g. [ id:'genome' ]
++    - gzi:
++        type: file
++        description: Index of gzipped FASTA file. Only needed when a gzipped fasta is supplied.
++        pattern: "*.gzi"
++  - - meta5:
++        type: map
++        description: |
++          Groovy Map containing reference information
++          e.g. [ id:'genome' ]
+     - dict:
+         type: file
+         description: Sequence dictionary of FASTA file. Only needed when bed interval
+
+Changes in 'picard/collecthsmetrics/main.nf':
+--- modules/nf-core/picard/collecthsmetrics/main.nf
++++ modules/nf-core/picard/collecthsmetrics/main.nf
+@@ -11,7 +11,8 @@
+     tuple val(meta), path(bam), path(bai), path(bait_intervals, stageAs: "baits/*"), path(target_intervals, stageAs: 'targets/*')
+     tuple val(meta2), path(fasta)
+     tuple val(meta3), path(fai)
+-    tuple val(meta4), path(dict)
++    tuple val(meta4), path(gzi)
++    tuple val(meta5), path(dict)
+ 
+     output:
+     tuple val(meta), path("*_metrics")  , emit: metrics
+
+'modules/nf-core/picard/collecthsmetrics/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/picard/collecthsmetrics/tests/main.nf.test' is unchanged
+************************************************************
