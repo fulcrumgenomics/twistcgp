@@ -29,7 +29,7 @@ workflow PREPARE_GENOME {
     if (msi_pro) {
         MSISENSORPRO_SCAN(fasta)
     } else {
-        MSISENSOR2_SCAN(fasta.map {it -> it[1]}, fasta.map {it -> "${it[1].baseName}.scan"})
+        MSISENSOR2_SCAN(fasta.map {it -> it[1]}, fasta.map {it -> "${it[1].baseName}.msisensor_scan.list"})
     }
     msi_scan = msi_pro
         ? MSISENSORPRO_SCAN.out.list
