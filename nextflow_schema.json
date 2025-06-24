@@ -53,6 +53,12 @@
                     "mimetype": "bed",
                     "description": "Path to BED or Interval List file containing location of targets."
                 },
+                "target_padding": {
+                    "type": "integer",
+                    "description": "The number of bp by which to pad each target interval on either side (default = 100) for variant calling by GATK4/MUTECT2. Target-padding cannot be negative and will not exceed the bounds of the contig.",
+                    "minimum": 0,
+                    "default": 100
+                },
                 "germline_resource": {
                     "type": ["string", "null"],
                     "pattern": "^\\S+\\.vcf\\.gz$",
