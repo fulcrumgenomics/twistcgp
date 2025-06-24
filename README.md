@@ -48,6 +48,8 @@ The TwistCGP panel was designed using the hg38 Genome in a Bottle (GIAB) referen
 ### Obtain list of Baits & Targets
 
 You will need a BED or Interval List file for (1) the panel baits and (2) the panel targets.
+Each interval should be in the format <chr>:<start>-<stop> + <target_name>, with fields separated by tabs and coordinates using 0-based indexing.
+Targets will be padded prior to variant calling; the padding size can be adjusted using the `--target_padding` parameter (default: 100, which adds 100 bp on each side of the interval).
 
 > [!NOTE]
 > If you lack the baits file, you can provide the panel targets for both arguments.

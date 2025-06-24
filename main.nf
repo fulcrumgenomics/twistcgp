@@ -57,7 +57,6 @@ workflow {
         germline_resource_tbi,
         pon,
         pon_tbi,
-        intervals
     )
 
     //
