@@ -99,6 +99,14 @@
                     "description": "Path to FASTA reference index.",
                     "hidden": true
                 },
+                "fasta_gzi": {
+                    "type": "string",
+                    "fa_icon": "fas fa-file",
+                    "exists": true,
+                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "description": "Path to FASTA reference .gzi index for gzipped fasta reference only.",
+                    "hidden": true
+                },
                 "bwa": {
                     "type": "string",
                     "fa_icon": "fas fa-copy",

@@ -37,6 +37,7 @@ workflow TWISTCGP {
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
+    ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
 
     main:
     ch_versions = Channel.empty()
@@ -110,7 +111,7 @@ workflow TWISTCGP {
     ch_bam_and_regions = PICARD_MARKDUPLICATES.out.bam
         .join(PICARD_MARKDUPLICATES.out.bai)
         .map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
-    PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_dict)
+    PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_fasta_gzi, ch_dict)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_COLLECTHSMETRICS.out.versions.first())
 

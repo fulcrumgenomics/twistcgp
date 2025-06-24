@@ -32,5 +32,6 @@ workflow PREPARE_GENOME {
     bwa = BWAMEM2_INDEX.out.index.collect() // path: bwa/*
     dict = SAMTOOLS_DICT.out.dict.collect() // path: genome.fasta.dict
     fasta_fai = SAMTOOLS_FAIDX.out.fai.collect() // path: genome.fasta.fai
+    fasta_gzi = SAMTOOLS_FAIDX.out.gzi.collect() // path: genome.fasta.gz.gzi
     versions // channel: [ versions.yml ]
 }
