@@ -17,6 +17,8 @@ include { TWISTCGP } from './workflows/twistcgp'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
+include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -43,19 +45,28 @@ workflow {
     pon_cnn = params.pon_cnn ? file(params.pon_cnn) : []
     baits = tuple([id: "baits"], file(params.baits))
     targets = tuple([id: "targets"], file(params.targets))
-    germline_resource = params.germline_resource ? params.germline_resource : []
-    germline_resource_tbi = params.germline_resource_tbi ? params.germline_resource_tbi : []
-    pon = params.pon ? params.pon : []
-    pon_tbi = params.pon_tbi ? params.pon_tbi : []
+    ch_pop_germline_resource = Channel.of(
+        params.population_germline_vcf
+            ? tuple([id: "population_germline_resource"], file(params.population_germline_vcf))
+            : tuple([id: "population_germline_resource"], [])
+    )
+    germline_resource_tbi = params.population_germline_tbi ? file(params.population_germline_tbi) : []
+
+    ch_pon_vcf = Channel.of(
+        params.pon_vcf
+            ? tuple([id: "pon_vcf"], file(params.pon_vcf))
+            : tuple([id: "pon_vcf"], [])
+    )
+    pon_tbi = params.pon_tbi ? file(params.pon_tbi) : []
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
         targets,
         adapters_fasta,
         pon_cnn,
-        germline_resource,
+        ch_pop_germline_resource,
         germline_resource_tbi,
-        pon,
+        ch_pon_vcf,
         pon_tbi,
     )
 
@@ -84,9 +95,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     targets //tuple of meta and targets regions file read in from --targets
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
-    germline_resource //optional path to germline_resource VCF
+    ch_pop_germline_resource //optional val(reference meta), path(germline_resource VCF)
     germline_resource_tbi //optional path to germline_resource index
-    pon //optional path to panel_of_normals VCF
+    ch_pon_vcf //optional val(reference meta), path(panel_of_normals VCF)
     pon_tbi //optional path to panel_of_normals VCF index
 
     main:
@@ -96,7 +107,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     // WORKFLOW: build indexes if needed
     //
+
     PREPARE_GENOME(fasta)
+    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
 
     // Gather built indices or get them from the params
     // Built from the fasta file:
@@ -114,23 +127,19 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
-    germline_resource = params.germline_resource
-        ? Channel.fromPath(params.germline_resource)
-        : Channel.value([])
 
-    germline_resource_tbi = params.germline_resource_tbi
-        ? Channel.fromPath(params.germline_resource_tbi)
-        : Channel.value([])
+    ch_pop_germ_tbi = params.population_germline_vcf
+        ? (params.population_germline_tbi
+            ? Channel.fromPath(params.population_germline_tbi).collect()
+            : PREPARE_INDICES.out.ch_germline_resource_tbi)
+        : Channel.value([[id: "population_germline_tbi"], []])
+    ch_pon_tbi = params.pon_vcf
+        ? (params.pon_tbi
+            ? Channel.fromPath(params.pon_tbi).collect()
+            : PREPARE_INDICES.out.ch_pon_tbi)
+        : Channel.value([[id: "pon_tbi"], []])
 
-    pon = params.pon
-        ? Channel.fromPath(params.pon)
-        : Channel.value([])
 
-    pon_tbi = params.pon_tbi
-        ? Channel.fromPath(params.pon_tbi)
-        : Channel.value([])
-
-    //
     // WORKFLOW: Run pipeline
     //
     TWISTCGP(
@@ -143,10 +152,10 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         dict,
         fasta,
         fasta_fai,
-        germline_resource,
-        germline_resource_tbi,
-        pon,
-        pon_tbi,
+        ch_pop_germline_resource,
+        ch_pop_germ_tbi,
+        ch_pon_vcf,
+        ch_pon_tbi,
     )
 
     emit:
