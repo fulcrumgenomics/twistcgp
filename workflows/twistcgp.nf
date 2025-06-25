@@ -18,7 +18,7 @@ include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipe
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include {PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
+include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,8 +76,9 @@ workflow TWISTCGP {
     //
     // MODULE: GATK4/MUTECT2
     //
-    ch_bams_and_intervals = ALIGNBAM.out.bam_bai.combine(intervals)
-    GATK4_MUTECT2(ch_bams_and_intervals, ch_fasta, ch_fasta_fai, ch_dict, germline_resource, germline_resource_tbi, pon, pon_tbi)
+
+    ch_bams_and_targets = ALIGNBAM.out.bam_bai.map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    GATK4_MUTECT2(ch_bams_and_targets, ch_fasta, ch_fasta_fai, ch_dict, germline_resource, germline_resource_tbi, pon, pon_tbi)
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
@@ -102,9 +103,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
-        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
-        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
+        ch_baits_bed,
+        tuple([], pon_cnn),
+        false,
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 

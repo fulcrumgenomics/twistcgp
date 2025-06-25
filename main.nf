@@ -41,8 +41,8 @@ workflow {
     //
     adapters_fasta = params.adapters_fasta ? file(params.adapters_fasta) : []
     pon_cnn = params.pon_cnn ? file(params.pon_cnn) : []
-    baits = tuple([id:"baits"], file(params.baits))
-    targets = tuple([id:"targets"], file(params.targets))
+    baits = tuple([id: "baits"], file(params.baits))
+    targets = tuple([id: "targets"], file(params.targets))
     germline_resource = params.germline_resource ? params.germline_resource : []
     germline_resource_tbi = params.germline_resource_tbi ? params.germline_resource_tbi : []
     pon = params.pon ? params.pon : []
@@ -52,7 +52,7 @@ workflow {
         baits,
         targets,
         adapters_fasta,
-        pon_cnn
+        pon_cnn,
         germline_resource,
         germline_resource_tbi,
         pon,
@@ -115,20 +115,20 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
     germline_resource = params.germline_resource
-    ? Channel.fromPath(params.germline_resource)
-    : Channel.value([])
+        ? Channel.fromPath(params.germline_resource)
+        : Channel.value([])
 
     germline_resource_tbi = params.germline_resource_tbi
-    ? Channel.fromPath(params.germline_resource_tbi)
-    : Channel.value([])
+        ? Channel.fromPath(params.germline_resource_tbi)
+        : Channel.value([])
 
     pon = params.pon
-    ? Channel.fromPath(params.pon)
-    : Channel.value([])
+        ? Channel.fromPath(params.pon)
+        : Channel.value([])
 
     pon_tbi = params.pon_tbi
-    ? Channel.fromPath(params.pon_tbi)
-    : Channel.value([])
+        ? Channel.fromPath(params.pon_tbi)
+        : Channel.value([])
 
     //
     // WORKFLOW: Run pipeline
