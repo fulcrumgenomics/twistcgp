@@ -59,19 +59,19 @@
                     "minimum": 0,
                     "default": 100
                 },
-                "germline_resource": {
+                "population_germline_vcf": {
                     "type": ["string", "null"],
                     "pattern": "^\\S+\\.vcf\\.gz$",
                     "description": "Optional path to the compressed and indexed germline resource VCF file. Should contain allele fractions.",
                     "default": null
                 },
-                "germline_resource_tbi": {
+                "population_germline_tbi": {
                     "type": ["string", "null"],
                     "pattern": "^\\S+\\.vcf\\.gz.tbi$",
                     "description": "Optional path to the index file for the germline resource VCF.",
                     "default": null
                 },
-                "pon": {
+                "pon_vcf": {
                     "type": ["string", "null"],
                     "pattern": "^\\S+\\.vcf\\.gz$",
                     "description": "Optional path to the compressed and indexed panel of normals VCF file.",

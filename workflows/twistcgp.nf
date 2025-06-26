@@ -38,10 +38,10 @@ workflow TWISTCGP {
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
-    germline_resource //optional path to germline_resource VCF
-    germline_resource_tbi //optional path to germline_resource index
-    pon //optional path to panel_of_normals VCF
-    pon_tbi //optional path to panel_of_normals VCF index
+    ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
+    ch_pop_germ_tbi //channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pon_vcf //channel [optional]: val(reference_meta), path(panel_of_normals VCF)
+    ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
 
     main:
     ch_versions = Channel.empty()
@@ -77,9 +77,18 @@ workflow TWISTCGP {
     //
     // MODULE: GATK4/MUTECT2
     //
-
+    // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
     ch_bams_and_targets = ALIGNBAM.out.bam_bai.map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
-    GATK4_MUTECT2(ch_bams_and_targets, ch_fasta, ch_fasta_fai, ch_dict, germline_resource, germline_resource_tbi, pon, pon_tbi)
+    GATK4_MUTECT2(
+        ch_bams_and_targets,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+        ch_pop_germline_resource.map { _meta, vcf -> vcf },
+        ch_pop_germ_tbi.map { _meta, tbi -> tbi },
+        ch_pon_vcf.map { _meta, vcf -> vcf },
+        ch_pon_tbi.map { _meta, tbi -> tbi },
+    )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
