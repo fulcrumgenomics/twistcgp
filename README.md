@@ -14,7 +14,7 @@
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
-1. Variant Calling on local assembly of haplotypes ([`gatk4/mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
+1. Variant Calling via local assembly of haplotypes ([`gatk4/mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
 1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
@@ -48,7 +48,9 @@ The TwistCGP panel was designed using the hg38 Genome in a Bottle (GIAB) referen
 ### Obtain list of Baits & Targets
 
 You will need a BED or Interval List file for (1) the panel baits and (2) the panel targets.
-Each interval should be in the format <chr>:<start>-<stop> + <target_name>, with fields separated by tabs and coordinates using 0-based indexing.
+
+BED files should follow the [UCSC BED format specifications](https://genome.ucsc.edu/FAQ/FAQformat.html#format1); interval list files should adhere to [GATK interval list conventions.](https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists)
+
 Targets will be padded prior to variant calling; the padding size can be adjusted using the `--target_padding` parameter (default: 100, which adds 100 bp on each side of the interval).
 
 > [!NOTE]
@@ -108,6 +110,13 @@ See [docs/germline_resource_vcf.md](/docs/germline_resource_vcf.md) for more det
 While a panel of normals (PoN) VCF is not required for Mutect2 to run, it is recommended. A PoN is a VCF that contains sites found across multiple "normal" samples (e.g., derived from healthy tissue that is believed to not have somatic alterations), ideally from the same sequencing preparation, pipeline, platform, etc. as the tumor samples. While the germline resource helps model population variants, the PoN VCF filters out technical artifacts to improve the quality of the variant calling analyses.
 
 The panel of normals VCF can be supplied to the pipeline using the `--pon_vcf` parameter. See [docs/panel_of_normals_vcf.md](/docs/panel_of_normals_vcf.md) for more details on how to generate a panel of normals VCF.
+
+### (Optionally) Provide a Panel of Normal Reference for CNV Calling
+
+You may supply a Panel of Normal (PON) reference `.cnn` file for use with [CNVkit](https://cnvkit.readthedocs.io/en/stable/index.html).
+For details on how to generate this file see [docs/cnvkit_pon.md](/docs/cnvkit_pon.md).
+
+If you do not supply a PON reference, a "flat" reference will be used which assumes equal coverage across the panel regions.
 
 ### Run the Pipeline
 

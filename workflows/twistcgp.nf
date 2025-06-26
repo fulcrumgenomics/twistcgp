@@ -75,10 +75,20 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
 
     //
+    // MODULE: PICARD_MARKDUPLICATES
+    //
+    PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
+    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
+    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+
+    //
     // MODULE: GATK4/MUTECT2
     //
     // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
-    ch_bams_and_targets = ALIGNBAM.out.bam_bai.map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
+        .join(PICARD_MARKDUPLICATES.out.bai)
+        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    ch_bams_and_targets.view()
     GATK4_MUTECT2(
         ch_bams_and_targets,
         ch_fasta,
@@ -90,13 +100,6 @@ workflow TWISTCGP {
         ch_pon_tbi.map { _meta, tbi -> tbi },
     )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
-
-    //
-    // MODULE: PICARD_MARKDUPLICATES
-    //
-    PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
-    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
     //
     // CNVKIT_BATCH
@@ -113,9 +116,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed,
-        tuple([], pon_cnn),
-        false,
+        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
+        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+        false, // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
