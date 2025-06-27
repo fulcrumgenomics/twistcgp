@@ -306,6 +306,9 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
+            "$ref": "#/$defs/tool_selection_options"
+        },
+        {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
