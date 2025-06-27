@@ -13,7 +13,7 @@ include { TABIX_TABIX as TABIX_POPULATION_GERMLINE } from '../../../modules/nf-c
 workflow PREPARE_INDICES {
     take:
     ch_pop_germline_resource // channel: val(meta), path(vcf)
-    ch_pon_vcf // val(meta), path(vcf)
+    ch_pon_vcf // channel: val(meta), path(vcf)
 
     main:
     versions = Channel.empty()

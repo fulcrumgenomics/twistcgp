@@ -88,7 +88,6 @@ workflow TWISTCGP {
     ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
         .join(PICARD_MARKDUPLICATES.out.bai)
         .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
-    ch_bams_and_targets.view()
     GATK4_MUTECT2(
         ch_bams_and_targets,
         ch_fasta,
