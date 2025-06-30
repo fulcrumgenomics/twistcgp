@@ -96,7 +96,7 @@
                 },
                 "snpeff_cache": {
                     "type": "string",
-                    "description": "The locatio of the root of the annotation cache folder. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/snpeff_cache/)., "
+                    "description": "The locatio of the root of the annotation cache folder. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/snpeff_cache/)."
                 },
                 "snpeff_db": {
                     "type": "string",
