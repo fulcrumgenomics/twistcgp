@@ -45,19 +45,19 @@ workflow {
     pon_cnn = params.pon_cnn ? file(params.pon_cnn) : []
     baits = tuple([id: "baits"], file(params.baits))
     targets = tuple([id: "targets"], file(params.targets))
-    ch_pop_germline_resource = Channel.of(
-        params.population_germline_vcf
-            ? tuple([id: "population_germline_resource"], file(params.population_germline_vcf))
-            : tuple([id: "population_germline_resource"], [])
+
+    ch_pop_germline_resource = Channel.value(
+        tuple([id: 'population_germline_resource'], params.population_germline_vcf ? file(params.population_germline_vcf) : [])
     )
+
     germline_resource_tbi = params.population_germline_tbi ? file(params.population_germline_tbi) : []
 
-    ch_pon_vcf = Channel.of(
-        params.pon_vcf
-            ? tuple([id: "pon_vcf"], file(params.pon_vcf))
-            : tuple([id: "pon_vcf"], [])
+    ch_pon_vcf = Channel.value(
+        tuple([id: 'pon_vcf'], params.pon_vcf ? file(params.pon_vcf) : [])
     )
+
     pon_tbi = params.pon_tbi ? file(params.pon_tbi) : []
+
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
