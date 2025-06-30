@@ -1,0 +1,15 @@
+## Test Mutect2.yml (an input to CALCULATE_TMB)
+##freq (AF): The allele frequency of the alternate allele — i.e., the proportion of reads supporting the variant.
+##depth (DP): The total read depth at the variant position — sum of all reads (reference + alternate).
+##altDepth (AD): The allelic depths for the reference and alternate alleles — useful for calculating AF manually.
+##maxVaf: A maximum variant allele frequency value — "1" typically represents 100% alternate allele presence (i.e. homozygous alt).
+##systematicNoiseScore (AQ): A score representing systematic noise — often used to flag low-confidence variants.
+##tumorDepth (tDP): The read depth in the tumor sample at the variant site — important in somatic variant calling.
+###############################################
+
+freq: "AF"
+depth: "DP"
+altDepth: "AD"
+maxVaf: "1"
+systematicNoiseScore: "AQ"
+tumorDepth: "tDP"
