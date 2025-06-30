@@ -61,6 +61,9 @@ workflow {
     snpeff_genome_info = Channel.value([[id: "${params.snpeff_genome}.${params.snpeff_db}"], "${params.snpeff_genome}.${params.snpeff_db}"])
     snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
+    variant_calling_config = params.variant_calling_config ? file(params.variant_calling_config) : []
+    variant_annotation_config = params.variant_annotation_config ? file(params.variant_annotation_config) : []
+
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
@@ -73,6 +76,8 @@ workflow {
         pon_tbi,
         snpeff_genome_info,
         snpeff_cache,
+        variant_calling_config,
+        variant_annotation_config
     )
 
     //
@@ -106,6 +111,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     pon_tbi // optional path to panel_of_normals VCF index
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
     snpeff_cache // channel: path(snpeff_cache)
+    variant_calling_config // TODO
+    variant_annotation_config //TODO
 
     main:
     // Initialize fasta file with meta map:
@@ -170,6 +177,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_pon_tbi,
         snpeff_genome_info,
         ch_snpeff_cache,
+        variant_calling_config,
+        variant_annotation_config
     )
 
     emit:
