@@ -16,6 +16,7 @@
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
 1. Variant Calling via local assembly of haplotypes ([`gatk4/mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
+1. Annotate variants (['SnpEff`](https://pcingola.github.io/SnpEff/))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
 1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
 1. Present QC ([`MultiQC`](http://multiqc.info/))
@@ -117,6 +118,10 @@ You may supply a Panel of Normal (PON) reference `.cnn` file for use with [CNVki
 For details on how to generate this file see [docs/cnvkit_pon.md](/docs/cnvkit_pon.md).
 
 If you do not supply a PON reference, a "flat" reference will be used which assumes equal coverage across the panel regions.
+
+### (Optionally) Pre-Generate a SnpEff Cache
+
+SnpEff requires many large files known as a cache with which to annotate variantsa. To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the locations to the root of the annotation cache folder. For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md). If a cache is not provided, the pipeline will automatically download it (which will add computation time).
 
 ### Run the Pipeline
 
