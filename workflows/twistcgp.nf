@@ -20,8 +20,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
-include { CALCULATE_TMB } from '../subworkflows/local/calculate_tmb/main'
-include { TMB } from '../modules/local/TMB'
+include { TMB } from '../modules/local/tmb'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,8 +46,8 @@ workflow TWISTCGP {
     ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info //channel: tuple val(meta), val(snpeff_db)
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
-    variant_annotation_config // TODO
-    variant_calling_config // TODO
+    variant_annotation_config // channel: path(variant variant annotation config)
+    variant_calling_config // channel: path(variant variant calling config)
 
     main:
     ch_versions = Channel.empty()
@@ -123,6 +122,7 @@ workflow TWISTCGP {
     //
     //
     TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, variant_annotation_config, variant_calling_config, targets[1])
+    ch_versions = ch_versions.mix(TMB.out.versions.first())
 
     //
     // CNVKIT_BATCH

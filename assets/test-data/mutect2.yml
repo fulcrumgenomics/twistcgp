@@ -1,4 +1,4 @@
-## Test Mutect2.yml (an input to CALCULATE_TMB)
+## Test Mutect2.yml (an input to TMB)
 ##freq (AF): The allele frequency of the alternate allele — i.e., the proportion of reads supporting the variant.
 ##depth (DP): The total read depth at the variant position — sum of all reads (reference + alternate).
 ##altDepth (AD): The allelic depths for the reference and alternate alleles — useful for calculating AF manually.

@@ -1,22 +1,23 @@
 process TMB {
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/tmb:1.3.0--pyh5e36f6f_0':
-        'quay.io/biocontainers/tmb:1.3.0--pyh5e36f6f_0' }"
+    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+        ? 'https://depot.galaxyproject.org/singularity/tmb:1.3.0--pyh5e36f6f_0'
+        : 'quay.io/biocontainers/tmb:1.3.0--pyh5e36f6f_0'}"
 
     input:
     tuple val(meta), path(vcf)
-    path(variant_annotation_config)
-    path(variant_caller_config)
-    path(targets)
+    path variant_annotation_config
+    path variant_caller_config
+    path targets
 
     output:
     tuple val(meta), path("*.log"), emit: log
-    path("*_export.vcf")          , emit: vcf
-    path "versions.yml"           , emit: versions
+    path ("*_export.vcf"), emit: vcf
+    // export a VCF with the considered variants
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -33,7 +34,7 @@ process TMB {
         ${target_region} \\
         ${args} \\
         --export \\
-        > ${prefix}.tmb.txt
+        > ${prefix}.tmb.log
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         tmb: \$(echo \$(pyTMB.py --version 2>&1) | sed 's/^.*pyTMB.py //; s/.*\$//' | sed 's|[()]||g')
