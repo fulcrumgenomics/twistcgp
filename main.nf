@@ -95,10 +95,10 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     targets //tuple of meta and targets regions file read in from --targets
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
-    ch_pop_germline_resource //optional val(reference meta), path(germline_resource VCF)
-    germline_resource_tbi //optional path to germline_resource index
-    ch_pon_vcf //optional val(reference meta), path(panel_of_normals VCF)
-    pon_tbi //optional path to panel_of_normals VCF index
+    ch_pop_germline_resource // optional val(reference meta), path(germline_resource VCF)
+    germline_resource_tbi // optional path to germline_resource index
+    ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
+    pon_tbi // optional path to panel_of_normals VCF index
 
     main:
     // Initialize fasta file with meta map:

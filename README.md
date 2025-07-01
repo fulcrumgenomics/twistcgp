@@ -49,7 +49,7 @@ The TwistCGP panel was designed using the hg38 Genome in a Bottle (GIAB) referen
 
 You will need a BED or Interval List file for (1) the panel baits and (2) the panel targets.
 
-BED files should follow the [UCSC BED format specifications](https://genome.ucsc.edu/FAQ/FAQformat.html#format1); interval list files should adhere to [GATK interval list conventions.](https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists)
+BED files should follow the [UCSC BED format specifications](https://genome.ucsc.edu/FAQ/FAQformat.html#format1); interval list files should adhere to [GATK interval list conventions](https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists).
 
 Targets will be padded prior to variant calling; the padding size can be adjusted using the `--target_padding` parameter (default: 100, which adds 100 bp on each side of the interval).
 
@@ -75,7 +75,7 @@ The adapter sequences can be supplied to the pipeline using the `--adapters_fast
 
 ### (Optionally) Provide a Population Germline Resource VCF
 
-This pipeline uses Mutect2 to perform somatic variant calling on local haplotypes.
+This pipeline uses [Mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2) to perform somatic variant calling on local haplotypes.
 
 While Mutect2 does not require a germline resource or a panel of normals (PoN) to run, both are recommended.
 
