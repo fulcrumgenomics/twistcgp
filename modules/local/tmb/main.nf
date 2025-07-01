@@ -9,13 +9,13 @@ process TMB {
 
     input:
     tuple val(meta), path(vcf)
+    tuple val(meta2), path(targets)
     path variant_annotation_config
     path variant_caller_config
-    path targets
 
     output:
     tuple val(meta), path("*.log"), emit: log
-    path ("*_export.vcf"), emit: vcf
+    tuple val(meta), path ("*_export.vcf"), emit: vcf
     // export a VCF with the considered variants
     path "versions.yml", emit: versions
 
