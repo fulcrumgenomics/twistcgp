@@ -21,6 +21,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twis
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
 include { CALCULATE_TMB } from '../subworkflows/local/calculate_tmb/main'
+include { TMB } from '../modules/local/TMB'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,10 +119,10 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE_SNPEFF.out.reports.collect { it[1] })
 
     //
-    // SUB-WORKFLOW: CALCULATE_TMB
+    // MODULE: TMB
     //
     //
-    CALCULATE_TMB(VCF_ANNOTATE_SNPEFF.vcf_tbi, ch_fasta, targets, variant_annotation_config, variant_calling_config)
+    TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, variant_annotation_config, variant_calling_config, targets[1])
 
     //
     // CNVKIT_BATCH
