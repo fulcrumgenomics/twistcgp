@@ -121,7 +121,13 @@ If you do not supply a PON reference, a "flat" reference will be used which assu
 
 ### (Optionally) Pre-Generate a SnpEff Cache
 
-SnpEff requires many large files known as a cache with which to annotate variantsa. To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the locations to the root of the annotation cache folder. For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md). If a cache is not provided, the pipeline will automatically download it (which will add computation time).
+SnpEff requires many large files known as a cache with which to annotate variants.
+
+To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the locations to the root of the annotation cache folder.
+
+For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md).
+
+If a cache is not provided, the pipeline will automatically download it (which will add computation time).
 
 ### Run the Pipeline
 

@@ -109,11 +109,11 @@ workflow TWISTCGP {
     //
     VCF_ANNOTATE_SNPEFF(
         GATK4_MUTECT2.out.vcf,
-        snpeff_genome_info.map { _meta, genome_info -> genome_info }.first(),
+        snpeff_genome_info.map { _meta, genome_info -> genome_info },
         ch_snpeff_cache,
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE_SNPEFF.out.versions.first())
-
+    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE_SNPEFF.out.reports.collect { it[1] })
 
     //
     // CNVKIT_BATCH
