@@ -46,8 +46,8 @@ workflow TWISTCGP {
     ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info //channel: tuple val(meta), val(snpeff_db)
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
-    variant_annotation_config // channel: path(variant variant annotation config)
-    variant_calling_config // channel: path(variant variant calling config)
+    variant_annotation_config // path(variant annotation config)
+    variant_calling_config /// path(variant calling config)
 
     main:
     ch_versions = Channel.empty()

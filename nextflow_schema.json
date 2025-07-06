@@ -117,10 +117,12 @@
                 },
                 "variant_annotation_config": {
                     "type": "string",
+                    "exists": true,
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in an annotated VCF."
                 },
                 "variant_calling_config": {
                     "type": "string",
+                    "exists": true,
                     "description": "Path to the variant calling config file that defines how pyTMB should interpret the VCF structure."
                 }
             }
