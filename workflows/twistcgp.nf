@@ -106,7 +106,6 @@ workflow TWISTCGP {
     //
     // SUB-WORKFLOW: VCF_ANNOTATE_SNPEFF
     //
-    //
     VCF_ANNOTATE_SNPEFF(
         GATK4_MUTECT2.out.vcf,
         snpeff_genome_info.map { _meta, genome_info -> genome_info },
