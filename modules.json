@@ -25,7 +25,7 @@
                     "ensemblvep/vep": {
                         "branch": "master",
                         "git_sha": "7452092e1a296442f2989bff9801797f28c28aaf",
-                        "installed_by": ["vcf_annotate_ensemblvep"]
+                        "installed_by": ["modules", "vcf_annotate_ensemblvep"]
                     },
                     "fastp": {
                         "branch": "master",
