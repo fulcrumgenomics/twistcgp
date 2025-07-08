@@ -15,7 +15,7 @@
                 "outdir",
                 "baits",
                 "targets",
-                "snpeff_genome",
+                "annotation_genome_version",
                 "snpeff_db",
                 "tmb_mutect2_config",
                 "tmb_snpeff_config"
@@ -103,6 +103,10 @@
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
                 },
+                "annotation_genome_version": {
+                    "type": "string",
+                    "description": "The version of the genome that SnpEff and VEP will use for variant annotation. Defaults to GRCh38."
+                },
                 "snpeff_cache": {
                     "type": "string",
                     "description": "The location of the root of the annotation cache folder. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/snpeff_cache/)."
@@ -111,9 +115,23 @@
                     "type": "string",
                     "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 105."
                 },
-                "snpeff_genome": {
+                "ensemblvep_species": {
                     "type": "string",
-                    "description": "The version of the genome that SnpEff will use for variant annotation. Defaults to GRCh38."
+                    "description": "The species for which to pull annotation information. Defaults to `homo sapiens`.",
+                    "help_text": "Alternatively, species listed in Ensembl Genomes caches can be used for non-human genome annotaiton."
+                },
+                "ensemblvep_cache": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-cloud-download-alt",
+                    "description": "Path to VEP cache which should contain the relevant species, genome and build directories. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/vep_cache/).",
+                    "help_text": "The VEP cache stores information about regulatory regions, attributes about different variants and transcripts, as well as predictions and scores for SIFT and PolyPhen-2."
+                },
+                "ensemblvep_cache_version": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tag",
+                    "description": "The version of the VEP cache to use for annotation. Defaults to version 114.",
+                    "help_text": "More information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_cache.html."
                 },
                 "tmb_mutect2_config": {
                     "type": "string",
