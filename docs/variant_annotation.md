@@ -10,13 +10,13 @@ snpEff download GRCh38.105 -v
 
 3. Pass the cache to the pipeline:
 
-```bash
+```console
 nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \
    --input samplesheet.csv \
    --baits baits.bed \
    --targets targets.bed \
-   --snpeff_cache $CONDA_PREFIX/share/snpeff-5.2-1/data/GRCh38.105  \
+   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
    --outdir <OUTDIR>
 ```

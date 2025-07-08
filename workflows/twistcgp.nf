@@ -134,6 +134,7 @@ workflow TWISTCGP {
         false, // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
+
     //
     // MODULE: PICARD_COLLECTMULTIPLEMETRICS
     //
