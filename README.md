@@ -123,7 +123,7 @@ If you do not supply a PON reference, a "flat" reference will be used which assu
 
 SnpEff requires many large files known as a cache with which to annotate variants.
 
-To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the locations to the root of the annotation cache folder.
+To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the path to the root of the annotation cache folder.
 
 For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md).
 
