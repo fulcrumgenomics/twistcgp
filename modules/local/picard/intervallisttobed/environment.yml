@@ -3,5 +3,6 @@
 channels:
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - bioconda::picard=3.3.0
