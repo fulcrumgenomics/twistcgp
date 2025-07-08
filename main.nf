@@ -58,11 +58,27 @@ workflow {
     )
 
     pon_tbi = params.pon_tbi ? file(params.pon_tbi) : []
-    snpeff_genome_info = Channel.value([[id: "${params.snpeff_genome}.${params.snpeff_db}"], "${params.snpeff_genome}.${params.snpeff_db}"])
+
+    // VCF Annotation Parameters (SnpEff + VEP)
+    snpeff_genome_info = Channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
     snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
     tmb_mutect2_config = file(params.tmb_mutect2_config)
     tmb_snpeff_config = file(params.tmb_snpeff_config)
+
+    // ensemblvep_info = Channel.of([ [ id:"${params.ensemblvep_cache_version}_${params.annotation_genome_version}" ], params.annotation_genome_version, params.ensemblvep_species, params.ensemblvep_cache_version ])
+    ensemblvep_info = Channel.of(
+        tuple(
+            [id: "${params.ensemblvep_cache_version}_${params.annotation_genome_version}"],
+            params.annotation_genome_version,
+            params.ensemblvep_species,
+            params.ensemblvep_cache_version,
+        )
+    )
+    ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
+
+    vep_extra_files = []
+    //TODO
 
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
@@ -75,9 +91,12 @@ workflow {
         ch_pon_vcf,
         pon_tbi,
         snpeff_genome_info,
+        ensemblvep_info,
         snpeff_cache,
         tmb_mutect2_config,
         tmb_snpeff_config,
+        ensemblvep_cache,
+        vep_extra_files,
     )
 
     //
@@ -110,9 +129,12 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
     pon_tbi // optional path to panel_of_normals VCF index
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
+    ensemblvep_info // TODO
     snpeff_cache // channel: path(snpeff_cache)
     tmb_mutect2_config // required path to variant calling config file
     tmb_snpeff_config // required path to variant annotation config file
+    ensemblvep_cache // TODO
+    vep_extra_files // TODO
 
     main:
     // Initialize fasta file with meta map:
@@ -123,7 +145,10 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
-    PREPARE_ANNOTATION_DB(snpeff_genome_info)
+    PREPARE_ANNOTATION_DB(
+        ensemblvep_info,
+        snpeff_genome_info,
+    )
 
     // Gather built indices or get them from the params
     // Built from the fasta file:
@@ -142,6 +167,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_snpeff_cache = params.snpeff_cache
         ? Channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.snpeff_cache
+    ch_vep_cache = params.ensemblvep_cache
+        ? Channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
+        : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
     ch_msi_scan = params.msisensor_scan
         ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
         : PREPARE_GENOME.out.msi_scan
@@ -179,9 +207,12 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_pon_vcf,
         ch_pon_tbi,
         snpeff_genome_info,
+        ensemblvep_info,
         ch_snpeff_cache,
         tmb_mutect2_config,
         tmb_snpeff_config,
+        ch_vep_cache,
+        vep_extra_files,
         ch_msi_scan,
     )
 
