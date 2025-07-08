@@ -17,8 +17,8 @@
                 "targets",
                 "snpeff_genome",
                 "snpeff_db",
-                "variant_annotation_config",
-                "variant_calling_config"
+                "tmb_mutect2_config",
+                "tmb_snpeff_config"
             ],
             "properties": {
                 "input": {
@@ -115,15 +115,15 @@
                     "type": "string",
                     "description": "The version of the genome that SnpEff will use for variant annotation. Defaults to GRCh38."
                 },
-                "variant_annotation_config": {
+                "tmb_mutect2_config": {
                     "type": "string",
                     "exists": true,
-                    "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in an annotated VCF."
+                    "description": "Path to the variant calling config file that defines how pyTMB should interpret the VCF structure as emitted by GATK_MUTECT2."
                 },
-                "variant_calling_config": {
+                "tmb_snpeff_config": {
                     "type": "string",
                     "exists": true,
-                    "description": "Path to the variant calling config file that defines how pyTMB should interpret the VCF structure."
+                    "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by SnpEff."
                 }
             }
         },

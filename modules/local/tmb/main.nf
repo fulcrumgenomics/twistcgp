@@ -10,8 +10,8 @@ process TMB {
     input:
     tuple val(meta), path(vcf)
     tuple val(meta2), path(targets)
-    path variant_annotation_config
-    path variant_caller_config
+    path tmb_snpeff_config
+    path tmb_mutect2_config
 
     output:
     tuple val(meta), path("*.log"), emit: log
@@ -29,12 +29,25 @@ process TMB {
     def target_region = args.contains("--effGenomeSize") ? '' : targets_bed
     """
     pyTMB.py -i ${vcf} \\
-        --dbConfig ${variant_annotation_config} \\
-        --varConfig ${variant_caller_config} \\
+        --dbConfig ${tmb_snpeff_config} \\
+        --varConfig ${tmb_mutect2_config} \\
         ${target_region} \\
         ${args} \\
         --export \\
         > ${prefix}.tmb.log
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        tmb: \$(echo \$(pyTMB.py --version 2>&1) | sed 's/^.*pyTMB.py //; s/.*\$//' | sed 's|[()]||g')
+    END_VERSIONS
+    """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    touch ${prefix}.tmb.log
+    touch ${prefix}_export.vcf
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         tmb: \$(echo \$(pyTMB.py --version 2>&1) | sed 's/^.*pyTMB.py //; s/.*\$//' | sed 's|[()]||g')
