@@ -24,7 +24,7 @@ process SAMTOOLS_DICT {
         dict \\
         $args \\
         $fasta \\
-        > ${fasta}.dict
+        > ${fasta.baseName}.dict
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -3,9 +3,11 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { ALIGNBAM } from '../modules/local/alignbam'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
@@ -16,9 +18,7 @@ include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipe
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-
-include { ALIGNBAM } from '../modules/local/alignbam'
-include {PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
+include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,6 +38,10 @@ workflow TWISTCGP {
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
+    ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
+    ch_pop_germ_tbi //channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pon_vcf //channel [optional]: val(reference_meta), path(panel_of_normals VCF)
+    ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
 
     main:
     ch_versions = Channel.empty()
@@ -78,6 +82,25 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
     //
+    // MODULE: GATK4/MUTECT2
+    //
+    // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
+    ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
+        .join(PICARD_MARKDUPLICATES.out.bai)
+        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    GATK4_MUTECT2(
+        ch_bams_and_targets,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+        ch_pop_germline_resource.map { _meta, vcf -> vcf },
+        ch_pop_germ_tbi.map { _meta, tbi -> tbi },
+        ch_pon_vcf.map { _meta, vcf -> vcf },
+        ch_pon_tbi.map { _meta, tbi -> tbi },
+    )
+    ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
+
+    //
     // CNVKIT_BATCH
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
@@ -94,7 +117,7 @@ workflow TWISTCGP {
         ch_fasta_fai,
         ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
         tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
-        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
+        false, // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 

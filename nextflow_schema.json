@@ -53,6 +53,36 @@
                     "mimetype": "bed",
                     "description": "Path to BED or Interval List file containing location of targets."
                 },
+                "target_padding": {
+                    "type": "integer",
+                    "description": "The number of bp by which to pad each target interval on either side (default = 100) for variant calling by GATK4/MUTECT2. Target-padding cannot be negative and will not exceed the bounds of the contig.",
+                    "minimum": 0,
+                    "default": 100
+                },
+                "population_germline_vcf": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.vcf\\.gz$",
+                    "description": "Optional path to the compressed germline resource VCF file. Should contain allele frequencies.",
+                    "default": null
+                },
+                "population_germline_tbi": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.vcf\\.gz.tbi$",
+                    "description": "Optional path to the index file for the germline resource VCF.",
+                    "default": null
+                },
+                "pon_vcf": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.vcf\\.gz$",
+                    "description": "Optional path to the compressed panel of normals VCF file.",
+                    "default": null
+                },
+                "pon_tbi": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.vcf\\.gz.tbi$",
+                    "description": "Optional path to the index file for the panel of normals VCF.",
+                    "default": null
+                },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
