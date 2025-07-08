@@ -18,6 +18,7 @@ include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_twis
 include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
 include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
+include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_db'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,6 +58,8 @@ workflow {
     )
 
     pon_tbi = params.pon_tbi ? file(params.pon_tbi) : []
+    snpeff_genome_info = Channel.value([[id: "${params.snpeff_genome}.${params.snpeff_db}"], "${params.snpeff_genome}.${params.snpeff_db}"])
+    snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
@@ -68,6 +71,8 @@ workflow {
         germline_resource_tbi,
         ch_pon_vcf,
         pon_tbi,
+        snpeff_genome_info,
+        snpeff_cache,
     )
 
     //
@@ -99,6 +104,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     germline_resource_tbi // optional path to germline_resource index
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
     pon_tbi // optional path to panel_of_normals VCF index
+    snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
+    snpeff_cache // channel: path(snpeff_cache)
 
     main:
     // Initialize fasta file with meta map:
@@ -110,13 +117,13 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     PREPARE_GENOME(fasta)
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
+    PREPARE_ANNOTATION_DB(snpeff_genome_info)
 
     // Gather built indices or get them from the params
     // Built from the fasta file:
     dict = params.dict
         ? Channel.fromPath(params.dict).map { it -> [[id: 'dict'], it] }.collect()
         : PREPARE_GENOME.out.dict
-
     fasta_fai = params.fasta_fai
         ? Channel.fromPath(params.fasta_fai).map { it -> [[id: 'fai'], it] }.collect()
         : PREPARE_GENOME.out.fasta_fai
@@ -126,6 +133,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     bwa = params.bwa
         ? Channel.fromPath(params.bwa).map { it -> [[id: 'bwa'], it] }.collect()
         : PREPARE_GENOME.out.bwa
+    ch_snpeff_cache = params.snpeff_cache
+        ? Channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
+        : PREPARE_ANNOTATION_DB.out.snpeff_cache
 
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
@@ -140,7 +150,6 @@ workflow FULCRUMGENOMICS_TWISTCGP {
             ? Channel.fromPath(params.pon_tbi).collect()
             : PREPARE_INDICES.out.ch_pon_tbi)
         : Channel.value([[id: "pon_tbi"], []])
-
 
     // WORKFLOW: Run pipeline
     //
@@ -159,6 +168,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_pop_germ_tbi,
         ch_pon_vcf,
         ch_pon_tbi,
+        snpeff_genome_info,
+        ch_snpeff_cache,
     )
 
     emit:

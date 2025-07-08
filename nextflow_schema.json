@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir", "baits", "targets"],
+            "required": ["input", "outdir", "baits", "targets", "snpeff_genome", "snpeff_db"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -93,6 +93,18 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "snpeff_cache": {
+                    "type": "string",
+                    "description": "The location of the root of the annotation cache folder. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/snpeff_cache/)."
+                },
+                "snpeff_db": {
+                    "type": "string",
+                    "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 105."
+                },
+                "snpeff_genome": {
+                    "type": "string",
+                    "description": "The version of the genome that SnpEff will use for variant annotation. Defaults to GRCh38."
                 }
             }
         },
