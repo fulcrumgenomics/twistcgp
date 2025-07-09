@@ -20,7 +20,6 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE } from '../subworkflows/local/annotate_vcf/main'
-include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
 include { TMB } from '../modules/local/tmb'
 
 /*
@@ -48,10 +47,10 @@ workflow TWISTCGP {
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     ch_snpeff_cache // channel [optional]: path(snpeff_cache)
-    ch_vep_cache // channel [optional]: path(vep_cache)
-    vep_extra_files //TODO
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_snpeff_config /// path(tmb_snpeff_config)
+    ch_vep_cache // channel [optional]: path(vep_cache)
+    vep_extra_files // channel [optional]: [path(cosmic_vcf)]
 
     main:
     ch_versions = Channel.empty()
@@ -123,8 +122,8 @@ workflow TWISTCGP {
         ch_vep_cache,
         vep_extra_files,
     )
-    ch_versions = ch_versions.mix(VCF_ANNOTATE_SNPEFF.out.versions.first())
-    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE_SNPEFF.out.reports.collect { it[1] })
+    ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
+    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports.collect { it[1] })
 
     //
     // MODULE: TMB

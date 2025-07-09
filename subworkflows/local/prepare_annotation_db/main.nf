@@ -28,7 +28,7 @@ workflow PREPARE_ANNOTATION_DB {
     versions = versions.mix(SNPEFF_DOWNLOAD.out.versions)
 
     emit:
-    ensemblvep_cache = ENSEMBLVEP_DOWNLOAD.out.cache.collect()  // channel: [ meta, cache ]
-    snpeff_cache     = SNPEFF_DOWNLOAD.out.cache.collect()      // channel: [ meta, cache ]
+    ensemblvep_cache = ENSEMBLVEP_DOWNLOAD.out.cache.collect() // channel: [ meta, cache ]
+    snpeff_cache = SNPEFF_DOWNLOAD.out.cache.collect() // channel: [ meta, cache ]
     versions // channel: [ versions.yml ]
 }

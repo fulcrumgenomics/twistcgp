@@ -66,7 +66,6 @@ workflow {
     tmb_mutect2_config = file(params.tmb_mutect2_config)
     tmb_snpeff_config = file(params.tmb_snpeff_config)
 
-    // ensemblvep_info = Channel.of([ [ id:"${params.ensemblvep_cache_version}_${params.annotation_genome_version}" ], params.annotation_genome_version, params.ensemblvep_species, params.ensemblvep_cache_version ])
     ensemblvep_info = Channel.of(
         tuple(
             [id: "${params.ensemblvep_cache_version}_${params.annotation_genome_version}"],
@@ -76,9 +75,11 @@ workflow {
         )
     )
     ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
-
     vep_extra_files = []
-    //TODO
+    // this will be populated based on whether users provide a VCF from COSMIC
+    if (params.cosmic_vcf && file("${params.cosmic_vcf}.tbi").exists()) {
+        vep_extra_files.add(file(params.cosmic_vcf, checkIfExists: true))
+    }
 
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
@@ -129,12 +130,12 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
     pon_tbi // optional path to panel_of_normals VCF index
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
-    ensemblvep_info // TODO
+    ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     snpeff_cache // channel: path(snpeff_cache)
     tmb_mutect2_config // required path to variant calling config file
     tmb_snpeff_config // required path to variant annotation config file
-    ensemblvep_cache // TODO
-    vep_extra_files // TODO
+    ensemblvep_cache // channel: path(ensemblvep_cache)
+    vep_extra_files // list[path(cosmic_vcf)]
 
     main:
     // Initialize fasta file with meta map:
