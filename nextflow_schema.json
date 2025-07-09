@@ -133,6 +133,14 @@
                     "description": "The version of the VEP cache to use for annotation. Defaults to version 114.",
                     "help_text": "More information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_cache.html."
                 },
+                "cosmic_vcf": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.vcf\\.gz$",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Path to a VCF file that has been emitted from COSMIC, compressed, and indexed.",
+                    "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html"
+                },
                 "tmb_mutect2_config": {
                     "type": "string",
                     "exists": true,
