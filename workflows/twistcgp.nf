@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { CIVICPY } from '../modules/local/civicpy/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
@@ -131,6 +132,11 @@ workflow TWISTCGP {
     //
     TMB(VCF_ANNOTATE.out.vcf_ann, tmb_snpeff_config, tmb_mutect2_config, targets[1])
     ch_versions = ch_versions.mix(TMB.out.versions.first())
+
+    //
+    // MODULE: CIVICPY
+    //
+    CIVICPY(VCF_ANNOTATE.out.vcf_ann, snpeff_genome_info.map { _meta, genome_info -> genome_info })
 
     //
     // CNVKIT_BATCH
