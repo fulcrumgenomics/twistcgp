@@ -20,6 +20,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
+include { TMB } from '../modules/local/tmb'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,6 +46,8 @@ workflow TWISTCGP {
     ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info //channel: tuple val(meta), val(snpeff_db)
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
+    tmb_mutect2_config // path(tmb_mutect2_config)
+    tmb_snpeff_config /// path(tmb_snpeff_config)
 
     main:
     ch_versions = Channel.empty()
@@ -115,6 +118,13 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE_SNPEFF.out.reports.collect { it[1] })
 
     //
+    // MODULE: TMB
+    //
+    //
+    TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, tmb_snpeff_config, tmb_mutect2_config, targets[1])
+    ch_versions = ch_versions.mix(TMB.out.versions.first())
+
+    //
     // CNVKIT_BATCH
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
@@ -129,9 +139,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
-        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
-        false, // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
+        ch_baits_bed,
+        tuple([], pon_cnn),
+        false,
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
