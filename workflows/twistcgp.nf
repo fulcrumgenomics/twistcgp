@@ -153,9 +153,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed,
-        tuple([], pon_cnn),
-        false,
+        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
+        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 

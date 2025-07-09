@@ -170,6 +170,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_vep_cache = params.ensemblvep_cache
         ? Channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
+
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
 
