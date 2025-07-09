@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "civicpy"
+
+description: A python client and analysis toolkit for the Clinical Interpretations of Variants in Cancer (CIViC) knowledgebase
+keywords:
+  - clinical interpretation
+  - variant annotation
+  - genetic variation analysis
+  - genomics
+tools:
+  - "civicpy":
+      description: "CIViC variant knowledgebase analysis toolkit."
+      homepage: "https://docs.civicpy.org/en/latest/"
+      documentation: "https://docs.civicpy.org/en/latest/"
+      tool_dev_url: "https://github.com/griffithlab/civicpy"
+      doi: "10.1200/CCI.19.00127"
+      licence: ["MIT"]
+      identifier: biotools:CIViCpy
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1', single_end:false ]`
+
+    - vcf:
+        type: file
+        description: Sorted and indexed VCF file
+        pattern: "*.{vcf}"
+        ontologies:
+          - edam: "http://edamontology.org/format_3016"
+
+output:
+  vcf:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.vcf":
+          type: file
+          description: Annotated VCF file
+          pattern: "*.vcf"
+          ontologies:
+            - edam: "http://edamontology.org/format_3016"
+
+versions:
+  versions_yml:
+    type: file
+    description: File containing software versions
+    pattern: "versions.yml"
+
+authors:
+  - "@emmcauley"
+maintainers:
+  - "@emmcauley"
