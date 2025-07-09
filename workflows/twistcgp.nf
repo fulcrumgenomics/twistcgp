@@ -129,7 +129,7 @@ workflow TWISTCGP {
     // MODULE: TMB
     //
     //
-    TMB(VCF_ANNOTATE.out.vcf_ann, targets, tmb_snpeff_config, tmb_mutect2_config)
+    TMB(VCF_ANNOTATE.out.vcf_ann, tmb_snpeff_config, tmb_mutect2_config, targets[1])
     ch_versions = ch_versions.mix(TMB.out.versions.first())
 
     //
