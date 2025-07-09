@@ -4,7 +4,7 @@ Variant annotation caches are downloadable files that store information about tr
 
 The cache is downloaded once and then reused for multiple analyses.
 
-While this pipeline will download both the Ensembl VEP and SnpEff annotation caches if either are missing, we recommend pre-downloading these files for performance.
+While this pipeline will automatically download the Ensembl VEP, SnpEff, and CIViCpy annotation caches if any are missing, we recommend pre-downloading these files for performance.
 
 ## Ensembl Variant Effect Predictor (VEP) cache
 
@@ -59,5 +59,32 @@ nextflow run twistcgp/main.nf \
    --targets targets.bed \
    --ensemblvep_cache ~/vep/ \
    --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
+   --outdir <OUTDIR>
+```
+
+## CIViC cache
+
+1. Install CIViCpy which is available directly from [github.com/civicpy](https://github.com/griffithlab/civicpy) or install with pip from [PyPi](https://pypi.org/project/civicpy/).
+
+2. Download the cache with CIViCpy:
+
+```console
+civicpy update
+```
+
+This will download the CIViCpy cache to a default location, $HOME/.civicpy/cache.pkl.
+
+3. Pass the cache to the pipeline:
+
+```console
+nextflow run twistcgp/main.nf \
+   -profile <docker/singularity/conda> \
+   --fasta hg38.fa \
+   --input samplesheet.csv \
+   --baits baits.bed \
+   --targets targets.bed \
+   --ensemblvep_cache ~/vep/ \
+   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
+   --civic_cache "${HOME}/.civicpy/cache.pkl" \
    --outdir <OUTDIR>
 ```
