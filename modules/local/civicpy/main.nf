@@ -10,7 +10,6 @@ process CIVICPY {
     input:
     tuple val(meta), path(vcf), path(tbi)
     val annotation_genome_version
-    path civic_cache
 
     output:
     tuple val(meta), path("*.vcf"), emit: vcf
