@@ -8,7 +8,7 @@ process TMB {
         : 'quay.io/biocontainers/tmb:1.3.0--pyh5e36f6f_0'}"
 
     input:
-    tuple val(meta), path(vcf)
+    tuple val(meta), path(vcf), path(vcf_tbi)
     tuple val(meta2), path(targets)
     path tmb_snpeff_config
     path tmb_mutect2_config

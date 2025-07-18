@@ -98,6 +98,7 @@ workflow TWISTCGP {
         ch_bams_and_targets,
         ch_fasta,
         ch_fasta_fai,
+        ch_fasta_gzi,
         ch_dict,
         ch_pop_germline_resource.map { _meta, vcf -> vcf },
         ch_pop_germ_tbi.map { _meta, tbi -> tbi },
@@ -121,7 +122,7 @@ workflow TWISTCGP {
     // MODULE: TMB
     //
     //
-    TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, tmb_snpeff_config, tmb_mutect2_config, targets[1])
+    TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, targets, tmb_snpeff_config, tmb_mutect2_config)
     ch_versions = ch_versions.mix(TMB.out.versions.first())
 
     //

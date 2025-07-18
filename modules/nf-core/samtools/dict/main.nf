@@ -24,7 +24,7 @@ process SAMTOOLS_DICT {
         dict \\
         $args \\
         $fasta \\
-        > ${fasta.baseName}.dict
+        > ${fasta.name.replaceFirst(/\.f(ast)?a(\.gz)?$/, '.dict')}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
