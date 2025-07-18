@@ -24,7 +24,6 @@ include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
 include { TMB } from '../modules/local/tmb'
 
-include { ALIGNBAM } from '../modules/local/alignbam'
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
 include { PICARD_INTERVALLISTTOBED as TARGETS_TO_BED } from '../modules/local/picard/intervallisttobed'
 
@@ -55,7 +54,6 @@ workflow TWISTCGP {
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_snpeff_config /// path(tmb_snpeff_config)
-    ch_msi_scan // channel: val(reference meta), path(reference .msisensor_scan.list)
 
     main:
     ch_versions = Channel.empty()
@@ -164,7 +162,7 @@ workflow TWISTCGP {
     if (msi_pro) {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
-            ch_msi_scan,
+            [],
             ch_fasta,
             ch_fasta_fai
         )
@@ -180,7 +178,7 @@ workflow TWISTCGP {
         // TODO: can/should we include model input? Models available from github built from different fasta files
         MSISENSOR2_MSI(
             ch_bam_and_target_bed,
-            ch_msi_scan.collect().map {it -> it[1]},
+            [],
             []
         )
     }
