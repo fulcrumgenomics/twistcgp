@@ -8,40 +8,30 @@
                     "bwamem2/index": {
                         "branch": "master",
                         "git_sha": "a29f18660f5e3748d44d6f716241e70c942c065d",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
                     },
                     "cnvkit/batch": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/cnvkit/batch/cnvkit-batch.diff"
                     },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "d082103d7976a2804f21225446cc110cbd822f4c",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/fastp/fastp.diff"
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "08108058ea36a63f141c25c4e75f9f872a5b2296",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "fgbio/fastqtobam": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "gatk4/mutect2": {
                         "branch": "master",
@@ -52,52 +42,38 @@
                     "msisensor2/msi": {
                         "branch": "master",
                         "git_sha": "1c4ba174446aa5777727611d0e63dae2fd91be3c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "msisensorpro/pro": {
                         "branch": "master",
                         "git_sha": "fafa7b3a577412b6bde309170408da4cb911f04b",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "f0719ae309075ae4a291533883847c3f7c441dad",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "perbase": {
                         "branch": "master",
                         "git_sha": "be5b19747298e30ca21270ce40abb3bb16b11475",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "picard/collecthsmetrics": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": [
-                            "modules"
-                        ],
+                        "installed_by": ["modules"],
                         "patch": "modules/nf-core/picard/collecthsmetrics/picard-collecthsmetrics.diff"
                     },
                     "picard/collectmultiplemetrics": {
                         "branch": "master",
                         "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "picard/markduplicates": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "samtools/dict": {
                         "branch": "master",
@@ -137,16 +113,12 @@
                     "utils_nextflow_pipeline": {
                         "branch": "master",
                         "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
                         "git_sha": "51ae5406a030d4da1e49e4dab49756844fdd6c7a",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "utils_nfschema_plugin": {
                         "branch": "master",
