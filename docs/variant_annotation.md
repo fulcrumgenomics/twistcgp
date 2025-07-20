@@ -68,8 +68,10 @@ This pipeline uses CIViCpy, a Python tool for the CIViC knowledgebase.
 
 The [CIViC knowledgebase](https://civicdb.org/welcome) (Clinical Interpretation of Variants in Cancer) is an open-source database that provides curated information about the clinical relevance of genomic variants in cancer. This pipeline will use the CIViC knowledgebase to annotate variants with an "accepted" status, which means the variants were reviewed by users with “Editor” or “Admin” level privileges.
 
-CIViCpy stores its annotation cache in a `pickle` file. Pickle files are generally [considered insecure](https://docs.python.org/3/library/pickle.html) because arbitrary code can be executed during deserialization.
+CIViCpy stores its annotation cache in a `pickle` file.
+
+While pickle files are generally [considered insecure](https://docs.python.org/3/library/pickle.html) because arbitrary code can be executed during deserialization, this file is pulled directly from a trusted source.
 
 If you load a pickle file from an untrusted source, a malicious actor could potentially embed code that would execute on your system when the file is unpacked for use.
 
-If pickle files are not compliant with your organization's security policies, you can skip this module with the `--skip-civicpy` argument.
+If pickle files are not compliant with your organization's security policies, you can skip this module with the `--skip-civicpy` parameter.
