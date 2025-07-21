@@ -133,7 +133,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     tmb_mutect2_config // required path to variant calling config file
     tmb_snpeff_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
-    vep_extra_files // list[path(cosmic_vcf)]
+    ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
 
     main:
     // Initialize fasta file with meta map:
@@ -206,7 +206,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     // WORKFLOW: Run pipeline
     //
-    TWISTCGP(
+TWISTCGP(
         ch_samplesheet,
         baits,
         targets,
