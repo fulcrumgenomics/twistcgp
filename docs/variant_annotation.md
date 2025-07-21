@@ -4,7 +4,11 @@ Variant annotation caches are downloadable files that store information about tr
 
 The cache is downloaded once and then reused for multiple analyses.
 
-While this pipeline will automatically download the Ensembl VEP, SnpEff, and CIViCpy annotation caches if any are missing. We recommend pre-downloading the VEP and SnpEff cache files for performance. The CIViCpy annotation cache is small and is downloaded on each pipeline run. If the cache is older than 7 days, the tool will refresh it automatically.
+This pipeline will automatically download the Ensembl VEP, SnpEff, and CIViCpy annotation caches if any are missing.
+
+We recommend pre-downloading the VEP and SnpEff cache files for performance.
+
+The CIViCpy annotation cache is small and is downloaded on each pipeline run. If the cache is older than 7 days, the tool will refresh it automatically.
 
 ## Ensembl Variant Effect Predictor (VEP) cache
 
