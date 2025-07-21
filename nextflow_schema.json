@@ -105,7 +105,8 @@
                 },
                 "annotation_genome_version": {
                     "type": "string",
-                    "description": "The version of the genome that SnpEff and VEP will use for variant annotation. Defaults to GRCh38."
+                    "description": "The version of the genome that SnpEff and VEP will use for variant annotation. Defaults to GRCh38.",
+                    "hidden": true
                 },
                 "snpeff_cache": {
                     "type": "string",
