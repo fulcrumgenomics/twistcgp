@@ -3,6 +3,7 @@
 channels:
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - bioconda::bwa-mem2=2.2.1
   - bioconda::fgbio=2.5.21
