@@ -75,12 +75,10 @@ workflow {
         )
     )
     ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
-    vep_extra_files = []
-    // this will be populated based on whether users provide a VCF from COSMIC
-    if (params.cosmic_vcf && file("${params.cosmic_vcf}.tbi").exists()) {
-        vep_extra_files.add(file(params.cosmic_vcf, checkIfExists: true))
-    }
 
+    ch_cosmic_vcf = Channel.value(
+        tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
+    )
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
@@ -97,7 +95,7 @@ workflow {
         tmb_mutect2_config,
         tmb_snpeff_config,
         ensemblvep_cache,
-        vep_extra_files,
+        ch_cosmic_vcf,
     )
 
     //
@@ -135,7 +133,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     tmb_mutect2_config // required path to variant calling config file
     tmb_snpeff_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
-    vep_extra_files // list[path(cosmic_vcf)]
+    ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
 
     main:
     // Initialize fasta file with meta map:
@@ -146,7 +144,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
 
     PREPARE_GENOME(fasta)
-    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
+    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf)
     PREPARE_ANNOTATION_DB(
         ensemblvep_info,
         snpeff_genome_info,
@@ -172,7 +170,6 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_vep_cache = params.ensemblvep_cache
         ? Channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
-
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
 
@@ -186,6 +183,25 @@ workflow FULCRUMGENOMICS_TWISTCGP {
             ? Channel.fromPath(params.pon_tbi).collect()
             : PREPARE_INDICES.out.ch_pon_tbi)
         : Channel.value([[id: "pon_tbi"], []])
+
+    // VEP extra files
+    vep_extra_files = []
+
+    if (params.cosmic_vcf) {
+        def cosmic_vcf_path = file(params.cosmic_vcf, checkIfExists: true)
+        vep_extra_files.add(cosmic_vcf_path)
+        def tbi_path = "${params.cosmic_vcf}.tbi"
+        def tbi_exists = new File(tbi_path).exists()
+        if (tbi_exists) {
+            ch_cosmic_tbi = file(tbi_path)
+            vep_extra_files.add(file(tbi_path, checkIfExists: true))
+        }
+        else {
+            // Get the TBI file path from PREPARE_INDICES emitted channel
+            ch_cosmic_tbi = PREPARE_INDICES.out.ch_cosmic_tbi.map { meta, f -> f }
+            vep_extra_files.add(ch_cosmic_tbi)
+        }
+    }
 
     // WORKFLOW: Run pipeline
     //
