@@ -60,6 +60,15 @@ input:
         description: |
           Groovy Map containing reference information
           e.g. [ id:'genome' ]
+    - gzi:
+        type: file
+        description: Index of gzipped FASTA file. Only needed when a gzipped fasta is supplied.
+        pattern: "*.gzi"
+  - - meta5:
+        type: map
+        description: |
+          Groovy Map containing reference information
+          e.g. [ id:'genome' ]
     - dict:
         type: file
         description: GATK sequence dictionary

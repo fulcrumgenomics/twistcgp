@@ -9,7 +9,7 @@ Changes in 'samtools/dict/main.nf':
          $args \\
          $fasta \\
 -        > ${fasta}.dict
-+        > ${fasta.baseName}.dict
++        > ${fasta.name.replaceFirst(/\.f(ast)?a(\.gz)?$/, '.dict')}
  
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
