@@ -34,8 +34,7 @@ nextflow run twistcgp/main.nf \
    --input samplesheet.csv \
    --baits baits.bed \
    --targets targets.bed \
-   --snpeff_cache $CONDA_PREFIX/share/snpeff-5.2-1/data/GRCh38.105  \
-   --ensemblvep_cache ~/vep/
+   --ensemblvep_cache ~/vep/ \
    --outdir <OUTDIR>
 ```
 
@@ -58,6 +57,7 @@ nextflow run twistcgp/main.nf \
    --input samplesheet.csv \
    --baits baits.bed \
    --targets targets.bed \
+   --ensemblvep_cache ~/vep/ \
    --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
    --outdir <OUTDIR>
 ```
