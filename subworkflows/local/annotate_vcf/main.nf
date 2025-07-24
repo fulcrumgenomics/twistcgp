@@ -8,12 +8,12 @@ include { VCF_ANNOTATE_SNPEFF } from '../../nf-core/vcf_annotate_snpeff/main'
 workflow VCF_ANNOTATE {
     take:
     vcf // channel: [ val(meta), vcf ]
-    fasta
-    annotation_genome_version
-    ensemblvep_info
-    snpeff_cache
-    vep_cache
-    vep_extra_files
+    fasta // channel: [ val(meta), path(fasta) ] (optional)
+    annotation_genome_version // value: genome to use
+    ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
+    snpeff_cache //   value: SnpEff cache version to use
+    vep_cache // channel: [ path(cache) ] (optional)
+    vep_extra_files // channel: [ path(file1), path(file2)... ] (optional)
 
     main:
     versions = Channel.empty()
