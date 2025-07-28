@@ -142,6 +142,11 @@
                     "description": "Path to a VCF file that has been emitted from COSMIC, compressed, and indexed.",
                     "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html"
                 },
+                "skip_civicpy": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip the CIVICpy annotation step."
+                },
                 "tmb_mutect2_config": {
                     "type": "string",
                     "exists": true,

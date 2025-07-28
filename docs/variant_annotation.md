@@ -4,7 +4,11 @@ Variant annotation caches are downloadable files that store information about tr
 
 The cache is downloaded once and then reused for multiple analyses.
 
-While this pipeline will download both the Ensembl VEP and SnpEff annotation caches if either are missing, we recommend pre-downloading these files for performance.
+This pipeline will automatically download the Ensembl VEP, SnpEff, and CIViCpy annotation caches if any are missing.
+
+We recommend pre-downloading the VEP and SnpEff cache files for performance.
+
+The CIViCpy annotation cache is small and is downloaded on each pipeline run. If the cache is older than 7 days, the tool will refresh it automatically.
 
 ## Ensembl Variant Effect Predictor (VEP) cache
 
@@ -61,3 +65,17 @@ nextflow run twistcgp/main.nf \
    --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
    --outdir <OUTDIR>
 ```
+
+## CIViC cache
+
+This pipeline uses CIViCpy, a Python tool for the CIViC knowledgebase.
+
+The [CIViC knowledgebase](https://civicdb.org/welcome) (Clinical Interpretation of Variants in Cancer) is an open-source database that provides curated information about the clinical relevance of genomic variants in cancer. This pipeline will use the CIViC knowledgebase to annotate variants with an "accepted" status, which means the variants were reviewed by users with “Editor” or “Admin” level privileges.
+
+CIViCpy stores its annotation cache in a `pickle` file.
+
+While pickle files are generally [considered insecure](https://docs.python.org/3/library/pickle.html) because arbitrary code can be executed during deserialization, this file is pulled directly from a trusted source.
+
+If you load a pickle file from an untrusted source, a malicious actor could potentially embed code that would execute on your system when the file is unpacked for use.
+
+If pickle files are not compliant with your organization's security policies, you can skip this module with the `--skip-civicpy` parameter.
