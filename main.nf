@@ -19,12 +19,24 @@ include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
 include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
 include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_db'
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+def getTbiChannel(param, idName, prepChannel) {
+    if (param) {
+        def tbi_path = "${param}" + ".tbi"
+        def tbi_exists = new File(tbi_path).exists()
+        if (tbi_exists) {
+            return Channel.value([ ['id': "${idName}"], new File(tbi_path) ])
+        } else {
+            return prepChannel
+        }
+    } else {
+        return Channel.value([ ['id': "${idName}"], [] ])
+    }
+}
 
 workflow {
     //
@@ -51,13 +63,9 @@ workflow {
         tuple([id: 'population_germline_resource'], params.population_germline_vcf ? file(params.population_germline_vcf) : [])
     )
 
-    germline_resource_tbi = params.population_germline_tbi ? file(params.population_germline_tbi) : []
-
     ch_pon_vcf = Channel.value(
         tuple([id: 'pon_vcf'], params.pon_vcf ? file(params.pon_vcf) : [])
     )
-
-    pon_tbi = params.pon_tbi ? file(params.pon_tbi) : []
 
     // VCF Annotation Parameters (SnpEff + VEP)
     snpeff_genome_info = Channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
@@ -86,9 +94,7 @@ workflow {
         adapters_fasta,
         pon_cnn,
         ch_pop_germline_resource,
-        germline_resource_tbi,
         ch_pon_vcf,
-        pon_tbi,
         snpeff_genome_info,
         ensemblvep_info,
         snpeff_cache,
@@ -124,9 +130,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_pop_germline_resource // optional val(reference meta), path(germline_resource VCF)
-    germline_resource_tbi // optional path to germline_resource index
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
-    pon_tbi // optional path to panel_of_normals VCF index
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     snpeff_cache // channel: path(snpeff_cache)
@@ -173,16 +177,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
 
-    ch_pop_germ_tbi = params.population_germline_vcf
-        ? (params.population_germline_tbi
-            ? Channel.fromPath(params.population_germline_tbi).collect()
-            : PREPARE_INDICES.out.ch_germline_resource_tbi)
-        : Channel.value([[id: "population_germline_tbi"], []])
-    ch_pon_tbi = params.pon_vcf
-        ? (params.pon_tbi
-            ? Channel.fromPath(params.pon_tbi).collect()
-            : PREPARE_INDICES.out.ch_pon_tbi)
-        : Channel.value([[id: "pon_tbi"], []])
+    ch_pop_germ_tbi = getTbiChannel(params.population_germline_vcf, 'population_germline_tbi', PREPARE_INDICES.out.ch_germline_resource_tbi)
+    ch_pon_tbi = getTbiChannel(params.pon_vcf, 'pon_tbi', PREPARE_INDICES.out.ch_pon_tbi)
 
     // VEP extra files
     vep_extra_files = []
@@ -190,18 +186,15 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     if (params.cosmic_vcf) {
         def cosmic_vcf_path = file(params.cosmic_vcf, checkIfExists: true)
         vep_extra_files.add(cosmic_vcf_path)
-        def tbi_path = "${params.cosmic_vcf}.tbi"
-        def tbi_exists = new File(tbi_path).exists()
-        if (tbi_exists) {
-            ch_cosmic_tbi = file(tbi_path)
-            vep_extra_files.add(file(tbi_path, checkIfExists: true))
-        }
-        else {
-            // Get the TBI file path from PREPARE_INDICES emitted channel
-            ch_cosmic_tbi = PREPARE_INDICES.out.ch_cosmic_tbi.map { meta, f -> f }
-            vep_extra_files.add(ch_cosmic_tbi)
-        }
+
+        def ch_cosmic_tbi = getTbiChannel(params.cosmic_vcf, 'cosmic_tbi', PREPARE_INDICES.out.ch_cosmic_tbi)
+
+        // Extract the actual TBI file from the channel to append to vep_extra_files
+        def ch_cosmic_tbi_file = ch_cosmic_tbi.map { _meta, f -> f }
+
+        vep_extra_files.add(ch_cosmic_tbi_file)
     }
+
 
     // WORKFLOW: Run pipeline
     //
