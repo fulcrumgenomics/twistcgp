@@ -54,6 +54,7 @@ workflow TWISTCGP {
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_snpeff_config /// path(tmb_snpeff_config)
+    ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
 
     main:
     ch_versions = Channel.empty()
@@ -162,7 +163,7 @@ workflow TWISTCGP {
     if (msi_pro) {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
-            [],
+            ch_msi_scan,
             ch_fasta,
             ch_fasta_fai
         )
@@ -175,10 +176,9 @@ workflow TWISTCGP {
         // Currently the pipeline does not support matched tumor-normal analysis, so an empty
         //   list is supplied for the normal BAM.
         ch_bam_and_target_bed = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], targets_bed[1]) }
-        // TODO: can/should we include model input? Models available from github built from different fasta files
         MSISENSOR2_MSI(
             ch_bam_and_target_bed,
-            [],
+            ch_msi_scan.collect().map {it -> it[1]},
             []
         )
     }
