@@ -20,7 +20,7 @@ process MSISENSOR2_SCAN {
 
     script:
     def args    = task.ext.args ?: ''
-    def gunzip  = fasta.Extension == "gz" ? "gunzip -c ${fasta} > ${fasta.baseName}" : ""
+    def gunzip  = fasta.Extension == "gz" ? "gzip -dc ${fasta} > ${fasta.baseName}" : ""
     def inputs  = gunzip ? fasta.baseName : fasta.collect{ "-d $it"}.join(" ")
     output_path = output ?: "output.scan"
     """
