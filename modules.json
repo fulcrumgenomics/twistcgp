@@ -47,7 +47,8 @@
                     "msisensor2/scan": {
                         "branch": "master",
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/msisensor2/scan/msisensor2-scan.diff"
                     },
                     "msisensorpro/pro": {
                         "branch": "master",
@@ -57,7 +58,8 @@
                     "msisensorpro/scan": {
                         "branch": "master",
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/msisensorpro/scan/msisensorpro-scan.diff"
                     },
                     "multiqc": {
                         "branch": "master",

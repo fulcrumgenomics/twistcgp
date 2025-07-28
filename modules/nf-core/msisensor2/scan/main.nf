@@ -19,10 +19,13 @@ process MSISENSOR2_SCAN {
     task.ext.when == null || task.ext.when
 
     script:
-    def args        = task.ext.args ?: ''
-    def inputs      = fasta.collect{ "-d $it"}.join(" ")
+    def args    = task.ext.args ?: ''
+    def gunzip  = fasta.Extension == "gz" ? "gunzip -c ${fasta} > ${fasta.baseName}" : ""
+    def inputs  = gunzip ? fasta.baseName : fasta.collect{ "-d $it"}.join(" ")
     output_path = output ?: "output.scan"
     """
+    $gunzip
+
     msisensor2 scan \\
         $args \\
         $inputs \\
