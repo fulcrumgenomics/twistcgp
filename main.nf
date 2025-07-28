@@ -225,6 +225,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_pop_germ_tbi,
         ch_pon_vcf,
         ch_pon_tbi,
+        snpeff_genome_info,
         ensemblvep_info,
         ch_snpeff_cache,
         tmb_mutect2_config,

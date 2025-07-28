@@ -50,6 +50,7 @@ workflow TWISTCGP {
     ch_pop_germ_tbi // channel [optional]: val(reference_meta), path(germline_resource VCF index)
     ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
     ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
+    snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     ch_snpeff_cache // channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
@@ -124,7 +125,7 @@ workflow TWISTCGP {
     VCF_ANNOTATE(
         GATK4_MUTECT2.out.vcf,
         ch_fasta,
-        params.annotation_genome_version,
+        snpeff_genome_info,
         ensemblvep_info,
         ch_snpeff_cache,
         ch_vep_cache,
