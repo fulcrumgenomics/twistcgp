@@ -19,7 +19,7 @@ include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipe
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include { VCF_ANNOTATE } from '../subworkflows/local/annotate_vcf/main'
+include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
 include { TMB } from '../modules/local/tmb'
 
 /*
