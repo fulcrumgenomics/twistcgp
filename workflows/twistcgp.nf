@@ -164,7 +164,7 @@ workflow TWISTCGP {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
             ch_msi_scan,
-            ch_fasta,
+            [[:], []],
             ch_fasta_fai
         )
     } else {

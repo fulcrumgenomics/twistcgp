@@ -26,12 +26,13 @@ process MSISENSORPRO_PRO {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
+    def fasta_cmd = fasta ? "-g ${fasta}" : ""
     """
     msisensor-pro \\
         pro \\
         -d $list \\
         -t $input \\
-        -g $fasta \\
+        $fasta_cmd \\
         -o ${prefix} \\
         -b $task.cpus \\
         $args
