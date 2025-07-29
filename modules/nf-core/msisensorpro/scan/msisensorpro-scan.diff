@@ -1,0 +1,26 @@
+Changes in component 'nf-core/msisensorpro/scan'
+'modules/nf-core/msisensorpro/scan/environment.yml' is unchanged
+'modules/nf-core/msisensorpro/scan/meta.yml' is unchanged
+Changes in 'msisensorpro/scan/main.nf':
+--- modules/nf-core/msisensorpro/scan/main.nf
++++ modules/nf-core/msisensorpro/scan/main.nf
+@@ -20,10 +20,14 @@
+     script:
+     def args = task.ext.args ?: ''
+     def prefix = task.ext.prefix ?: "${meta.id}"
++    def gunzip = fasta.Extension == "gz" ? "gzip -dc ${fasta} > ${fasta.baseName}" : ""
++    def input = gunzip ? fasta.baseName : fasta
+     """
++    $gunzip
++
+     msisensor-pro \\
+         scan \\
+-        -d $fasta \\
++        -d $input \\
+         -o ${prefix}.msisensor_scan.list \\
+         $args
+ 
+
+'modules/nf-core/msisensorpro/scan/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/msisensorpro/scan/tests/main.nf.test' is unchanged
+************************************************************
