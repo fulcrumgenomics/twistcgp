@@ -18,6 +18,7 @@
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Annotate variants (['SnpEff`](https://pcingola.github.io/SnpEff/))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
+1. Identify MSI ([`MSIsensor2`](https://github.com/niu-lab/msisensor2) or [`MSIsensor-pro`](https://github.com/xjtu-omics/msisensor-pro))
 1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
 1. Present QC ([`MultiQC`](http://multiqc.info/))
 
