@@ -164,8 +164,8 @@ workflow TWISTCGP {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
             ch_msi_scan,
-            [[:], []],
-            ch_fasta_fai
+            [[:], []], // fasta and fai are only required for CRAM format
+            [[:], []]
         )
     } else {
         targets_are_bed = targets[1].getExtension() == "bed"
