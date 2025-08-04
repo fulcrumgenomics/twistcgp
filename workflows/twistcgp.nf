@@ -38,7 +38,7 @@ workflow TWISTCGP {
     ch_samplesheet // channel: samplesheet read in from --input
     baits // channel: tuple of meta and baits region file read in from --baits
     targets // channel: tuple of meta and targets region file read in from --targets
-    msi_pro // boolean indicating if MSIsensor-pro can be run
+    use_msi_pro // boolean indicating if MSIsensor-pro can be run
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
@@ -160,7 +160,7 @@ workflow TWISTCGP {
     //
     // MSIsensor-pro is free for non-profit use but a license is required for commercial use
     // https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/2_License.md
-    if (msi_pro) {
+    if (use_msi_pro) {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
             ch_msi_scan,

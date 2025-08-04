@@ -133,7 +133,7 @@
             "fa_icon": "fas fa-code-branch",
             "description": "Options related to selection of tools used in the workflow.",
             "properties": {
-                "msisensor_pro_licensed": {
+                "use_msisensor_pro_licensed": {
                     "type": "boolean",
                     "fa_icon": "fas id-card",
                     "description": "Enable if you are a licensed user of MSIsensor-pro to use MSIsensor-pro instead of MSIsensor2, https://github.com/xjtu-omics/msisensor-pro/blob/master/LICENSE."

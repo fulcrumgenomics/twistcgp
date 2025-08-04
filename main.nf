@@ -121,7 +121,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     // WORKFLOW: build indexes if needed
     //
-    PREPARE_GENOME(fasta, params.msisensor_pro_licensed)
+    PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
     PREPARE_ANNOTATION_DB(snpeff_genome_info)
 
@@ -166,7 +166,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_samplesheet,
         baits,
         targets,
-        params.msisensor_pro_licensed,
+        params.use_msisensor_pro_licensed,
         adapters_fasta,
         pon_cnn,
         bwa,

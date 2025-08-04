@@ -17,7 +17,7 @@ include { MSISENSORPRO_SCAN } from '../../../modules/nf-core/msisensorpro/scan/m
 workflow PREPARE_GENOME {
     take:
     fasta // channel: [mandatory] fasta
-    msi_pro // boolean: if true, will run MSISensorPro else MSISensor2
+    use_msi_pro // boolean: if true, will run MSISensorPro else MSISensor2
 
     main:
     versions = Channel.empty()
@@ -27,12 +27,12 @@ workflow PREPARE_GENOME {
     SAMTOOLS_FAIDX(fasta, [[id: 'no_fai'], []], false)
     SAMTOOLS_DICT(fasta)
 
-    if (msi_pro) {
+    if (use_msi_pro) {
         MSISENSORPRO_SCAN(fasta)
     } else {
         MSISENSOR2_SCAN(fasta.map {it -> it[1]}, fasta.map {it -> "${it[1].baseName}.msisensor_scan.list"})
     }
-    msi_scan = msi_pro
+    msi_scan = use_msi_pro
         ? MSISENSORPRO_SCAN.out.list
         : MSISENSOR2_SCAN.out.scan.map {it -> tuple([id: 'scan'], it) }
 
