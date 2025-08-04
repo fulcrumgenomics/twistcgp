@@ -7,6 +7,9 @@ MSIsensor-pro is available for [MSIsensor-pro licensed users](https://github.com
 
 2. Download and **_unzip_** the reference genome from GIAB, [fasta.gz link](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta.gz).
 
+> [!WARNING]
+> If the genome is not unzipped, msisensor2 will hang indefinitely.
+
 3. Run the MSIsensor2 scan command:
 
 ```console
@@ -22,6 +25,9 @@ msisensor2 scan \
 1. [Install MSIsensor-pro](https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/3_Installation.md)
 
 2. Download and **_unzip_** the reference genome from GIAB, [fasta.gz link](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta.gz).
+
+> [!WARNING]
+> If the genome is not unzipped, msisensor-pro will hang indefinitely.
 
 3. Run the MSIsensor-pro scan command:
 
