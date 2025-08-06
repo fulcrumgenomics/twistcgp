@@ -31,7 +31,7 @@ vep_install -a cf -s homo_sapiens -y GRCh38 -c ~/vep --CONVERT
 
 3. Pass the cache to the pipeline:
 
-```bash
+```console
 nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \

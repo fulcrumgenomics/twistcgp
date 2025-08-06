@@ -41,7 +41,7 @@ process CIVICPY {
     """
     touch ${prefix}.vcf
 
-        cat <<-END_VERSIONS > versions.yml
+    cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         civicpy: \$(civicpy --version | sed 's/.*version //')
     END_VERSIONS

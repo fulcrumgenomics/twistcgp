@@ -10,7 +10,7 @@ The pipeline will automatically use `tabix` to index the provided VCF if no inde
 
 3. Pass the VCF to the pipeline:
 
-```bash
+```console
 nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \

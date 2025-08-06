@@ -142,7 +142,7 @@ If a cache is not provided, the pipeline will automatically download it (which w
 
 Now, you can run the pipeline using:
 
-```bash
+```console
 nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \
