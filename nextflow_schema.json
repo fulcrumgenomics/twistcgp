@@ -127,6 +127,19 @@
                 }
             }
         },
+        "tool_selection_options": {
+            "title": "Tool selection options",
+            "type": "object",
+            "fa_icon": "fas fa-code-branch",
+            "description": "Options related to selection of tools used in the workflow.",
+            "properties": {
+                "use_msisensor_pro_licensed": {
+                    "type": "boolean",
+                    "fa_icon": "fas id-card",
+                    "description": "Enable if you are a licensed user of MSIsensor-pro to use MSIsensor-pro instead of MSIsensor2, https://github.com/xjtu-omics/msisensor-pro/blob/master/LICENSE."
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -149,14 +162,14 @@
                     "fa_icon": "fas fa-file",
                     "exists": true,
                     "description": "Path to FASTA dictionary file.",
-                    "help_text": "If you use AWS iGenomes, this has already been set for you appropriately.\n\n> **NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "hidden": true
                 },
                 "fasta_fai": {
                     "type": "string",
                     "fa_icon": "fas fa-file",
                     "exists": true,
-                    "help_text": "If you use AWS iGenomes, this has already been set for you appropriately.\n\n> **NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "description": "Path to FASTA reference index.",
                     "hidden": true
                 },
@@ -173,7 +186,15 @@
                     "fa_icon": "fas fa-copy",
                     "exists": true,
                     "description": "Path to BWA mem indices.",
-                    "help_text": "If you use AWS iGenomes, this has already been set for you appropriately.\n\nIf you wish to recompute indices available on igenomes, set `--bwa false`.\n\n> **NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "hidden": true
+                },
+                "msisensor_scan": {
+                    "type": "string",
+                    "fa_icon": "fas fa-copy",
+                    "exists": true,
+                    "description": "Path to msisensor2 (or msisensor-pro) scan file.",
+                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "hidden": true
                 },
                 "save_reference": {
@@ -283,6 +304,9 @@
         },
         {
             "$ref": "#/$defs/reference_genome_options"
+        },
+        {
+            "$ref": "#/$defs/tool_selection_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

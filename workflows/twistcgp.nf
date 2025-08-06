@@ -8,6 +8,8 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
+include { MSISENSOR2_MSI } from '../modules/nf-core/msisensor2/msi/main'
+include { MSISENSORPRO_PRO } from '../modules/nf-core/msisensorpro/pro/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
@@ -22,6 +24,9 @@ include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
 include { TMB } from '../modules/local/tmb'
 
+include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
+include { PICARD_INTERVALLISTTOBED as TARGETS_TO_BED } from '../modules/local/picard/intervallisttobed'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -33,6 +38,7 @@ workflow TWISTCGP {
     ch_samplesheet // channel: samplesheet read in from --input
     baits // channel: tuple of meta and baits region file read in from --baits
     targets // channel: tuple of meta and targets region file read in from --targets
+    use_msi_pro // boolean indicating if MSIsensor-pro can be run
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
@@ -48,6 +54,7 @@ workflow TWISTCGP {
     ch_snpeff_cache //channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_snpeff_config /// path(tmb_snpeff_config)
+    ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
 
     main:
     ch_versions = Channel.empty()
@@ -84,6 +91,8 @@ workflow TWISTCGP {
     // MODULE: PICARD_MARKDUPLICATES
     //
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
+    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam
+        .join(PICARD_MARKDUPLICATES.out.bai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
@@ -132,9 +141,9 @@ workflow TWISTCGP {
     //   list is supplied for the normal BAM.
     baits_are_bed = baits[1].getExtension() == "bed"
     if (!baits_are_bed) {
-        PICARD_INTERVALLISTTOBED(baits)
+        BAITS_TO_BED(baits)
     }
-    ch_baits_bed = baits_are_bed ? baits : PICARD_INTERVALLISTTOBED.out.bed
+    ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
     ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
     CNVKIT_BATCH(
         ch_cnv_bam_pair,
@@ -147,6 +156,35 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
     //
+    // MODULE: MSISENSOR2_MSI or MSISENSORPRO_PRO
+    //
+    // MSIsensor-pro is free for non-profit use but a license is required for commercial use
+    // https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/2_License.md
+    if (use_msi_pro) {
+        MSISENSORPRO_PRO(
+            ch_bam_and_index,
+            ch_msi_scan,
+            [[:], []], // fasta and fai are only required for CRAM format
+            [[:], []]
+        )
+    } else {
+        targets_are_bed = targets[1].getExtension() == "bed"
+        if (!targets_are_bed) {
+            TARGETS_TO_BED(targets)
+        }
+        targets_bed = targets_are_bed ? targets : TARGETS_TO_BED.out.bed.collect()
+        // Currently the pipeline does not support matched tumor-normal analysis, so an empty
+        //   list is supplied for the normal BAM.
+        ch_bam_and_target_bed = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], targets_bed[1]) }
+        MSISENSOR2_MSI(
+            ch_bam_and_target_bed,
+            ch_msi_scan.collect().map {it -> it[1]},
+            []
+        )
+    }
+
+
+    //
     // MODULE: PICARD_COLLECTMULTIPLEMETRICS
     //
     PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
@@ -156,8 +194,7 @@ workflow TWISTCGP {
     //
     // MODULE: PICARD_COLLECTHSMETRICS
     //
-    ch_bam_and_regions = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bam_and_regions = ch_bam_and_index
         .map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
     PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_fasta_gzi, ch_dict)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { it[1] })

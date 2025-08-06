@@ -121,8 +121,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
     // WORKFLOW: build indexes if needed
     //
-
-    PREPARE_GENOME(fasta)
+    PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
     PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf)
     PREPARE_ANNOTATION_DB(snpeff_genome_info)
 
@@ -143,6 +142,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_snpeff_cache = params.snpeff_cache
         ? Channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.snpeff_cache
+    ch_msi_scan = params.msisensor_scan
+        ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
+        : PREPARE_GENOME.out.msi_scan
 
     // Grab inputs for GATK4/MUTECT2 from params
     // optional args that are not provided are instantiated as a value channel with an empty list
@@ -164,6 +166,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_samplesheet,
         baits,
         targets,
+        params.use_msisensor_pro_licensed,
         adapters_fasta,
         pon_cnn,
         bwa,
@@ -179,6 +182,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ch_snpeff_cache,
         tmb_mutect2_config,
         tmb_snpeff_config,
+        ch_msi_scan,
     )
 
     emit:
