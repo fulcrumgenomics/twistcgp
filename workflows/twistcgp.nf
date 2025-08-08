@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { CIVICPY } from '../modules/local/civicpy/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
@@ -21,7 +22,7 @@ include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipe
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include { VCF_ANNOTATE_SNPEFF } from '../subworkflows/nf-core/vcf_annotate_snpeff/main'
+include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
 include { TMB } from '../modules/local/tmb'
 
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
@@ -47,13 +48,16 @@ workflow TWISTCGP {
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
     ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
-    ch_pop_germ_tbi //channel [optional]: val(reference_meta), path(germline_resource VCF index)
-    ch_pon_vcf //channel [optional]: val(reference_meta), path(panel_of_normals VCF)
-    ch_pon_tbi //channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
-    snpeff_genome_info //channel: tuple val(meta), val(snpeff_db)
-    ch_snpeff_cache //channel [optional]: path(snpeff_cache)
+    ch_pop_germ_tbi // channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
+    ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
+    snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
+    ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
+    ch_snpeff_cache // channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_snpeff_config /// path(tmb_snpeff_config)
+    ch_vep_cache // channel [optional]: path(vep_cache)
+    vep_extra_files // channel [optional]: [path(cosmic_vcf)]
     ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
 
     main:
@@ -117,22 +121,31 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
-    // SUB-WORKFLOW: VCF_ANNOTATE_SNPEFF
+    // SUB-WORKFLOW: VCF_ANNOTATE
     //
-    VCF_ANNOTATE_SNPEFF(
+    VCF_ANNOTATE(
         GATK4_MUTECT2.out.vcf,
-        snpeff_genome_info.map { _meta, genome_info -> genome_info },
+        ch_fasta,
+        snpeff_genome_info,
+        ensemblvep_info,
         ch_snpeff_cache,
+        ch_vep_cache,
+        vep_extra_files,
     )
-    ch_versions = ch_versions.mix(VCF_ANNOTATE_SNPEFF.out.versions.first())
-    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE_SNPEFF.out.reports.collect { it[1] })
+    ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
+    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports.collect { it[1] })
 
     //
     // MODULE: TMB
     //
     //
-    TMB(VCF_ANNOTATE_SNPEFF.out.vcf_tbi, targets, tmb_snpeff_config, tmb_mutect2_config)
+    TMB(VCF_ANNOTATE.out.vcf_ann, tmb_snpeff_config, tmb_mutect2_config, targets[1])
     ch_versions = ch_versions.mix(TMB.out.versions.first())
+
+    //
+    // MODULE: CIVICPY
+    //
+    CIVICPY(VCF_ANNOTATE.out.vcf_ann, snpeff_genome_info.map { _meta, genome_info -> genome_info })
 
     //
     // CNVKIT_BATCH
@@ -149,9 +162,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed,
-        tuple([], pon_cnn),
-        false,
+        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
+        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 

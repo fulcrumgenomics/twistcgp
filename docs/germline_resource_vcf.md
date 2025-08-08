@@ -4,11 +4,13 @@ An existing population VCF can be used for the germline resource VCF, or a custo
 
 1. Download the appropriate gzipped [hg38](https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz) VCF file and corresponding [index file](https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz.tbi) from gnomAD.
 
-The pipeline will automatically use `tabix` to index the provided VCF if no index file is provided.
+The pipeline will first check for an existing index file, which is expected to have the same name as the provided VCF file but with a .tbi extension.
 
-3. Pass the VCF index to the pipeline:
+The pipeline will automatically use `tabix` to index the provided VCF if no index file can be found.
 
-```bash
+3. Pass the VCF to the pipeline:
+
+```console
 nextflow run twistcgp/main.nf \
    -profile <docker/singularity/conda> \
    --fasta hg38.fa \
@@ -16,6 +18,5 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --population_germline_vcf af-only-gnomad.hg38.vcf.gz \
-   --population_germline_tbi af-only-gnomad.hg38.vcf.gz.tbi \
    --outdir <OUTDIR>
 ```

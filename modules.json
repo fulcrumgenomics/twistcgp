@@ -17,6 +17,16 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/cnvkit/batch/cnvkit-batch.diff"
                     },
+                    "ensemblvep/download": {
+                        "branch": "master",
+                        "git_sha": "7452092e1a296442f2989bff9801797f28c28aaf",
+                        "installed_by": ["modules"]
+                    },
+                    "ensemblvep/vep": {
+                        "branch": "master",
+                        "git_sha": "7452092e1a296442f2989bff9801797f28c28aaf",
+                        "installed_by": ["modules", "vcf_annotate_ensemblvep"]
+                    },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "d082103d7976a2804f21225446cc110cbd822f4c",
@@ -117,7 +127,7 @@
                     "tabix/tabix": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules", "vcf_annotate_ensemblvep"]
                     }
                 }
             },
@@ -136,6 +146,11 @@
                     "utils_nfschema_plugin": {
                         "branch": "master",
                         "git_sha": "2fd2cd6d0e7b273747f32e465fdc6bcc3ae0814e",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "vcf_annotate_ensemblvep": {
+                        "branch": "master",
+                        "git_sha": "a96f42708b631dfc736f48980dbf2be418dd784b",
                         "installed_by": ["subworkflows"]
                     },
                     "vcf_annotate_snpeff": {
