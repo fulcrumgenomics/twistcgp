@@ -65,7 +65,7 @@ The TwistCGP baits and targets files are available from Twist after purchasing t
 
 ### Optional Time and Resource Saving Setup
 
-#### <details> <summary>Pre-Generate a Genome Index</summary>
+<details> <summary>#### Pre-Generate a Genome Index</summary>
 
 Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
 Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
