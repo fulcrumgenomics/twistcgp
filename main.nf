@@ -26,7 +26,7 @@ include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_
 */
 def getTbiChannel(param, idName, prepChannel) {
     if (param) {
-        def tbi = new File("${param}" + ".tbi")
+        def tbi = file("${param}" + ".tbi")
         if (tbi.exists()) {
             return Channel.value([ ['id': "${idName}"], tbi ])
         } else {
