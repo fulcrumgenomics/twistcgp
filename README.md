@@ -195,7 +195,7 @@ nextflow run twistcgp/main.nf \
 
 ## Credits
 
-twistcgp was originally written by Zach Norgaard of [Fulcrum Genomics](https://fulcrumgenomics.com/).
+twistcgp was originally written by Erin McAuley and Zach Norgaard of [Fulcrum Genomics](https://fulcrumgenomics.com/).
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
