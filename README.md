@@ -90,13 +90,13 @@ Additionally, the MSI scan list can be saved to the output directory for future 
 
 </details>
 
-<details> <summary>Pre-Generate a SnpEff Cache</summary>
+<details> <summary>Pre-Generate Variant Annotation Caches</summary>
 
-SnpEff requires many large files known as a cache with which to annotate variants.
+SnpEff and Ensembl VEP require many large files known as a cache with which to annotate variants.
 
-To use a pre-downloaded cache for variant annotation, supply the parameter `--snpeff_cache` with the path to the root of the annotation cache folder.
+To use a pre-downloaded cache for variant annotation, supply the parameters `--snpeff_cache` and/or `--ensemblvep_cache` with the path to the root of the annotation cache folder.
 
-For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md).
+For details on how to generate each cache see [docs/variant_annotation.md](/docs/variant_annotation.md).
 
 If a cache is not provided, the pipeline will automatically download it (which will add computation time).
 
