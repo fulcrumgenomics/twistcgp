@@ -70,8 +70,8 @@ workflow {
     snpeff_genome_info = Channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
     snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
-    tmb_mutect2_config = Channel.fromPath(params.tmb_mutect2_config)
-    tmb_snpeff_config = Channel.fromPath(params.tmb_snpeff_config)
+    tmb_mutect2_config = Channel.fromPath(params.tmb_mutect2_config).collect()
+    tmb_snpeff_config = Channel.fromPath(params.tmb_snpeff_config).collect()
 
     ensemblvep_info = Channel.of(
         tuple(
