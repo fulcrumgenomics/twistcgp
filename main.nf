@@ -73,7 +73,7 @@ workflow {
     tmb_mutect2_config = Channel.fromPath(params.tmb_mutect2_config).collect()
     tmb_snpeff_config = Channel.fromPath(params.tmb_snpeff_config).collect()
 
-    ensemblvep_info = Channel.of(
+    ensemblvep_info = Channel.value(
         tuple(
             [id: "${params.ensemblvep_cache_version}_${params.annotation_genome_version}"],
             params.annotation_genome_version,
