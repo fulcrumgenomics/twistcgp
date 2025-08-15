@@ -30,6 +30,36 @@ include { PICARD_INTERVALLISTTOBED as TARGETS_TO_BED } from '../modules/local/pi
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    GROOVY HELPERS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+def List<String> readVcfLines(File path) {
+    //Read in a compressed VCF and return the contents.
+    def InputStream gzipStream = new java.util.zip.GZIPInputStream(new FileInputStream(path))
+    def Reader decoder = new InputStreamReader(gzipStream, 'UTF-8')
+    def BufferedReader buffered = new BufferedReader(decoder)
+
+    def List<String> lines = buffered.readLines()
+    buffered.close()
+
+    return lines
+}
+
+def boolean hasVariants(List<String> lines) {
+    // Check for any non-header lines (e..g, those that do not start with '#') in
+    // a list of strings.
+    return lines.any { !it.startsWith('#') }
+}
+
+def boolean hasAnnotations(List<String> lines) {
+    //Check for the `ANN` tag in the VCF header. If this is not found, it is assumed
+    // that SnpEff did not annotate any variants.
+    return lines.any { it.startsWith("##INFO=<ID=ANN,") }
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
@@ -120,6 +150,15 @@ workflow TWISTCGP {
     )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
+    // The annotation tools do not work well with an empty VCF.
+    // Gracefully exit if GATK4_MUTECT2 has not called any variants
+    GATK4_MUTECT2.out.vcf.map { _meta, vcf_file ->
+        def lines = readVcfLines(vcf_file.toFile())
+        if (!hasVariants(lines)) {
+            throw new Exception("VCF ${vcf_file} is missing variant records; GATK may not have called any variants!")
+        }
+    }
+
     //
     // SUB-WORKFLOW: VCF_ANNOTATE
     //
@@ -134,6 +173,14 @@ workflow TWISTCGP {
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports.collect { it[1] })
+
+    //pyTMB will break if there are no SnpEff-emitted annotations; so we check for those before progressing.
+    VCF_ANNOTATE.out.vcf_ann.map { _meta, vcf_file, _tbi ->
+        def lines = readVcfLines(vcf_file.toFile())
+        if (!hasAnnotations(lines)) {
+            throw new Exception("VCF ${vcf_file} is missing annotations from SnpEff.")
+        }
+    }
 
     //
     // MODULE: TMB
