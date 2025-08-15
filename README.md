@@ -141,7 +141,9 @@ See [docs/germline_resource_vcf.md](/docs/germline_resource_vcf.md) for more det
 
 <details> <summary>Panel of Normals VCF</summary>
 
-While a panel of normals (PoN) VCF is not required for Mutect2 to run, it is recommended. A PoN is a VCF that contains sites found across multiple "normal" samples (e.g., derived from healthy tissue that is believed to not have somatic alterations), ideally from the same sequencing preparation, pipeline, platform, etc. as the tumor samples. While the germline resource helps model population variants, the PoN VCF filters out technical artifacts to improve the quality of the variant calling analyses.
+While a panel of normals (PoN) VCF is not required for Mutect2 to run, it is recommended.
+A PoN is a VCF that contains sites found across multiple "normal" samples (e.g., derived from healthy tissue that is believed to not have somatic alterations), ideally from the same sequencing preparation, pipeline, platform, etc. as the tumor samples.
+While the germline resource helps model population variants, the PoN VCF filters out technical artifacts to improve the quality of the variant calling analyses.
 
 The panel of normals VCF can be supplied to the pipeline using the `--pon_vcf` parameter.
 
