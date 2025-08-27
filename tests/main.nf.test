@@ -1,0 +1,154 @@
+// These pipeline-level tests are meant to test that the pipeline finishes successfully when given specific arguments
+// and the results match previously captured snapshots. Output validation is handled by dedicated process-level tests.
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+    tag "pipeline"
+
+    test("Should run pipeline without failures") {
+        // Conditions: pipeline level test with no optional files given (e.g., cosmic_vcf) and cache paths given.
+        // Assert that the workflow is successful with no partial failures. Stable content should match previous snapshot.
+        // Assert that the MD5 of BAM reads and SnpEff variants match. Assert that expected VCF files exist.
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            def stable_path = getAllFilesFromDir(params.outdir, includeDir: false, ignoreFile: 'tests/.nftignore')
+
+            // BAM files
+            def BamFiles  = getAllFilesFromDir(params.outdir, include: ['**/*.bam'])
+
+            // VCF files
+            // (excluding CIVICPY-emitted VCF: https://github.com/seppinho/nft-vcf/issues/6)
+            def VcfFiles  = getAllFilesFromDir(params.outdir, include: ['**/*.vcf.gz'])
+            def SnpEffAnnotatedVariants = path("${outputDir}/test2/test2.snpeff.vcf.gz").vcf
+            def vcfAssertions = VcfFiles.collect { f ->
+                return { assert file(f.toString()).exists() }
+            }
+
+            // pyTMB
+            def TmbLog = path("${outputDir}/test2/test2.tmb.log").readLines()
+
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.failed().isEmpty() },
+                {
+                    assert snapshot(
+                        workflow.trace.succeeded().size(),
+                        "$params.outdir/pipeline_info/twistcgp_software_mqc_versions.yml",
+                        stable_name,
+                        stable_path,
+                        BamFiles.collect { file -> [file.getName(), bam(file.toString()).readsMD5] },
+                        SnpEffAnnotatedVariants.variantsMD5
+                    ).match()
+                },
+                *vcfAssertions,
+                { assert TmbLog.any { it.contains("Total number of variants= 623") } },
+                { assert TmbLog.any { it.contains("Variants after filters= 15") } },
+                { assert TmbLog.any { it.contains("Effective Genome Size= 45152984") } },
+                { assert TmbLog.any { it.contains("TMB= 0.33") } }
+            )
+        }
+
+    }
+
+    test("Provide cosmic_vcf") {
+        // Conditions: pipeline level test with optional cosmic_vcf provided.
+        // This test is to make sure that the pipeline correctly accepts an extra file for VEP from an expected source (COSMIC),
+        // indexes it, and is able to use it.
+
+        when {
+            params {
+                cosmic_vcf = "${projectDir}/assets/integration/cosmic-v68-hg19-chr21_test.vcf.gz"
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            def stable_path = getAllFilesFromDir(params.outdir, includeDir: false, ignoreFile: 'tests/.nftignore')
+
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.failed().isEmpty() },
+                {
+                    assert snapshot(
+                        workflow.trace.succeeded().size(),
+                        "$params.outdir/pipeline_info/twistcgp_software_mqc_versions.yml",
+                        stable_name,
+                        stable_path,
+                    ).match()
+                }
+            )
+        }
+    }
+
+    test("Provide gnomAD germline_resource_vcf") {
+        // Conditions: pipeline level test with optional population_germline_vcf derived from gnomAD provided to GATK.
+        // This test is to make sure that the pipeline correctly accepts a germline_resource_VCF from a standard source,
+        // indexes it, and is able to use it.
+
+        when {
+            params {
+                population_germline_vcf = "${projectDir}/assets/integration/chr21_gnomAD.r2.vcf.gz"
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            def stable_path = getAllFilesFromDir(params.outdir, includeDir: false, ignoreFile: 'tests/.nftignore')
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.failed().isEmpty() },
+                {
+                    assert snapshot(
+                        workflow.trace.succeeded().size(),
+                        "$params.outdir/pipeline_info/twistcgp_software_mqc_versions.yml",
+                        stable_name,
+                        stable_path,
+                    ).match()
+                }
+            )
+        }
+    }
+
+
+    test("Provide 1000 Genomes PoN VCF") {
+        // Conditions: pipeline level test with optional pon_vcf derived from 1000 Genomes provided.
+        // This test is to make sure that the pipeline correctly accepts a pon_vcf from a standard source,
+        // indexes it, and is able to use it.
+
+        when {
+            params {
+                pon_vcf = "${projectDir}/assets/integration/chr21_1000g_pon.hg38.vcf.gz"
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
+            def stable_path = getAllFilesFromDir(params.outdir, includeDir: false, ignoreFile: 'tests/.nftignore')
+
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.failed().isEmpty() },
+                {
+                    assert snapshot(
+                        workflow.trace.succeeded().size(),
+                        "$params.outdir/pipeline_info/twistcgp_software_mqc_versions.yml",
+                        stable_name,
+                        stable_path,
+                    ).match()
+                }
+            )
+        }
+    }
+
+}
+
