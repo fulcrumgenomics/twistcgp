@@ -94,7 +94,8 @@
                 "annotation_genome_version": {
                     "type": "string",
                     "description": "The version of the genome that SnpEff and VEP will use for variant annotation. Defaults to GRCh38.",
-                    "hidden": true
+                    "hidden": true,
+                    "default": "GRCh38"
                 },
                 "snpeff_cache": {
                     "type": "string",
@@ -102,12 +103,14 @@
                 },
                 "snpeff_db": {
                     "type": "string",
-                    "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 105."
+                    "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 105.",
+                    "default": "105"
                 },
                 "ensemblvep_species": {
                     "type": "string",
                     "description": "The species for which to pull annotation information. Defaults to `homo sapiens`.",
-                    "help_text": "Alternatively, species listed in Ensembl Genomes caches can be used for non-human genome annotaiton."
+                    "help_text": "Alternatively, species listed in Ensembl Genomes caches can be used for non-human genome annotation.",
+                    "default": "homo_sapiens"
                 },
                 "ensemblvep_cache": {
                     "type": "string",
@@ -120,7 +123,8 @@
                     "type": "string",
                     "fa_icon": "fas fa-tag",
                     "description": "The version of the VEP cache to use for annotation. Defaults to version 114.",
-                    "help_text": "More information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_cache.html."
+                    "help_text": "More information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_cache.html.",
+                    "default": "114"
                 },
                 "cosmic_vcf": {
                     "type": "string",
