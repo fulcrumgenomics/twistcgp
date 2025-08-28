@@ -4,8 +4,8 @@ process CIVICPY {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/civicpy:4.0.0--pyhdfd78af_0'
-        : 'biocontainers/civicpy'}"
+        ? 'https://depot.galaxyproject.org/singularity/civicpy:5.0.0--pyhdfd78af_0'
+        : 'docker.io/griffithlab/civicpy:5.0.0' }"
 
     input:
     tuple val(meta), path(vcf), path(tbi)
@@ -23,6 +23,8 @@ process CIVICPY {
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
+    export CIVICPY_CACHE_FILE=\$PWD/.civicpy
+
     civicpy annotate-vcf --input-vcf ${vcf} \\
         --output-vcf ${prefix}.vcf \\
         --reference ${annotation_genome_version} \\
