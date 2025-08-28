@@ -134,7 +134,7 @@ lint:
     - nextflow_badge
     - nextflow_badge
     - nextflow_badge
-nf_core_version: 3.2.1
+nf_core_version: 3.3.2
 repository_type: pipeline
 template:
   author: Zach Norgaard
