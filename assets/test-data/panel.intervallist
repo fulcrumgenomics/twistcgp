@@ -1,3 +1,8 @@
 @HD	VN:1.6	SO:coordinate
-@SQ	SN:chr_fake	LN:50	M5:2383a7064f59ec85ab162c86c19fb0e4	UR:file:///Users/znorgaard/clients/twist/git/twistcgp/assets/test-data/reference.fa
-chr_fake	1	50	+	gene_fake
+@SQ	SN:chr21	LN:8880	M5:4af459db90574d15996c91ebcef08891	UR:file:///Users/erin/git/client/twist/twistcgp/assets/test-data/reference.fa
+chr21	1	100	+	TP53_1
+chr21	102	200	+	TP53_2
+chr21	301	400	+	TP53_3
+chr21	401	500	+	TP53_4
+chr21	501	600	+	TP53_5
+chr21	601	700	+	TP53_6

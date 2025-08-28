@@ -1,1 +1,6 @@
-chr_fake	0	50	gene_fake
+chr21	0	100	TP53_1
+chr21	101	200	TP53_2
+chr21	300	400	TP53_3
+chr21	400	500	TP53_4
+chr21	500	600	TP53_5
+chr21	600	700	TP53_6
