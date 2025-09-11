@@ -217,7 +217,7 @@
                     "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "hidden": true
                 },
-                "msi_sensor2_model_name": {
+                "msisensor2_model_name": {
                     "type": "string",
                     "description": "The specific model name for MSIsensor 2 analysis.",
                     "enum": [
