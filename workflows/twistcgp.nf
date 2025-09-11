@@ -9,6 +9,7 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
+include { GIT_CLONEMSISENSOR2MODEL } from '../modules/local/git/clonemsisensor2model/main'
 include { MSISENSOR2_MSI } from '../modules/nf-core/msisensor2/msi/main'
 include { MSISENSORPRO_PRO } from '../modules/nf-core/msisensorpro/pro/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
@@ -40,6 +41,7 @@ workflow TWISTCGP {
     baits // channel: tuple of meta and baits region file read in from --baits
     targets // channel: tuple of meta and targets region file read in from --targets
     use_msi_pro // boolean indicating if MSIsensor-pro can be run
+    msi_sensor2_model_name // name of desired model directory in https://github.com/niu-lab/msisensor2.git
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
@@ -180,6 +182,7 @@ workflow TWISTCGP {
             [[:], []], // fasta and fai are only required for CRAM format
             [[:], []]
         )
+        ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
     } else {
         targets_are_bed = targets[1].getExtension() == "bed"
         if (!targets_are_bed) {
@@ -189,11 +192,14 @@ workflow TWISTCGP {
         // Currently the pipeline does not support matched tumor-normal analysis, so an empty
         //   list is supplied for the normal BAM.
         ch_bam_and_target_bed = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], targets_bed[1]) }
+        GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
+        ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
         MSISENSOR2_MSI(
             ch_bam_and_target_bed,
             ch_msi_scan.collect().map {it -> it[1]},
-            []
+            GIT_CLONEMSISENSOR2MODEL.out.model.collect().map {it -> it[1]},
         )
+        ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
     }
 
 
