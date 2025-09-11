@@ -197,7 +197,7 @@ workflow TWISTCGP {
         MSISENSOR2_MSI(
             ch_bam_and_target_bed,
             ch_msi_scan.collect().map {it -> it[1]},
-            GIT_CLONEMSISENSOR2MODEL.out.model.collect().map {it -> it[1]},
+            GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
         )
         ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
     }
