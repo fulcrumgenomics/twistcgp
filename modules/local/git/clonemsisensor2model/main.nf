@@ -9,7 +9,7 @@ process GIT_CLONEMSISENSOR2MODEL {
     val model_name
 
     output:
-    path "model", emit: model
+    path "model/*", emit: model
     path "versions.yml", emit: versions
 
     when:
