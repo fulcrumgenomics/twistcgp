@@ -1,4 +1,6 @@
 lint:
+  actions_nf_test: false
+  actions_awsfulltest: false
   files_exist:
     - .editorconfig
     - .github/.dockstore.yml
@@ -7,10 +9,13 @@ lint:
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/ISSUE_TEMPLATE/feature_request.yml
     - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/actions/get-shards/action.yml
+    - .github/actions/nf-test/action.yml
     - .github/workflows/branch.yml
     - .github/workflows/ci.yml
     - .github/workflows/linting.yml
     - .github/workflows/linting_comment.yml
+    - .github/workflows/nf-test.yml
     - .prettierignore
     - .prettierrc.yml
     - CHANGELOG.md
@@ -27,6 +32,7 @@ lint:
     - docs/images/nf-core-twistcgp_logo_dark.png
     - docs/images/nf-core-twistcgp_logo_light.png
     - docs/output.md
+    - docs/README.md
     - docs/usage.md
   files_unchanged:
     - .github/.dockstore.yml
@@ -47,11 +53,13 @@ lint:
     - docs/images/nf-core-twistcgp_logo_dark.png
     - docs/images/nf-core-twistcgp_logo_light.png
   included_configs: false
+  nextflow_config: false
+  nf_test_content: false
   multiqc_config:
     - report_comment
-  nextflow_config: false
   readme:
     - nextflow_badge
+  rocrate_readme_sync: false
 nf_core_version: 3.3.2
 repository_type: pipeline
 template:
