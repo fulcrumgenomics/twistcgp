@@ -1,138 +1,56 @@
 lint:
   files_exist:
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/ISSUE_TEMPLATE/feature_request.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .github/CONTRIBUTING.md
-    - .github/.dockstore.yml
-    - .github/workflows/branch.yml
-    - .github/workflows/ci.yml
-    - .github/workflows/linting_comment.yml
-    - .github/workflows/linting.yml
-    - conf/igenomes.config
-    - conf/igenomes_ignored.config
-    - conf/igenomes.config
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/ISSUE_TEMPLATE/feature_request.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .github/CONTRIBUTING.md
-    - .github/.dockstore.yml
-    - CITATIONS.md
-    - .github/workflows/branch.yml
-    - .github/workflows/ci.yml
-    - .github/workflows/linting_comment.yml
-    - .github/workflows/linting.yml
-    - conf/igenomes.config
-    - conf/igenomes_ignored.config
     - .editorconfig
-    - .prettierignore
-    - .prettierrc.yml
-    - CITATIONS.md
-    - CHANGELOG.md
-    - LICENSE
-    - assets/email_template.html
-    - assets/sendmail_template.txt
-    - assets/email_template.txt
-    - docs/output.md
-    - docs/README.md
-    - docs/usage.md
-    - conf/test.config
-    - conf/test_full.config
-    - .github/workflows/ci.yml
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/ISSUE_TEMPLATE/feature_request.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .github/CONTRIBUTING.md
     - .github/.dockstore.yml
-    - .github/workflows/branch.yml
-    - .github/workflows/ci.yml
-    - .github/workflows/linting_comment.yml
-    - .github/workflows/linting.yml
-    - conf/igenomes.config
-    - conf/igenomes_ignored.config
-    - .editorconfig
-    - .prettierignore
-    - .prettierrc.yml
-    - CITATIONS.md
-    - CHANGELOG.md
-    - LICENSE
-    - assets/email_template.html
-    - assets/sendmail_template.txt
-    - assets/email_template.txt
-    - docs/output.md
-    - docs/README.md
-    - docs/usage.md
-    - conf/test.config
-    - conf/test_full.config
-    - .github/workflows/ci.yml
-    - CODE_OF_CONDUCT.md
-    - assets/nf-core-twistcgp_logo_light.png
-    - docs/images/nf-core-twistcgp_logo_light.png
-    - docs/images/nf-core-twistcgp_logo_dark.png
+    - .github/CONTRIBUTING.md
+    - .github/ISSUE_TEMPLATE/bug_report.yml
     - .github/ISSUE_TEMPLATE/config.yml
-    - .github/workflows/awstest.yml
-    - .github/workflows/awsfulltest.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting.yml
+    - .github/workflows/linting_comment.yml
+    - .prettierignore
+    - .prettierrc.yml
+    - CHANGELOG.md
+    - CITATIONS.md
+    - CODE_OF_CONDUCT.md
+    - LICENSE
+    - assets/email_template.html
+    - assets/email_template.txt
+    - assets/nf-core-twistcgp_logo_light.png
+    - assets/sendmail_template.txt
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - conf/test_full.config
+    - docs/images/nf-core-twistcgp_logo_dark.png
+    - docs/images/nf-core-twistcgp_logo_light.png
+    - docs/output.md
+    - docs/usage.md
   files_unchanged:
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
     - .github/ISSUE_TEMPLATE/bug_report.yml
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/ISSUE_TEMPLATE/feature_request.yml
     - .github/PULL_REQUEST_TEMPLATE.md
     - .github/workflows/branch.yml
-    - .github/workflows/linting_comment.yml
     - .github/workflows/linting.yml
-    - .github/CONTRIBUTING.md
-    - .github/.dockstore.yml
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/ISSUE_TEMPLATE/config.yml
-    - .github/ISSUE_TEMPLATE/feature_request.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .github/workflows/branch.yml
     - .github/workflows/linting_comment.yml
-    - .github/workflows/linting.yml
-    - .github/CONTRIBUTING.md
-    - .github/.dockstore.yml
-    - .github/CONTRIBUTING.md
-    - LICENSE
-    - .prettierignore
-    - .prettierignore
-    - .prettierignore
-    - .github/CONTRIBUTING.md
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .prettierignore
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/ISSUE_TEMPLATE/config.yml
-    - .github/ISSUE_TEMPLATE/feature_request.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - .github/workflows/branch.yml
-    - .github/workflows/linting_comment.yml
-    - .github/workflows/linting.yml
-    - .github/CONTRIBUTING.md
-    - .github/.dockstore.yml
-    - .github/CONTRIBUTING.md
-    - LICENSE
-    - .prettierignore
-    - .prettierignore
-    - .prettierignore
-    - .github/CONTRIBUTING.md
-    - .github/PULL_REQUEST_TEMPLATE.md
     - .prettierignore
     - CODE_OF_CONDUCT.md
-    - assets/nf-core-twistcgp_logo_light.png
-    - docs/images/nf-core-twistcgp_logo_light.png
-    - docs/images/nf-core-twistcgp_logo_dark.png
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/CONTRIBUTING.md
-    - .github/PULL_REQUEST_TEMPLATE.md
+    - LICENSE
     - assets/email_template.txt
+    - assets/nf-core-twistcgp_logo_light.png
     - docs/README.md
+    - docs/images/nf-core-twistcgp_logo_dark.png
+    - docs/images/nf-core-twistcgp_logo_light.png
   included_configs: false
   multiqc_config:
     - report_comment
   nextflow_config: false
   readme:
-    - nextflow_badge
-    - nextflow_badge
-    - nextflow_badge
     - nextflow_badge
 nf_core_version: 3.3.2
 repository_type: pipeline
