@@ -11,6 +11,7 @@ skip_features:
   - ci
   - citations
   - codespaces
+  - continuous_integration_testing
   - documentation
   - email
   - github
@@ -20,6 +21,5 @@ skip_features:
   - license
   - nf_core_configs
   - rocrate
-  - seqera_platform
   - slackreport
   - vscode
