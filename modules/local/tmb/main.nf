@@ -15,7 +15,7 @@ process TMB {
 
     output:
     tuple val(meta), path("*.log"), emit: log
-    tuple val(meta), path ("*_export.vcf"), emit: vcf
+    tuple val(meta), path ("*_export.vcf.gz"), emit: vcf
     // export a VCF with the considered variants
     path "versions.yml", emit: versions
 
