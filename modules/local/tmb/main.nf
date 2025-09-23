@@ -4,8 +4,8 @@ process TMB {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/tmb:1.3.0--pyh5e36f6f_0'
-        : 'quay.io/biocontainers/tmb:1.3.0--pyh5e36f6f_0'}"
+        ? 'https://depot.galaxyproject.org/singularity/tmb:1.5.0--pyhdfd78af_1'
+        : 'quay.io/biocontainers/tmb:1.5.0--pyhdfd78af_1'}"
 
     input:
     tuple val(meta), path(vcf), path(vcf_tbi)
