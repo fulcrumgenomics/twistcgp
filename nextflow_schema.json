@@ -219,8 +219,9 @@
                 },
                 "msisensor2_model_name": {
                     "type": "string",
-                    "description": "The specific model name for MSIsensor 2 analysis.",
-                    "enum": ["models_hg38", "models_hg19_GRCh37", "models_b37_HumanG1Kv37"]
+                    "description": "The specific model name for MSIsensor 2 analysis (default: hg38).",
+                    "enum": ["hg38", "hg19", "b37"],
+                    "default": "hg38"
                 },
                 "save_reference": {
                     "type": "boolean",

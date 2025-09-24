@@ -6,7 +6,7 @@ process GIT_CLONEMSISENSOR2MODEL {
         'community.wave.seqera.io/library/git:2.51.0--bd70ff2445f3ae66' }"
 
     input:
-    val model_name
+    val model
 
     output:
     path "model/*", emit: model
@@ -17,13 +17,18 @@ process GIT_CLONEMSISENSOR2MODEL {
 
     script:
     def args = task.ext.args ?: ''
+    def models = [hg38: 'models_hg38', hg19: 'models_hg19_GRCh37', b37: 'models_b37_HumanG1Kv37']
+    def model_name = models.get(model)
+    if (!model_name) {
+        throw new IllegalArgumentException("Unsupported model: ${model}. Supported models are: ${models.keySet().join(', ')}")
+    }
     """
     git \\
         clone \\
         ${args} \\
         https://github.com/niu-lab/msisensor2.git
 
-    mv msisensor2/${model_name} model
+    mv -v msisensor2/${model_name} model
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

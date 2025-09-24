@@ -19,7 +19,7 @@ tools:
 input:
   - model_name:
       type: string
-      description: Name of the desired model directory from msisensor2 repo
+      description: Name of the desired model from msisensor2 repo. Supported values are hg38, hg19, and b37.
 
 output:
   - model:
