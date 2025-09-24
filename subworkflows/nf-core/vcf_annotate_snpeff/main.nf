@@ -2,23 +2,19 @@
 // Run SNPEFF to annotate VCF files
 //
 
-include { SNPEFF_SNPEFF } from '../../../modules/nf-core/snpeff/snpeff'
+include { SNPEFF_SNPEFF    } from '../../../modules/nf-core/snpeff/snpeff'
 include { TABIX_BGZIPTABIX } from '../../../modules/nf-core/tabix/bgziptabix'
-include { SNPEFF_DOWNLOAD } from '../../../modules/nf-core/snpeff/download/main'
 
 workflow VCF_ANNOTATE_SNPEFF {
     take:
-    ch_vcf // channel: [ val(meta), path(vcf) ]
-    val_snpeff_db // string:  db version to use
+    ch_vcf          // channel: [ val(meta), path(vcf) ]
+    val_snpeff_db   // string:  db version to use
     ch_snpeff_cache // channel: [ path(cache) ] (optional)
 
     main:
     ch_versions = Channel.empty()
 
-    ch_snpeff_inputs = ch_snpeff_cache.map { meta, cache_path ->
-        tuple(meta.id, cache_path)
-    }
-    SNPEFF_SNPEFF(ch_vcf, val_snpeff_db, ch_snpeff_inputs)
+    SNPEFF_SNPEFF(ch_vcf, val_snpeff_db, ch_snpeff_cache)
     TABIX_BGZIPTABIX(SNPEFF_SNPEFF.out.vcf)
 
     // Gather versions of all tools used
@@ -26,9 +22,9 @@ workflow VCF_ANNOTATE_SNPEFF {
     ch_versions = ch_versions.mix(TABIX_BGZIPTABIX.out.versions)
 
     emit:
-    vcf_tbi = TABIX_BGZIPTABIX.out.gz_tbi // channel: [ val(meta), path(vcf), path(tbi) ]
-    reports = SNPEFF_SNPEFF.out.report // channel: [ path(csv) ]
-    summary = SNPEFF_SNPEFF.out.summary_html // channel: [ path(html) ]
+    vcf_tbi   = TABIX_BGZIPTABIX.out.gz_tbi // channel: [ val(meta), path(vcf), path(tbi) ]
+    reports   = SNPEFF_SNPEFF.out.report // channel: [ path(html) ]
+    summary   = SNPEFF_SNPEFF.out.summary_html // channel: [ path(html) ]
     genes_txt = SNPEFF_SNPEFF.out.genes_txt // channel: [ path(genes.txt) ]
-    versions = ch_versions // channel: [ path(versions.yml) ]
+    versions  = ch_versions // channel: [ path(versions.yml) ]
 }
