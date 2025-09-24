@@ -20,7 +20,7 @@ process CIVICPY {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}.civic"
 
     """
     export CIVICPY_CACHE_FILE=\$PWD/.civicpy
