@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+
+name: "git_clonemsisensor2model"
+description: Clone a the msisensor2 GitHub repository and return the desired model directory.
+keywords:
+  - git
+  - msisensor2
+  - model
+  - download
+tools:
+  - "git":
+      description: "Git is a free and open source distributed version control system."
+      homepage: "https://git-scm.com/"
+      documentation: "https://git-scm.com/doc"
+      tool_dev_url: "https://github.com/git/git"
+      license: ["GPL-2.0"]
+      identifier: ""
+
+input:
+  - model_name:
+      type: string
+      description: Name of the desired model from msisensor2 repo. Supported values are hg38, hg19, and b37.
+
+output:
+  - model:
+      - model/*:
+          type: file
+          description: All model files from desired msisensor2 model
+          pattern: "model/*"
+  - versions:
+      - versions.yml:
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+authors:
+  - "@znorgaard"
+maintainers:
+  - "@znorgaard"

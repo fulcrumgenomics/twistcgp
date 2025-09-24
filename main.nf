@@ -206,6 +206,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         baits,
         targets,
         params.use_msisensor_pro_licensed,
+        params.msisensor2_model_name,
         adapters_fasta,
         pon_cnn,
         bwa,
