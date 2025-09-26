@@ -21,6 +21,7 @@ You will need:
 cnvkit.py batch  \
     --normal *normal.bam \
     --targets baits.bed \
+    --fasta GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta \
     --output-reference pon.cnn \
     --output-dir cnv-kit-pon-reference/
 ```
