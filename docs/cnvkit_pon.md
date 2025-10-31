@@ -14,7 +14,6 @@ You may use BAM files processed with this pipeline.
   Note the command line argument is called "targets"; however, [the CNVkit documentation](https://cnvkit.readthedocs.io/en/stable/quickstart.html#build-a-reference-from-normal-samples-and-infer-tumor-copy-ratios) recommends providing the baits.
 - aligned and indexed BAM files for your PON samples, see [samtools index](https://www.htslib.org/doc/samtools-index.html)
 
-
 ```console
 cnvkit.py autobin  \
     --normal *normal.bam \
