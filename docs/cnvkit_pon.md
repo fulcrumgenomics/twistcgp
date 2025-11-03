@@ -43,6 +43,8 @@ You may use BAM files processed with this pipeline.
   - aligned BAM files for your PON samples
   - the bin sizes identified in the previous step
 
+  Using those files, run:
+
   ```console
   cnvkit.py batch  \
       --normal *normal.bam \
@@ -53,3 +55,5 @@ You may use BAM files processed with this pipeline.
       --target-avg-size 48 \
       --antitarget-avg-size 29880
   ```
+
+  This will generate a `pon.cnn` that can be passed to the pipeline using the `--pon_cnn` parameter.
