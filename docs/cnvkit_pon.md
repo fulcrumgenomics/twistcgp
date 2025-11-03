@@ -6,9 +6,9 @@ You may use BAM files processed with this pipeline.
 
 ## Steps
 
-1. [Install CNVkit](https://github.com/etal/cnvkit?tab=readme-ov-file#installation)
+### 1. [Install CNVkit](https://github.com/etal/cnvkit?tab=readme-ov-file#installation)
 
-2. [Calculate Bin Sizes](https://cnvkit.readthedocs.io/en/stable/pipeline.html#autobin)
+### 2. [Calculate Bin Sizes](https://cnvkit.readthedocs.io/en/stable/pipeline.html#autobin)
 
 You will need:
 
@@ -35,7 +35,7 @@ Antitarget:	3.347    29880
 
 Use these bin sizes for the next step.
 
-3. [Build a reference `.cnn` file](https://cnvkit.readthedocs.io/en/stable/quickstart.html#build-a-reference-from-normal-samples-and-infer-tumor-copy-ratios)
+### 3. [Build a reference `.cnn` file](https://cnvkit.readthedocs.io/en/stable/quickstart.html#build-a-reference-from-normal-samples-and-infer-tumor-copy-ratios)
 
 You will need:
 
