@@ -49,7 +49,7 @@ nextflow run twistcgp/main.nf \
 2. Download the cache with SnpEff, making sure that the genome version and database version match the pipeline parameters:
 
 ```console
-snpEff download GRCh38.105 -v
+snpEff download GRCh38.99 -v
 ```
 
 3. Pass the cache to the pipeline:
@@ -62,7 +62,7 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --ensemblvep_cache ~/vep/ \
-   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.2-1/data/GRCh38.105" \
+   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/GRCh38.99" \
    --outdir <OUTDIR>
 ```
 

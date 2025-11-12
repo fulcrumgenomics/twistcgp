@@ -102,7 +102,7 @@
                 },
                 "snpeff_db": {
                     "type": "string",
-                    "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 105."
+                    "description": "The database version that SnpEff will use for variant annotation. Alternatively databases' names can be listed with the snpEff databases. Defaults to version 99."
                 },
                 "ensemblvep_species": {
                     "type": "string",
