@@ -5,7 +5,7 @@ process CIVICPY {
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
         ? 'https://depot.galaxyproject.org/singularity/civicpy:5.0.0--pyhdfd78af_0'
-        : 'docker.io/griffithlab/civicpy:5.0.0' }"
+        : 'docker.io/griffithlab/civicpy:5.1.0' }"
 
     input:
     tuple val(meta), path(vcf), path(tbi)
