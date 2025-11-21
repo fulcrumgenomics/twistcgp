@@ -228,15 +228,13 @@ workflow TWISTCGP {
     //
     // Collate and save software versions
     //
-    softwareVersionsToYAML(ch_versions)
-        .collectFile(
-            storeDir: "${params.outdir}/pipeline_info",
-            name: 'twistcgp_software_' + 'mqc_' + 'versions.yml',
-            sort: true,
-            newLine: true,
-        )
-        .set { ch_collated_versions }
-
+    ch_collated_versions = softwareVersionsToYAML(ch_versions)
+    .collectFile(
+        storeDir: "${params.outdir}/pipeline_info",
+        name: 'twistcgp_software_mqc_versions.yml',
+        sort: true,
+        newLine: true,
+    )
 
     //
     // MODULE: MultiQC
