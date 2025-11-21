@@ -135,7 +135,7 @@ workflow TWISTCGP {
         vep_extra_files,
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
-    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
     // MODULE: TMB
