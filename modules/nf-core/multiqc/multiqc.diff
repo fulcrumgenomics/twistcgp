@@ -4,6 +4,15 @@ Changes in component 'nf-core/multiqc'
 Changes in 'multiqc/main.nf':
 --- modules/nf-core/multiqc/main.nf
 +++ modules/nf-core/multiqc/main.nf
+@@ -15,7 +15,7 @@
+     path(sample_names)
+ 
+     output:
+-    path "*multiqc_report.html", emit: report
++    path "*.html", emit: report
+     path "*_data"              , emit: data
+     path "*_plots"             , optional:true, emit: plots
+     path "versions.yml"        , emit: versions
 @@ -26,21 +26,21 @@
      script:
      def args = task.ext.args ?: ''
