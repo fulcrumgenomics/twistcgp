@@ -130,6 +130,14 @@
                     "description": "Path to a VCF file that has been emitted from COSMIC, compressed, and indexed.",
                     "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html"
                 },
+                "gnomad_vcf": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.vcf\\.bgz$",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Path to a VCF file that has been emitted from gnomAD, compressed, and indexed.",
+                    "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html. Instructions on how to generate this file can be found in docs/gnomad_vcf.md"
+                },
                 "skip_civicpy": {
                     "type": "boolean",
                     "default": false,
@@ -140,10 +148,10 @@
                     "exists": true,
                     "description": "Path to the variant calling config file that defines how pyTMB should interpret the VCF structure as emitted by GATK_MUTECT2."
                 },
-                "tmb_snpeff_config": {
+                "tmp_vep_config": {
                     "type": "string",
                     "exists": true,
-                    "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by SnpEff."
+                    "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
                 }
             }
         },
