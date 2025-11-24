@@ -44,7 +44,8 @@ nextflow run twistcgp/main.nf \
    --outdir <OUTDIR>
 ```
 
-Note that the path provided to `--ensemblvep_cache` should be the parent directory of the parent directory of the cache files:
+Note that the path provided to `--ensemblvep_cache` should be the parent directory of the parent directory of the cache files.
+In this example, it would be `--ensemblvep_cache ~/vep/`:
 
 ```console
 $ tree -L 1 ~/vep/
@@ -77,7 +78,8 @@ nextflow run twistcgp/main.nf \
    --outdir <OUTDIR>
 ```
 
-Note that the path provided to `--snpeff_cache` should be the parent directory of the cache files:
+Note that the path provided to `--snpeff_cache` should be the parent directory of the cache files.
+In this example, SnpEff was installed with conda, so the `--snpeff_cache` would be `${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/`:
 
 ```console
 $ tree -L 1 "${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/"
