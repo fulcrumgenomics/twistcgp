@@ -7,7 +7,7 @@ from the gnomAD [4.1 exomes set](https://gnomad.broadinstitute.org/downloads#v4)
 
 Any gnomAD VCF can be passed to the pipeline using the `--gnomad_vcf` parameter.
 A script is included in the pipeline to prepare a gnomAD VCF that is sub-selected to the genomic
-positions included in the targets BED file.
+positions included in the targets BED file to facilitate variant annotation.
 
 To run this script:
 
@@ -15,7 +15,7 @@ To run this script:
 bash ./assets/scripts/fetch_and_intersect_gnomad_vcfs.sh
 ```
 
-This will generate a gnomAD VCF file and its corresponding TBI index.
+This will generate a bg-zipped gnomAD VCF file and its corresponding TBI index.
 
 The VCF can be supplied to the pipeline:
 
