@@ -87,7 +87,7 @@ workflow {
     snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
     tmb_mutect2_config = Channel.fromPath(params.tmb_mutect2_config).collect()
-    tmb_snpeff_config = Channel.fromPath(params.tmb_snpeff_config).collect()
+    tmb_vep_config = Channel.fromPath(params.tmb_vep_config).collect()
 
     ensemblvep_info = Channel.value(
         tuple(
@@ -117,7 +117,7 @@ workflow {
         ensemblvep_info,
         snpeff_cache,
         tmb_mutect2_config,
-        tmb_snpeff_config,
+        tmb_vep_config,
         ensemblvep_cache,
         ch_cosmic_vcf,
         ch_gnomad_vcf
@@ -154,7 +154,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     snpeff_cache // channel: path(snpeff_cache)
     tmb_mutect2_config // required path to variant calling config file
-    tmb_snpeff_config // required path to variant annotation config file
+    tmb_vep_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
     ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
@@ -239,7 +239,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ensemblvep_info,
         ch_snpeff_cache,
         tmb_mutect2_config,
-        tmb_snpeff_config,
+        tmb_vep_config,
         ch_vep_cache,
         vep_extra_files,
         ch_msi_scan,
