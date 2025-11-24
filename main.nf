@@ -25,6 +25,7 @@ include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 def getTbiChannel(param, idName, prepChannel) {
+// Returns a Nextflow channel containing the index (.tbi) file for a given VCF parameter.
     if (param) {
         def tbi = file("${param}" + ".tbi")
         if (tbi.exists()) {
@@ -36,6 +37,21 @@ def getTbiChannel(param, idName, prepChannel) {
         return Channel.value([ ['id': "${idName}"], [] ])
     }
 }
+
+def handleOptionalVcf(paramValue, paramName, vep_extra_files, prepare_indices_out) {
+//If a VCF param is provided for VEP, check if it exists. If it exists and has a corresponding
+//.tbi, then add it to the list of extra files to supply to VEP.
+    if (!paramValue) return
+
+    def vcfPath = file(paramValue, checkIfExists: true)
+    vep_extra_files.add(vcfPath)
+
+    def ch_tbi = getTbiChannel(paramValue, "${paramName}_tbi", prepare_indices_out."ch_${paramName}_tbi")
+    def ch_tbi_file = ch_tbi.map { _meta, f -> f }
+
+    vep_extra_files.add(ch_tbi_file)
+}
+
 
 workflow {
     //
@@ -86,6 +102,9 @@ workflow {
     ch_cosmic_vcf = Channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
+    ch_gnomad_vcf = Channel.value(
+        tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
+    )
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
@@ -101,6 +120,7 @@ workflow {
         tmb_snpeff_config,
         ensemblvep_cache,
         ch_cosmic_vcf,
+        ch_gnomad_vcf
     )
 
     //
@@ -137,6 +157,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     tmb_snpeff_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
+    ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
 
     main:
     // Initialize fasta file with meta map:
@@ -147,7 +168,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
 
     PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
-    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf)
+    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf, ch_gnomad_vcf)
     PREPARE_ANNOTATION_DB(
         ensemblvep_info,
         snpeff_genome_info,
@@ -185,17 +206,13 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     // VEP extra files
     vep_extra_files = []
+    def vep_inputs = [
+    cosmic : params.cosmic_vcf,
+    gnomad : params.gnomad_vcf,
+    ]
 
-    if (params.cosmic_vcf) {
-        def cosmic_vcf_path = file(params.cosmic_vcf, checkIfExists: true)
-        vep_extra_files.add(cosmic_vcf_path)
-
-        def ch_cosmic_tbi = getTbiChannel(params.cosmic_vcf, 'cosmic_tbi', PREPARE_INDICES.out.ch_cosmic_tbi)
-
-        // Extract the actual TBI file from the channel to append to vep_extra_files
-        def ch_cosmic_tbi_file = ch_cosmic_tbi.map { _meta, f -> f }
-
-        vep_extra_files.add(ch_cosmic_tbi_file)
+    vep_inputs.each { name, value ->
+      handleOptionalVcf(value, name, vep_extra_files, PREPARE_INDICES.out)
     }
 
 
