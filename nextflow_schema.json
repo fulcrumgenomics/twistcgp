@@ -18,7 +18,7 @@
                 "annotation_genome_version",
                 "snpeff_db",
                 "tmb_mutect2_config",
-                "tmb_snpeff_config"
+                "tmb_vep_config"
             ],
             "properties": {
                 "input": {
@@ -148,7 +148,7 @@
                     "exists": true,
                     "description": "Path to the variant calling config file that defines how pyTMB should interpret the VCF structure as emitted by GATK_MUTECT2."
                 },
-                "tmp_vep_config": {
+                "tmb_vep_config": {
                     "type": "string",
                     "exists": true,
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
