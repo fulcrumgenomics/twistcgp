@@ -145,7 +145,7 @@ Tumor mutational burden (TMB) is a total number of somatic mutations present wit
 It is crucial to exclude germline variants for the calculation of TMB. This pipeline expects a
 VCF derived from [gnomAD](https://gnomad.broadinstitute.org/).
 
-See [docs/gnomad_vcf.md](/docs/bwamem2_index.md) for details on how to generate a gnomAD VCF.
+See [docs/gnomad_vcf.md](/docs/gnomad_vcf.md) for details on how to generate a gnomAD VCF.
 
 ### Run the Pipeline
 
