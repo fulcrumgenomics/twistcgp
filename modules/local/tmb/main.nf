@@ -10,7 +10,7 @@ process TMB {
     input:
     tuple val(meta), path(vcf), path(vcf_tbi)
     tuple val(meta2), path(targets)
-    path tmb_snpeff_config
+    path tmb_vep_config
     path tmb_mutect2_config
 
     output:
@@ -29,7 +29,7 @@ process TMB {
     def target_region = args.contains("--effGenomeSize") ? '' : targets_bed
     """
     pyTMB.py -i ${vcf} \\
-        --dbConfig ${tmb_snpeff_config} \\
+        --dbConfig ${tmb_vep_config} \\
         --varConfig ${tmb_mutect2_config} \\
         ${target_region} \\
         ${args} \\

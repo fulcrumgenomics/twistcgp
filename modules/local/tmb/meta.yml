@@ -38,9 +38,9 @@ input:
     description: BED file defining target regions.
     pattern: "*.bed"
     required: true
-  - name: tmb_snpeff_config
+  - name: tmb_vep_config
     type: file
-    description: Configuration file for the variant database annotation tool (e.g. snpEff).
+    description: Configuration file for the variant database annotation tool (e.g. VEP).
     pattern: "*.yml"
     required: true
   - name: tmb_mutect2_config
