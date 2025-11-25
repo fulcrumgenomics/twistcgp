@@ -135,7 +135,7 @@ workflow TWISTCGP {
         vep_extra_files,
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
-    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
     // MODULE: TMB
@@ -228,15 +228,13 @@ workflow TWISTCGP {
     //
     // Collate and save software versions
     //
-    softwareVersionsToYAML(ch_versions)
-        .collectFile(
-            storeDir: "${params.outdir}/pipeline_info",
-            name: 'twistcgp_software_' + 'mqc_' + 'versions.yml',
-            sort: true,
-            newLine: true,
-        )
-        .set { ch_collated_versions }
-
+    ch_collated_versions = softwareVersionsToYAML(ch_versions)
+    .collectFile(
+        storeDir: "${params.outdir}/pipeline_info",
+        name: 'twistcgp_software_mqc_versions.yml',
+        sort: true,
+        newLine: true,
+    )
 
     //
     // MODULE: MultiQC
