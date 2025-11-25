@@ -1,8 +1,60 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ========= USER SETTINGS =========
-TARGET_BED="assets/Targeted_Twist_OncoProfilerDNA_Ver2_TE-96008936_hg38_v2.02.bed"
+show_help() {
+    cat <<EOF
+Usage: $0 --bed <TARGET_BED>
+
+Required arguments:
+  -b, --bed <TARGET_BED>     BED file to use for intersection.
+
+Optional:
+  -h, --help                 Show this help message and exit.
+
+Example:
+  $0 --bed assets/targets.bed
+EOF
+}
+
+TARGET_BED=""
+
+# --- Parse arguments ---
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -b|--bed)
+            if [[ $# -lt 2 ]]; then
+                echo "ERROR: --bed requires an argument." >&2
+                exit 1
+            fi
+            TARGET_BED="$2"
+            shift 2
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "ERROR: Unknown argument: $1" >&2
+            echo "Use --help for usage." >&2
+            exit 1
+            ;;
+    esac
+done
+
+# --- Validate BED file ---
+if [[ -z "${TARGET_BED}" ]]; then
+    echo "ERROR: You must provide --bed <file>" >&2
+    echo "Use --help for usage." >&2
+    exit 1
+fi
+
+if [[ ! -f "$TARGET_BED" ]]; then
+    echo "ERROR: BED file not found: $TARGET_BED" >&2
+    exit 1
+fi
+
+echo "Using target BED: $TARGET_BED"
+
 
 # Build list of chromosome VCF URLs
 EXOME_FILES=()
