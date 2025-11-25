@@ -19,6 +19,8 @@ wget https://ftp.ensembl.org/pub/release-114/variation/indexed_vep_cache/homo_sa
 tar -xzf homo_sapiens_vep_114_GRCh38.tar.gz
 ```
 
+The version and build you choose should match the `--ensemblvep_cache_version` and `--annotation_genome_version` arguments provided to the pipeline, respectively.
+
 2. Alternatively, install Ensembl VEP which is available directly from [github.com/ensembl-vep](https://github.com/Ensembl/ensembl-vep.git) or install with mamba/conda, [bioconda::ensembl-vep](https://anaconda.org/bioconda/ensembl-vep). If using conda, activate your environment.
 
 3. Download the cache with Ensembl VEP, making sure that the genome version and database version match the pipeline parameters.
@@ -42,6 +44,16 @@ nextflow run twistcgp/main.nf \
    --outdir <OUTDIR>
 ```
 
+Note that the path provided to `--ensemblvep_cache` should be the parent directory of the parent directory of the cache files.
+In this example, it would be `--ensemblvep_cache ~/vep/`:
+
+```console
+$ tree -L 1 ~/vep/
+~/vep/
+├── homo_sapiens
+│   └── 114_GRCh38
+```
+
 ## SnpEff cache
 
 1. Install SnpEff which is available directly from [github.com/snpeff](https://pcingola.github.io/SnpEff/) or install with mamba/conda, [bioconda::snpeff](https://anaconda.org/bioconda/snpeff). If using conda, activate your environment.
@@ -62,8 +74,17 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --ensemblvep_cache ~/vep/ \
-   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/GRCh38.99" \
+   --snpeff_cache "${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/" \
    --outdir <OUTDIR>
+```
+
+Note that the path provided to `--snpeff_cache` should be the parent directory of the cache files.
+In this example, SnpEff was installed with conda, so the `--snpeff_cache` would be `${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/`:
+
+```console
+$ tree -L 1 "${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/"
+"${CONDA_PREFIX}/share/snpeff-5.3.0a-1/data/"
+├── GRCh38.99
 ```
 
 ## CIViC cache
