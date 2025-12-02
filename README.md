@@ -17,6 +17,7 @@
 1. Variant Calling via local assembly of haplotypes ([`gatk4/mutect2](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Annotate variants (['SnpEff`](https://pcingola.github.io/SnpEff/))
+1. Calculate Tumor Mutational Burden ([pyTMB](https://github.com/bioinfo-pf-curie/TMB))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
 1. Identify MSI ([`MSIsensor2`](https://github.com/niu-lab/msisensor2) or [`MSIsensor-pro`](https://github.com/xjtu-omics/msisensor-pro))
 1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
@@ -137,6 +138,14 @@ To use a pre-downloaded cache for variant annotation, supply the parameter `--sn
 For details on how to generate the cache see [docs/variant_annotation.md](/docs/variant_annotation.md).
 
 If a cache is not provided, the pipeline will automatically download it (which will add computation time).
+
+### (Optionally) Generate a gnomAD VCF for Tumor Mutation Burden Calculation
+
+Tumor mutational burden (TMB) is a total number of somatic mutations present within the cancer genome.
+It is crucial to exclude germline variants for the calculation of TMB. This pipeline expects a
+VCF derived from [gnomAD](https://gnomad.broadinstitute.org/).
+
+See [docs/gnomad_vcf.md](/docs/gnomad_vcf.md) for details on how to generate a gnomAD VCF.
 
 ### Run the Pipeline
 
