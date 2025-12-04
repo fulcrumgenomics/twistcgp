@@ -97,6 +97,8 @@ The provided VCF file must contain allele frequencies.
 
 The germline resource VCF can be supplied to the pipeline using the `--population_germline_vcf` parameter.
 
+The corresponding TBI index can be supplied using the `--population_germline_tbi` parameter.
+
 See [docs/germline_resource_vcf.md](/docs/germline_resource_vcf.md) for more details on how to generate this input.
 
 <details><summary>Example Germline Resource VCF Records</summary>
@@ -120,7 +122,11 @@ See [docs/germline_resource_vcf.md](/docs/germline_resource_vcf.md) for more det
 
 While a panel of normals (PoN) VCF is not required for Mutect2 to run, it is recommended. A PoN is a VCF that contains sites found across multiple "normal" samples (e.g., derived from healthy tissue that is believed to not have somatic alterations), ideally from the same sequencing preparation, pipeline, platform, etc. as the tumor samples. While the germline resource helps model population variants, the PoN VCF filters out technical artifacts to improve the quality of the variant calling analyses.
 
-The panel of normals VCF can be supplied to the pipeline using the `--pon_vcf` parameter. See [docs/panel_of_normals_vcf.md](/docs/panel_of_normals_vcf.md) for more details on how to generate a panel of normals VCF.
+The panel of normals VCF can be supplied to the pipeline using the `--pon_vcf` parameter.
+
+Its corresponding TBI file can be supplied using the `--pon_tbi` parameter.
+
+See [docs/panel_of_normals_vcf.md](/docs/panel_of_normals_vcf.md) for more details on how to generate a panel of normals VCF.
 
 ### (Optionally) Provide a Panel of Normal Reference for CNV Calling
 

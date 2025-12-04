@@ -28,5 +28,7 @@ nextflow run twistcgp/main.nf \
    --targets targets.bed \
    --ensemblvep_cache ~/vep/ \
    --gnomad_vcf assets/gnomad_vcf_processing/all_chromosomes.intersect.vcf.bgz \
+   --gnomad_tbi assets/gnomad_vcf_processing/all_chromosomes.intersect.vcf.bgz.tbi \
+
    --outdir <OUTDIR>
 ```
