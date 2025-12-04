@@ -74,10 +74,22 @@
                     "description": "Optional path to the compressed germline resource VCF file. Should contain allele frequencies.",
                     "default": null
                 },
+                "population_germline_tbi": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.gz\\.tbi$",
+                    "description": "Optional path to the TBI of the germline resource VCF.",
+                    "default": null
+                },
                 "pon_vcf": {
                     "type": ["string", "null"],
                     "pattern": "^\\S+\\.vcf\\.gz$",
                     "description": "Optional path to the compressed panel of normals VCF file.",
+                    "default": null
+                },
+                "pon_tbi": {
+                    "type": ["string", "null"],
+                    "pattern": "^\\S+\\.gz\\.tbi$",
+                    "description": "Optional path to the TBI of the compressed panel of normals VCF.",
                     "default": null
                 },
                 "outdir": {
@@ -130,12 +142,28 @@
                     "description": "Path to a VCF file that has been emitted from COSMIC, compressed, and indexed.",
                     "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html"
                 },
+                "cosmic_tbi": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.gz\\.tbi$",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Path to the TBI of a VCF file that has been emitted from COSMIC.",
+                    "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html"
+                },
                 "gnomad_vcf": {
                     "type": "string",
                     "pattern": "^\\S+\\.vcf\\.bgz$",
                     "format": "file-path",
                     "fa_icon": "fas fa-file",
                     "description": "Path to a VCF file that has been emitted from gnomAD, compressed, and indexed.",
+                    "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html. Instructions on how to generate this file can be found in docs/gnomad_vcf.md"
+                },
+                "gnomad_tbi": {
+                    "type": "string",
+                    "pattern": "^\\S+\\.bgz\\.tbi$",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Path to the TBI of a VCF file that has been emitted from gnomAD.",
                     "help_text": "To be used with VEP's `--custom` flag .\nMore information can be found here: https://useast.ensembl.org/info/docs/tools/vep/script/vep_custom.html. Instructions on how to generate this file can be found in docs/gnomad_vcf.md"
                 },
                 "skip_civicpy": {
@@ -154,6 +182,12 @@
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
                 }
             }
+        },
+        "dependentRequired": {
+            "population_germline_vcf": ["population_germline_tbi"],
+            "pon_vcf": ["pon_tbi"],
+            "gnomad_vcf": ["gnomad_tbi"],
+            "cosmic_vcf": ["cosmic_tbi"]
         },
         "tool_selection_options": {
             "title": "Tool selection options",
