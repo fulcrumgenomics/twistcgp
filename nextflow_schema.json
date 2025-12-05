@@ -181,13 +181,13 @@
                     "exists": true,
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
                 }
+            },
+            "dependentRequired": {
+                "population_germline_vcf": ["population_germline_tbi"],
+                "pon_vcf": ["pon_tbi"],
+                "gnomad_vcf": ["gnomad_tbi"],
+                "cosmic_vcf": ["cosmic_tbi"]
             }
-        },
-        "dependentRequired": {
-            "population_germline_vcf": ["population_germline_tbi"],
-            "pon_vcf": ["pon_tbi"],
-            "gnomad_vcf": ["gnomad_tbi"],
-            "cosmic_vcf": ["cosmic_tbi"]
         },
         "tool_selection_options": {
             "title": "Tool selection options",
