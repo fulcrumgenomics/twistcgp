@@ -50,7 +50,7 @@ workflow TWISTCGP {
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
     ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
-    ch_pop_germ_tbi // channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pop_germline_resource_tbi /// channel [optional]: val(reference_meta), path(germline_resource VCF index)
     ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
     ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
@@ -59,7 +59,7 @@ workflow TWISTCGP {
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_vep_config /// path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
-    vep_extra_files // channel [optional]: [path(cosmic_vcf)]
+    vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
 
     main:
@@ -97,8 +97,7 @@ workflow TWISTCGP {
     // MODULE: PICARD_MARKDUPLICATES
     //
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
@@ -116,7 +115,7 @@ workflow TWISTCGP {
         ch_fasta_gzi,
         ch_dict,
         ch_pop_germline_resource.map { _meta, vcf -> vcf },
-        ch_pop_germ_tbi.map { _meta, tbi -> tbi },
+        ch_pop_germline_resource_tbi.map { _meta, tbi -> tbi },
         ch_pon_vcf.map { _meta, vcf -> vcf },
         ch_pon_tbi.map { _meta, tbi -> tbi },
     )
@@ -132,7 +131,7 @@ workflow TWISTCGP {
         ensemblvep_info,
         ch_snpeff_cache,
         ch_vep_cache,
-        vep_extra_files,
+        vep_extra_files_no_meta,
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
@@ -180,10 +179,11 @@ workflow TWISTCGP {
             ch_bam_and_index,
             ch_msi_scan,
             [[:], []], // fasta and fai are only required for CRAM format
-            [[:], []]
+            [[:], []],
         )
         ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
-    } else {
+    }
+    else {
         targets_are_bed = targets[1].getExtension() == "bed"
         if (!targets_are_bed) {
             TARGETS_TO_BED(targets)
@@ -196,7 +196,7 @@ workflow TWISTCGP {
         ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
         MSISENSOR2_MSI(
             ch_bam_and_target_bed,
-            ch_msi_scan.collect().map {it -> it[1]},
+            ch_msi_scan.collect().map { it -> it[1] },
             GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
         )
         ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
@@ -213,8 +213,7 @@ workflow TWISTCGP {
     //
     // MODULE: PICARD_COLLECTHSMETRICS
     //
-    ch_bam_and_regions = ch_bam_and_index
-        .map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
+    ch_bam_and_regions = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
     PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_fasta_gzi, ch_dict)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { it[1] })
     ch_versions = ch_versions.mix(PICARD_COLLECTHSMETRICS.out.versions.first())
@@ -228,8 +227,7 @@ workflow TWISTCGP {
     //
     // Collate and save software versions
     //
-    ch_collated_versions = softwareVersionsToYAML(ch_versions)
-    .collectFile(
+    ch_collated_versions = softwareVersionsToYAML(ch_versions).collectFile(
         storeDir: "${params.outdir}/pipeline_info",
         name: 'twistcgp_software_mqc_versions.yml',
         sort: true,

@@ -17,41 +17,13 @@ include { TWISTCGP } from './workflows/twistcgp'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
-include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
 include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_db'
+include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-def getTbiChannel(param, idName, prepChannel) {
-// Returns a Nextflow channel containing the index (.tbi) file for a given VCF parameter.
-    if (param) {
-        def tbi = file("${param}" + ".tbi")
-        if (tbi.exists()) {
-            return Channel.value([ ['id': "${idName}"], tbi ])
-        } else {
-            return prepChannel
-        }
-    } else {
-        return Channel.value([ ['id': "${idName}"], [] ])
-    }
-}
-
-def handleOptionalVcf(paramValue, paramName, vep_extra_files, prepare_indices_out) {
-//If a VCF param is provided for VEP, check if it exists. If it exists and has a corresponding
-//.tbi, then add it to the list of extra files to supply to VEP.
-    if (!paramValue) return
-
-    def vcfPath = file(paramValue, checkIfExists: true)
-    vep_extra_files.add(vcfPath)
-
-    def ch_tbi = getTbiChannel(paramValue, "${paramName}_tbi", prepare_indices_out."ch_${paramName}_tbi")
-    def ch_tbi_file = ch_tbi.map { _meta, f -> f }
-
-    vep_extra_files.add(ch_tbi_file)
-}
-
 
 workflow {
     //
@@ -102,9 +74,12 @@ workflow {
     ch_cosmic_vcf = Channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
+
     ch_gnomad_vcf = Channel.value(
         tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
     )
+
+
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
@@ -120,7 +95,7 @@ workflow {
         tmb_vep_config,
         ensemblvep_cache,
         ch_cosmic_vcf,
-        ch_gnomad_vcf
+        ch_gnomad_vcf,
     )
 
     //
@@ -198,23 +173,39 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
         : PREPARE_GENOME.out.msi_scan
 
-    // Grab inputs for GATK4/MUTECT2 from params
-    // optional args that are not provided are instantiated as a value channel with an empty list
+    //GATK Mutect2 resources
+    ch_pop_germline_resource_tbi = params.population_germline_tbi
+        ? Channel.fromPath(params.population_germline_tbi).map { it -> [[id: 'population_germline_resource_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_germline_resource_tbi
 
-    ch_pop_germ_tbi = getTbiChannel(params.population_germline_vcf, 'population_germline_tbi', PREPARE_INDICES.out.ch_germline_resource_tbi)
-    ch_pon_tbi = getTbiChannel(params.pon_vcf, 'pon_tbi', PREPARE_INDICES.out.ch_pon_tbi)
+    ch_pon_tbi = params.pon_tbi
+        ? Channel.fromPath(params.pon_tbi).map { it -> [[id: 'pon_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_pon_tbi
 
     // VEP extra files
-    vep_extra_files = []
-    def vep_inputs = [
-    cosmic : params.cosmic_vcf,
-    gnomad : params.gnomad_vcf,
-    ]
+    ch_cosmic_tbi = params.cosmic_tbi
+        ? Channel.fromPath(params.cosmic_tbi).map { it -> [[id: 'cosmic_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_cosmic_tbi
 
-    vep_inputs.each { name, value ->
-      handleOptionalVcf(value, name, vep_extra_files, PREPARE_INDICES.out)
+    ch_gnomad_tbi = params.gnomad_tbi
+        ? Channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_gnomad_tbi
+
+    vep_extra_files = channel.empty()
+    // Check for VCFs from either COSMIC or gnomAD; VCF and TBI files both get passed to VEP
+    if (params.cosmic_vcf) {
+        vep_extra_files = vep_extra_files
+            .mix(ch_cosmic_vcf)
+            .mix(ch_cosmic_tbi)
     }
 
+    if (params.gnomad_vcf) {
+        vep_extra_files = vep_extra_files
+            .mix(ch_gnomad_vcf)
+            .mix(ch_gnomad_tbi)
+    }
+
+    vep_extra_files_no_meta = vep_extra_files.map { _m, f -> f }.collect()
 
     // WORKFLOW: Run pipeline
     //
@@ -232,7 +223,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         fasta_fai,
         fasta_gzi,
         ch_pop_germline_resource,
-        ch_pop_germ_tbi,
+        ch_pop_germline_resource_tbi,
         ch_pon_vcf,
         ch_pon_tbi,
         snpeff_genome_info,
@@ -241,7 +232,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         tmb_mutect2_config,
         tmb_vep_config,
         ch_vep_cache,
-        vep_extra_files,
+        vep_extra_files_no_meta,
         ch_msi_scan,
     )
 
