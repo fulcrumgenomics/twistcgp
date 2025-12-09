@@ -18,6 +18,7 @@ include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_twis
 include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
 include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_db'
+include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -48,14 +49,10 @@ workflow {
     ch_pop_germline_resource = Channel.value(
         tuple([id: 'population_germline_resource'], params.population_germline_vcf ? file(params.population_germline_vcf) : [])
     )
-    ch_pop_germline_resource_tbi = params.population_germline_resource_tbi ? Channel.fromPath(params.population_germline_resource_tbi) : []
-
 
     ch_pon_vcf = Channel.value(
         tuple([id: 'pon_vcf'], params.pon_vcf ? file(params.pon_vcf) : [])
     )
-    ch_pon_tbi = params.pon_tbi ? Channel.fromPath(params.pon_tbi) : []
-
 
     // VCF Annotation Parameters (SnpEff + VEP)
     snpeff_genome_info = Channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
@@ -77,12 +74,10 @@ workflow {
     ch_cosmic_vcf = Channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
-    ch_cosmic_tbi = params.cosmic_tbi ? Channel.fromPath(params.cosmic_tbi) : []
 
     ch_gnomad_vcf = Channel.value(
         tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
     )
-    ch_gnomad_tbi = params.gnomad_tbi ? Channel.fromPath(params.gnomad_tbi) : []
 
 
     FULCRUMGENOMICS_TWISTCGP(
@@ -92,9 +87,7 @@ workflow {
         adapters_fasta,
         pon_cnn,
         ch_pop_germline_resource,
-        ch_pop_germline_resource_tbi,
         ch_pon_vcf,
-        ch_pon_tbi,
         snpeff_genome_info,
         ensemblvep_info,
         snpeff_cache,
@@ -102,9 +95,7 @@ workflow {
         tmb_vep_config,
         ensemblvep_cache,
         ch_cosmic_vcf,
-        ch_cosmic_tbi,
         ch_gnomad_vcf,
-        ch_gnomad_tbi,
     )
 
     //
@@ -133,9 +124,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
     ch_pop_germline_resource // optional val(reference meta), path(germline_resource VCF)
-    ch_pop_germline_resource_tbi // optional path(germline_resource TBI)
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
-    ch_pon_tbi // optional path(panel_of_normals TBI)
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     snpeff_cache // channel: path(snpeff_cache)
@@ -143,9 +132,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     tmb_vep_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
-    ch_cosmic_tbi // optional path(COSMIC TBI)
     ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
-    ch_gnomad_tbi // optional path(gnomAD TBI)
 
     main:
     // Initialize fasta file with meta map:
@@ -156,6 +143,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
 
     PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
+    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf, ch_gnomad_vcf)
     PREPARE_ANNOTATION_DB(
         ensemblvep_info,
         snpeff_genome_info,
@@ -185,8 +173,23 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
         : PREPARE_GENOME.out.msi_scan
 
+    //GATK Mutect2 resources
+    ch_pop_germline_resource_tbi = params.population_germline_tbi
+        ? Channel.fromPath(params.population_germline_tbi).map { it -> [[id: 'population_germline_resource_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_germline_resource_tbi
+
+    ch_pon_tbi = params.pon_tbi
+        ? Channel.fromPath(params.pon_tbi).map { it -> [[id: 'pon_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_pon_tbi
+
     // VEP extra files
-    // the files provided here should match the file in ext.args in modules.config
+    ch_cosmic_tbi = params.cosmic_tbi
+        ? Channel.fromPath(params.cosmic_tbi).map { it -> [[id: 'cosmic_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_cosmic_tbi
+
+    ch_gnomad_tbi = params.gnomad_tbi
+        ? Channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
+        : PREPARE_INDICES.out.ch_gnomad_tbi
     vep_extra_files = []
 
     if (params.cosmic_vcf && params.cosmic_tbi) {

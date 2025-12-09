@@ -50,9 +50,9 @@ workflow TWISTCGP {
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
     ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
-    ch_pop_germline_resource_tbi // channel [optional]: path(germline_resource VCF index)
+    ch_pop_germline_resource_tbi /// channel [optional]: val(reference_meta), path(germline_resource VCF index)
     ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
-    ch_pon_tbi // channel [optional]:  path(panel_of_normals VCF index)
+    ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     ch_snpeff_cache // channel [optional]: path(snpeff_cache)
@@ -115,9 +115,9 @@ workflow TWISTCGP {
         ch_fasta_gzi,
         ch_dict,
         ch_pop_germline_resource.map { _meta, vcf -> vcf },
-        ch_pop_germline_resource_tbi,
+        ch_pop_germline_resource_tbi.map { _meta, tbi -> tbi },
         ch_pon_vcf.map { _meta, vcf -> vcf },
-        ch_pon_tbi,
+        ch_pon_tbi.map { _meta, tbi -> tbi },
     )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
