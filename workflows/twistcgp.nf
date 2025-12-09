@@ -59,7 +59,7 @@ workflow TWISTCGP {
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_vep_config /// path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
-    vep_extra_files // channel [optional]: [path(cosmic_vcf)]
+    vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
 
     main:
@@ -131,7 +131,7 @@ workflow TWISTCGP {
         ensemblvep_info,
         ch_snpeff_cache,
         ch_vep_cache,
-        vep_extra_files,
+        vep_extra_files_no_meta,
     )
     ch_versions = ch_versions.mix(VCF_ANNOTATE.out.versions.first())
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)

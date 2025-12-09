@@ -190,15 +190,22 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_gnomad_tbi = params.gnomad_tbi
         ? Channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
         : PREPARE_INDICES.out.ch_gnomad_tbi
-    vep_extra_files = []
 
-    if (params.cosmic_vcf && params.cosmic_tbi) {
-        vep_extra_files << [params.cosmic_vcf, params.cosmic_tbi]
+    vep_extra_files = channel.empty()
+    // Check for VCFs from either COSMIC or gnomAD; VCF and TBI files both get passed to VEP
+    if (params.cosmic_vcf) {
+        vep_extra_files = vep_extra_files
+            .mix(ch_cosmic_vcf)
+            .mix(ch_cosmic_tbi)
     }
 
-    if (params.gnomad_vcf && params.gnomad_tbi) {
-        vep_extra_files << [params.gnomad_vcf, params.gnomad_tbi]
+    if (params.gnomad_vcf) {
+        vep_extra_files = vep_extra_files
+            .mix(ch_gnomad_vcf)
+            .mix(ch_gnomad_tbi)
     }
+
+    vep_extra_files_no_meta = vep_extra_files.map { _m, f -> f }.collect()
 
     // WORKFLOW: Run pipeline
     //
@@ -225,7 +232,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         tmb_mutect2_config,
         tmb_vep_config,
         ch_vep_cache,
-        vep_extra_files,
+        vep_extra_files_no_meta,
         ch_msi_scan,
     )
 
