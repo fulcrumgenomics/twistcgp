@@ -176,20 +176,20 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //GATK Mutect2 resources
     ch_pop_germline_resource_tbi = params.population_germline_tbi
         ? Channel.fromPath(params.population_germline_tbi).map { it -> [[id: 'population_germline_resource_tbi'], it] }.collect()
-        : PREPARE_INDICES.out.ch_germline_resource_tbi
+        : (params.population_germline_vcf ? PREPARE_INDICES.out.ch_germline_resource_tbi : Channel.value([[id: 'population_germline_resource_tbi'], []]))
 
     ch_pon_tbi = params.pon_tbi
         ? Channel.fromPath(params.pon_tbi).map { it -> [[id: 'pon_tbi'], it] }.collect()
-        : PREPARE_INDICES.out.ch_pon_tbi
+        : (params.pon_vcf ? PREPARE_INDICES.out.ch_pon_tbi : Channel.value([[id: 'pon_tbi'], []]))
 
     // VEP extra files
     ch_cosmic_tbi = params.cosmic_tbi
         ? Channel.fromPath(params.cosmic_tbi).map { it -> [[id: 'cosmic_tbi'], it] }.collect()
-        : PREPARE_INDICES.out.ch_cosmic_tbi
+        : (params.cosmic_vcf ? PREPARE_INDICES.out.ch_cosmic_tbi : Channel.value([[id: 'cosmic_tbi'], []]))
 
     ch_gnomad_tbi = params.gnomad_tbi
         ? Channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
-        : PREPARE_INDICES.out.ch_gnomad_tbi
+        : (params.gnomad_vcf ? PREPARE_INDICES.out.ch_gnomad_tbi : Channel.value([[id: 'gnomad_tbi'], []]))
 
     vep_extra_files = channel.empty()
     // Check for VCFs from either COSMIC or gnomAD; VCF and TBI files both get passed to VEP
@@ -205,7 +205,11 @@ workflow FULCRUMGENOMICS_TWISTCGP {
             .mix(ch_gnomad_tbi)
     }
 
-    vep_extra_files_no_meta = vep_extra_files.map { _m, f -> f }.collect()
+    if (!params.gnomad_vcf && !params.cosmic_vcf) {
+        vep_extra_files_no_meta = channel.value([])
+    } else {
+        vep_extra_files_no_meta = vep_extra_files.map { _m, f -> f }.collect()
+    }
 
     // WORKFLOW: Run pipeline
     //
