@@ -30,7 +30,7 @@ The default is `hg38`.
 
 # Steps to Generate a MSIsensor-pro Scan List
 
-> [!CAUTION] > [MSIsensor-pro requires a license for commercial use.](https://github.com/xjtu-omics/msisensor-pro/blob/master/LICENSE)
+> [!CAUTION] [MSIsensor-pro requires a license for commercial use.](https://github.com/xjtu-omics/msisensor-pro/blob/master/LICENSE)
 
 1. [Install MSIsensor-pro](https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/3_Installation.md)
 
