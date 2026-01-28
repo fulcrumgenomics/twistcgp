@@ -182,8 +182,8 @@ nextflow run twistcgp/main.nf \
    --msisensor_scan resources/hg38_giab.msisensor_scan.list \
    --ensemblvep_cache resources/ensemblevep_cache/vep_cache \
    --snpeff_cache resources/snpeff_cache/GRCh38.105 \
-   --population_germline_vcf af-only-gnomad.hg38.vcf.gz \
-   --population_germline_tbi af-only-gnomad.hg38.vcf.gz.tbi \
+   --population_germline_vcf resources/af-only-gnomad.hg38.vcf.gz \
+   --population_germline_tbi resources/af-only-gnomad.hg38.vcf.gz.tbi \
    --pon_vcf resources/1000g_pon.hg38.vcf.gz \
    --pon_tbi resources/1000g_pon.hg38.vcf.gz.tbi \
    --pon_cnn resources/pon.cnn \
