@@ -1,9 +1,8 @@
 # Steps to Generate a gnomAD VCF
 
-Tumor mutational burden (TMB) is a total number of somatic mutations present within the cancer genome.
+Tumor mutational burden (TMB) is a measure of the total number of somatic mutations present within the cancer genome.
 It is crucial to exclude germline variants for the calculation of TMB.
-This pipeline uses [Ensembl VEP](https://useast.ensembl.org/index.html) to retrieve frequency data
-from the gnomAD [4.1 exomes set](https://gnomad.broadinstitute.org/downloads#v4) and annotate variants.
+This pipeline uses [Ensembl VEP](https://useast.ensembl.org/index.html) to retrieve frequency data from the gnomAD [4.1 exomes set](https://gnomad.broadinstitute.org/downloads#v4) and annotate variants.
 
 Any gnomAD VCF can be passed to the pipeline using the `--gnomad_vcf` parameter.
 A script is included in the pipeline to prepare a gnomAD VCF that is sub-selected to the genomic
@@ -29,6 +28,5 @@ nextflow run twistcgp/main.nf \
    --ensemblvep_cache ~/vep/ \
    --gnomad_vcf assets/gnomad_vcf_processing/all_chromosomes.intersect.vcf.bgz \
    --gnomad_tbi assets/gnomad_vcf_processing/all_chromosomes.intersect.vcf.bgz.tbi \
-
    --outdir <OUTDIR>
 ```
