@@ -1,8 +1,15 @@
 # twistcgp
 
-## Introduction
+A bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) TwistCGP product for targeted enrichment of cancer-associated genes.
 
-**twistcgp** is a bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) TwistCGP product for targeted enrichment of cancer-associated genes.
+<p>
+<a href="https://fulcrumgenomics.com"><img src=".github/logos/fulcrumgenomics.svg" alt="Fulcrum Genomics" height="100"/></a>
+</p>
+
+[Visit us at Fulcrum Genomics](https://www.fulcrumgenomics.com) to learn more about how we can power your Bioinformatics with twistcgp and beyond.
+
+<a href="mailto:contact@fulcrumgenomics.com?subject=[GitHub inquiry]"><img src="https://img.shields.io/badge/Email_us-brightgreen.svg?&style=for-the-badge&logo=gmail&logoColor=white"/></a>
+<a href="https://www.fulcrumgenomics.com"><img src="https://img.shields.io/badge/Visit_Us-blue.svg?&style=for-the-badge&logo=wordpress&logoColor=white"/></a>
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
@@ -202,6 +209,18 @@ We thank the following people for their extensive assistance in the development 
 
 - Nils Homer
 - Tim Dunn
+
+## Sponsors
+
+Sponsors provide support for `twistcgp` through direct funding or employing contributors.
+Public sponsors include:
+
+<p>
+<a href="https://fulcrumgenomics.com"><img src=".github/logos/fulcrumgenomics.svg" alt="Fulcrum Genomics" height="35"/></a>
+&nbsp;
+<a href="https://www.twistbioscience.com"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/logos/Twist-logo-dark-mode.png"><source media="(prefers-color-scheme: light)" srcset=".github/logos/Twist-logo-light-mode.png"><img alt="Twist Biosciences" src=".github/logos/Twist-logo-light-mode.png" height="35"></picture></a>
+&nbsp;
+</p>
 
 ## Citations
 
