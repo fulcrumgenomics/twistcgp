@@ -15,7 +15,7 @@ feature/my-change ──PR──▶ dev ──PR──▶ main
 - **`main`** — stable, release-ready code. Only receives merges from `dev`.
 - **`dev`** — integration branch for ongoing work. All feature branches target `dev`.
 - **feature branches** — short-lived branches for individual changes.
-Create one from `dev` for each piece of work.
+  Create one from `dev` for each piece of work.
 
 ## How to Contribute
 
