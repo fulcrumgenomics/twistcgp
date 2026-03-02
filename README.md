@@ -201,6 +201,10 @@ nextflow run twistcgp/main.nf \
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
 
+## Contributing
+
+If you're interested in contributing, please read our [contributing guide](docs/CONTRIBUTING.md).
+
 ## Credits
 
 twistcgp was originally written by Erin McAuley and Zach Norgaard of [Fulcrum Genomics](https://fulcrumgenomics.com/).
