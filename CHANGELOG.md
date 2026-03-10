@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0dev
+
+### Changes
+
+- Removed MSISENSOR2_SCAN module — msisensor2 no longer auto-generates a scan file
+- MSIsensor2 now uses only the ML model by default (no scan file or interval list required for human genomes)
+- The `--msisensor_scan` parameter is now optional for msisensor2 (useful for non-human panels) and remains used by msisensor-pro
+
 ## 1.0.0 - 2026-02-27
 
 Initial release of fulcrumgenomics/twistcgp, a Nextflow pipeline for processing data from Twist Bioscience's TwistCGP product for targeted enrichment of cancer-associated genes.
