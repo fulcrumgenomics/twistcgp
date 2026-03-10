@@ -187,9 +187,7 @@ workflow TWISTCGP {
         //   list is supplied for the normal BAM. No interval list is passed.
         // An optional scan file can be provided via --msisensor_scan (e.g. for non-human panels).
         ch_bam_for_msi = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) }
-        ch_msi_scan_file = params.msisensor_scan
-            ? ch_msi_scan.collect().map { it -> it[1] }
-            : Channel.value([])
+        ch_msi_scan_file = ch_msi_scan.map { _meta, scan -> scan }
         GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
         ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
         MSISENSOR2_MSI(
