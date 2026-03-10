@@ -249,8 +249,8 @@
                     "type": "string",
                     "fa_icon": "fas fa-copy",
                     "exists": true,
-                    "description": "Path to msisensor2 (or msisensor-pro) scan file.",
-                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "description": "Path to a pre-computed msisensor2 or msisensor-pro scan file.",
+                    "help_text": "Optional for msisensor2 (e.g. for non-human panels). Required for msisensor-pro if `--use_msisensor_pro_licensed` is enabled and no auto-generated scan is desired. See [docs/msisensor_scan.md](/docs/msisensor_scan.md) for generation instructions.",
                     "hidden": true
                 },
                 "msisensor2_model_name": {
