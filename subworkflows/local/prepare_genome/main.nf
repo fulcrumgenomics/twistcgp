@@ -11,7 +11,6 @@
 include { BWAMEM2_INDEX } from '../../../modules/nf-core/bwamem2/index/main'
 include { SAMTOOLS_FAIDX } from '../../../modules/nf-core/samtools/faidx/main'
 include { SAMTOOLS_DICT } from '../../../modules/nf-core/samtools/dict/main'
-include { MSISENSOR2_SCAN } from '../../../modules/nf-core/msisensor2/scan/main'
 include { MSISENSORPRO_SCAN } from '../../../modules/nf-core/msisensorpro/scan/main'
 
 workflow PREPARE_GENOME {
@@ -29,12 +28,10 @@ workflow PREPARE_GENOME {
 
     if (use_msi_pro) {
         MSISENSORPRO_SCAN(fasta)
-    } else {
-        MSISENSOR2_SCAN(fasta.map {it -> it[1]}, fasta.map {it -> "${it[1].baseName}.msisensor_scan.list"})
     }
     msi_scan = use_msi_pro
         ? MSISENSORPRO_SCAN.out.list
-        : MSISENSOR2_SCAN.out.scan.map {it -> tuple([id: 'scan'], it) }
+        : Channel.empty()
 
     // Gather versions of all tools used
     versions = versions.mix(BWAMEM2_INDEX.out.versions)
