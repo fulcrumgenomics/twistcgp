@@ -171,7 +171,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
     ch_msi_scan = params.msisensor_scan
         ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
-        : PREPARE_GENOME.out.msi_scan
+        : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : Channel.value([[id: 'scan'], []]))
 
     //GATK Mutect2 resources
     ch_pop_germline_resource_tbi = params.population_germline_tbi

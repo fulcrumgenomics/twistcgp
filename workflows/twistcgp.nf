@@ -27,7 +27,6 @@ include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
 include { TMB } from '../modules/local/tmb'
 
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
-include { PICARD_INTERVALLISTTOBED as TARGETS_TO_BED } from '../modules/local/picard/intervallisttobed'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -184,19 +183,16 @@ workflow TWISTCGP {
         ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
     }
     else {
-        targets_are_bed = targets[1].getExtension() == "bed"
-        if (!targets_are_bed) {
-            TARGETS_TO_BED(targets)
-        }
-        targets_bed = targets_are_bed ? targets : TARGETS_TO_BED.out.bed.collect()
         // Currently the pipeline does not support matched tumor-normal analysis, so an empty
-        //   list is supplied for the normal BAM.
-        ch_bam_and_target_bed = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], targets_bed[1]) }
+        //   list is supplied for the normal BAM. No interval list is passed.
+        // An optional scan file can be provided via --msisensor_scan (e.g. for non-human panels).
+        ch_bam_for_msi = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) }
+        ch_msi_scan_file = ch_msi_scan.map { _meta, scan -> scan }
         GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
         ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
         MSISENSOR2_MSI(
-            ch_bam_and_target_bed,
-            ch_msi_scan.collect().map { it -> it[1] },
+            ch_bam_for_msi,
+            ch_msi_scan_file,
             GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
         )
         ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())

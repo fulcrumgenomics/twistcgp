@@ -54,12 +54,6 @@
                         "git_sha": "1c4ba174446aa5777727611d0e63dae2fd91be3c",
                         "installed_by": ["modules"]
                     },
-                    "msisensor2/scan": {
-                        "branch": "master",
-                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/msisensor2/scan/msisensor2-scan.diff"
-                    },
                     "msisensorpro/pro": {
                         "branch": "master",
                         "git_sha": "fafa7b3a577412b6bde309170408da4cb911f04b",
