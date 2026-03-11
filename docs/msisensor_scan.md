@@ -3,7 +3,7 @@ MSIsensor-pro is available for [MSIsensor-pro licensed users](https://github.com
 
 # MSIsensor2
 
-MSIsensor2 uses ML models by default and does not require a scan file for human genomes (hg38, hg19, b37).
+MSIsensor2 uses machine learning (ML) models by default and does not require a scan file for human genomes (hg38, hg19, b37).
 
 ## Selecting an MSIsensor2 Model
 
