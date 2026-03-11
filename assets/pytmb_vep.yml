@@ -1,9 +1,14 @@
-## Describe the fields
-## For definition, provide the expected key:values
-## Note that several keys/values can be defined
-
-###############################################
-
+## pyTMB VEP configuration
+## Defines how to parse VEP CSQ annotations for TMB calculation
+##
+## - tag/sep: VEP CSQ field identifier and multi-consequence separator
+## - Annotation flags: classify VEP consequence terms (coding, non-coding, etc.)
+## - polymDb: population frequency fields for germline filtering
+##   Uses both gnomAD exome (--af_gnomade) and genome (--af_gnomadg) fields,
+##   plus 1000 Genomes (--af_1kg)
+## - cancerDb: somatic database fields (COSMIC via --custom)
+## The pipeline also makes use of CIVIC (https://civicdb.org/welcome) but those annotations
+## are not in the CSQ field and are handled separately
 #################################################
 ## VEP
 
@@ -13,7 +18,7 @@ sep: "|"
 
 ## Annotation flags
 isCoding:
-  Consequence:
+  1:
     - coding_sequence_variant
     - inframe_deletion
     - inframe_insertion
@@ -35,7 +40,7 @@ isCoding:
     - protein_altering_variant
 
 isNonCoding:
-  Consequence:
+  1:
     - 5_prime_UTR_variant
     - 3_prime_UTR_variant
     - intergenic_variant
@@ -46,7 +51,6 @@ isNonCoding:
     - mature_miRNA_variant
     - non_coding_transcript_exon_variant
     - NMD_transcript_variant
-    - non_coding_transcript_exon_variant
     - non_coding_transcript_variant
     - regulatory_region_ablation
     - regulatory_region_amplification
@@ -57,19 +61,19 @@ isNonCoding:
     - upstream_gene_variant
 
 isSplicing:
-  Consequence:
+  1:
     - splice_acceptor_variant
     - splice_donor_variant
     - splice_region_variant
 
 isSynonymous:
-  Consequence:
+  1:
     - synonymous_variant
     - start_retained_variant
     - stop_retained_variant
 
 isNonSynonymous:
-  Consequence:
+  1:
     - frameshift_variant
     - missense_variant
     - splice_acceptor_variant
@@ -80,41 +84,30 @@ isNonSynonymous:
     - start_lost
 
 ## Databases
+
 polymDb:
   gnomad:
-    - POPAF
-    - gnomADe
     - gnomADe_AF
     - gnomADe_AFR_AF
     - gnomADe_AMR_AF
     - gnomADe_ASJ_AF
     - gnomADe_EAS_AF
     - gnomADe_FIN_AF
+    - gnomADe_MID_AF
     - gnomADe_NFE_AF
-    - gnomADe_OTH_AF
     - gnomADe_SAS_AF
-    - gnomADe_AF_nfe_seu
-    - gnomADe_AF_raw
-    - gnomADe_AF_afr
-    - gnomADe_AF_nfe_onf
-    - gnomADe_AF_amr
-    - gnomADe_AF_eas
-    - gnomADe_AF_nfe_nwe
-    - gnomADe_AF_nfe_est
-    - gnomADe_AF_nfe
-    - gnomADe_AF_fin
-    - gnomADe_AF_asj
-    - gnomADe_AF_oth
-    - gnomADe_AF_popmax
+    - gnomADg_AF
+    - gnomADg_AFR_AF
+    - gnomADg_AMI_AF
+    - gnomADg_AMR_AF
+    - gnomADg_ASJ_AF
+    - gnomADg_EAS_AF
+    - gnomADg_FIN_AF
+    - gnomADg_MID_AF
+    - gnomADg_NFE_AF
+    - gnomADg_SAS_AF
   1k:
     - AF
-    - AC
-    - kg_AMR_AF
-    - kg_AFR_AF
-    - kg_EAS_AF
-    - kg_EUR_AF
-    - kg_SAS_AF
-    - KG_AF_GLOBAL
     - AFR_AF
     - AMR_AF
     - EAS_AF
@@ -123,13 +116,5 @@ polymDb:
 
 cancerDb:
   cosmic:
-    fields:
-      - GENE
-      - STRAND
-      - LEGACY_ID
-      - CDS
-      - AA
-      - HGVSC
-      - HGVSG
-      - CNT
-      - OLD_VARIANT
+    - COSMIC
+    - COSMIC_ID
