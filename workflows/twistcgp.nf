@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
 include { CIVICPY } from '../modules/local/civicpy/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
@@ -137,10 +138,21 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
+    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
+    //
+    BCFTOOLS_VIEW(
+        VCF_ANNOTATE.out.vcf_ann, // tuple val(meta), path(vcf), path(tbi)
+        [], // regions (unused)
+        [], // targets (unused)
+        [], // samples (unused)
+    )
+    ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
+        .join(BCFTOOLS_VIEW.out.tbi)
+
+    //
     // MODULE: TMB
     //
-    //
-    TMB(VCF_ANNOTATE.out.vcf_ann, targets, tmb_vep_config, tmb_mutect2_config)
+    TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
     ch_versions = ch_versions.mix(TMB.out.versions.first())
 
     //
@@ -163,9 +175,9 @@ workflow TWISTCGP {
         ch_cnv_bam_pair,
         ch_fasta,
         ch_fasta_fai,
-        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
-        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
-        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
+        ch_baits_bed,
+        tuple([], pon_cnn),
+        false,
     )
     ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
@@ -178,7 +190,7 @@ workflow TWISTCGP {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
             ch_msi_scan,
-            [[:], []], // fasta and fai are only required for CRAM format
+            [[:], []],
             [[:], []],
         )
         ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
