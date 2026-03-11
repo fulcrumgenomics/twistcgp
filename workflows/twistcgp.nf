@@ -138,10 +138,17 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
-    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
+    // MODULE: CIVICPY
     //
+    CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
+
+    //
+    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
+    // Excludes CIVIC-annotated cancer hotspots and applies quality/variant filters
+    //
+    ch_civic_vcf = CIVICPY.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) }
     BCFTOOLS_VIEW(
-        VCF_ANNOTATE.out.vcf_ann, // tuple val(meta), path(vcf), path(tbi)
+        ch_civic_vcf,
         [], // regions (unused)
         [], // targets (unused)
         [], // samples (unused)
@@ -154,11 +161,6 @@ workflow TWISTCGP {
     //
     TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
     ch_versions = ch_versions.mix(TMB.out.versions.first())
-
-    //
-    // MODULE: CIVICPY
-    //
-    CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
 
     //
     // CNVKIT_BATCH
