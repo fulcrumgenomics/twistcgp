@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added GATK4 FilterMutectCalls after Mutect2 variant calling
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
 
