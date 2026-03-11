@@ -9,6 +9,7 @@ include { CIVICPY } from '../modules/local/civicpy/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { GIT_CLONEMSISENSOR2MODEL } from '../modules/local/git/clonemsisensor2model/main'
 include { MSISENSOR2_MSI } from '../modules/nf-core/msisensor2/msi/main'
@@ -123,10 +124,32 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
+    // MODULE: GATK4/FILTERMUTECTCALLS
+    //
+    ch_filtermutect_in = GATK4_MUTECT2.out.vcf
+        .join(GATK4_MUTECT2.out.tbi)
+        .join(GATK4_MUTECT2.out.stats)
+        .map { meta, vcf, tbi, stats ->
+            tuple(meta, vcf, tbi, stats,
+                [], // orientationbias (unused)
+                [], // segmentation (unused)
+                [], // contamination table (unused)
+                [], // contamination estimate (unused)
+            )
+        }
+    GATK4_FILTERMUTECTCALLS(
+        ch_filtermutect_in,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+    )
+    ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions.first())
+
+    //
     // SUB-WORKFLOW: VCF_ANNOTATE
     //
     VCF_ANNOTATE(
-        GATK4_MUTECT2.out.vcf,
+        GATK4_FILTERMUTECTCALLS.out.vcf,
         ch_fasta,
         snpeff_genome_info,
         ensemblvep_info,
