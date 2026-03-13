@@ -48,17 +48,7 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
-                    "gatk4/calculatecontamination": {
-                        "branch": "master",
-                        "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
-                        "installed_by": ["modules"]
-                    },
                     "gatk4/filtermutectcalls": {
-                        "branch": "master",
-                        "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
-                        "installed_by": ["modules"]
-                    },
-                    "gatk4/learnreadorientationmodel": {
                         "branch": "master",
                         "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
                         "installed_by": ["modules"]
