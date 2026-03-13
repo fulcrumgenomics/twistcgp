@@ -19,6 +19,7 @@ include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
+include { TABIX_TABIX } from '../modules/nf-core/tabix/tabix'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -139,18 +140,29 @@ workflow TWISTCGP {
 
     //
     // MODULE: CIVICPY
-    //
     CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
+    ch_versions = ch_versions.mix(CIVICPY.out.versions.first())
 
     //
     // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
-    // Excludes CIVIC-annotated cancer hotspots and applies quality/variant filters
+    // Excludes CIVIC-annotated cancer hotspots (if not --skip_civicpy);
+    // applies quality/variant filters
     //
-    ch_civic_vcf = CIVICPY.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) }
+
+    if (!params.skip_civicpy) {
+        TABIX_TABIX(CIVICPY.out.vcf)
+
+        ch_bcftools_in = CIVICPY.out.vcf
+            .join(TABIX_TABIX.out.tbi, by: 0)
+            .map { meta, vcf, tbi -> tuple(meta, vcf, tbi) }
+    } else {
+        ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
+    }
+
     BCFTOOLS_VIEW(
-        ch_civic_vcf,
+        ch_bcftools_in,
         [], // regions (unused)
-        [], // targets (unused)
+        targets[1], // targets BED file
         [], // samples (unused)
     )
     ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
