@@ -48,6 +48,11 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
+                    "gatk4/filtermutectcalls": {
+                        "branch": "master",
+                        "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
+                        "installed_by": ["modules"]
+                    },
                     "gatk4/mutect2": {
                         "branch": "master",
                         "git_sha": "a97cba262e9367734e435dc07d2e3b7d6121ef3e",
