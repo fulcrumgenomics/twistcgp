@@ -180,6 +180,18 @@
                     "type": "string",
                     "exists": true,
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
+                },
+                "tmb_popaf_cutoff": {
+                    "type": "number",
+                    "default": 3.0,
+                    "description": "Minimum POPAF value (negative log10 of population allele frequency) for TMB pre-filtering.",
+                    "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. A value of 3.0 corresponds to a population allele frequency of <= 0.001 (0.1%)."
+                },
+                "tmb_vaf_cutoff": {
+                    "type": "number",
+                    "default": 0.05,
+                    "description": "Minimum variant allele frequency (FORMAT/AF) for TMB pre-filtering.",
+                    "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. A value of 0.05 (5%) excludes very low frequency variants that may represent sequencing artifacts."
                 }
             }
         },
