@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
+include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
 include { CIVICPY } from '../modules/local/civicpy/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
@@ -137,10 +138,21 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
+    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
+    //
+    BCFTOOLS_VIEW(
+        VCF_ANNOTATE.out.vcf_ann, // tuple val(meta), path(vcf), path(tbi)
+        [], // regions (unused)
+        [], // targets (unused)
+        [], // samples (unused)
+    )
+    ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
+        .join(BCFTOOLS_VIEW.out.tbi)
+
+    //
     // MODULE: TMB
     //
-    //
-    TMB(VCF_ANNOTATE.out.vcf_ann, targets, tmb_vep_config, tmb_mutect2_config)
+    TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
     ch_versions = ch_versions.mix(TMB.out.versions.first())
 
     //
