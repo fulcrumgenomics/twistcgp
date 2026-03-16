@@ -177,7 +177,6 @@ workflow TWISTCGP {
 
         ch_bcftools_in = CIVICPY.out.vcf
             .join(TABIX_TABIX.out.tbi, by: 0)
-            .map { meta, vcf, tbi -> tuple(meta, vcf, tbi) }
     } else {
         ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
     }
