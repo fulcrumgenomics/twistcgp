@@ -60,7 +60,7 @@ lint:
   readme:
     - nextflow_badge
   rocrate_readme_sync: false
-nf_core_version: 3.3.2
+nf_core_version: 3.5.2
 repository_type: pipeline
 template:
   author: Zach Norgaard

@@ -36,6 +36,9 @@ workflow {
         args,
         params.outdir,
         params.input,
+        params.help,
+        params.help_full,
+        params.show_hidden,
     )
 
     //
@@ -46,22 +49,22 @@ workflow {
     baits = tuple([id: "baits"], file(params.baits))
     targets = tuple([id: "targets"], file(params.targets))
 
-    ch_pop_germline_resource = Channel.value(
+    ch_pop_germline_resource = channel.value(
         tuple([id: 'population_germline_resource'], params.population_germline_vcf ? file(params.population_germline_vcf) : [])
     )
 
-    ch_pon_vcf = Channel.value(
+    ch_pon_vcf = channel.value(
         tuple([id: 'pon_vcf'], params.pon_vcf ? file(params.pon_vcf) : [])
     )
 
     // VCF Annotation Parameters (SnpEff + VEP)
-    snpeff_genome_info = Channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
+    snpeff_genome_info = channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
     snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
-    tmb_mutect2_config = Channel.fromPath(params.tmb_mutect2_config).collect()
-    tmb_vep_config = Channel.fromPath(params.tmb_vep_config).collect()
+    tmb_mutect2_config = channel.fromPath(params.tmb_mutect2_config).collect()
+    tmb_vep_config = channel.fromPath(params.tmb_vep_config).collect()
 
-    ensemblvep_info = Channel.value(
+    ensemblvep_info = channel.value(
         tuple(
             [id: "${params.ensemblvep_cache_version}_${params.annotation_genome_version}"],
             params.annotation_genome_version,
@@ -71,11 +74,11 @@ workflow {
     )
     ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
 
-    ch_cosmic_vcf = Channel.value(
+    ch_cosmic_vcf = channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
 
-    ch_gnomad_vcf = Channel.value(
+    ch_gnomad_vcf = channel.value(
         tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
     )
 
@@ -136,7 +139,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
 
     main:
     // Initialize fasta file with meta map:
-    fasta = params.fasta ? Channel.fromPath(params.fasta).map { it -> [[id: it.baseName], it] }.collect() : Channel.empty()
+    fasta = params.fasta ? channel.fromPath(params.fasta).map { it -> [[id: it.baseName], it] }.collect() : channel.empty()
 
     //
     // WORKFLOW: build indexes if needed
@@ -152,44 +155,44 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     // Gather built indices or get them from the params
     // Built from the fasta file:
     dict = params.dict
-        ? Channel.fromPath(params.dict).map { it -> [[id: 'dict'], it] }.collect()
+        ? channel.fromPath(params.dict).map { it -> [[id: 'dict'], it] }.collect()
         : PREPARE_GENOME.out.dict
     fasta_fai = params.fasta_fai
-        ? Channel.fromPath(params.fasta_fai).map { it -> [[id: 'fai'], it] }.collect()
+        ? channel.fromPath(params.fasta_fai).map { it -> [[id: 'fai'], it] }.collect()
         : PREPARE_GENOME.out.fasta_fai
     fasta_gzi = params.fasta_gzi
-        ? Channel.fromPath(params.fasta_gzi).map { it -> [[id: 'gzi'], it] }.collect()
-        : { file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : Channel.value([[id: "gzi"], []]) }
+        ? channel.fromPath(params.fasta_gzi).map { it -> [[id: 'gzi'], it] }.collect()
+        : { file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : channel.value([[id: "gzi"], []]) }
     bwa = params.bwa
-        ? Channel.fromPath(params.bwa).map { it -> [[id: 'bwa'], it] }.collect()
+        ? channel.fromPath(params.bwa).map { it -> [[id: 'bwa'], it] }.collect()
         : PREPARE_GENOME.out.bwa
     ch_snpeff_cache = params.snpeff_cache
-        ? Channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
+        ? channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.snpeff_cache
     ch_vep_cache = params.ensemblvep_cache
-        ? Channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
+        ? channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
     ch_msi_scan = params.msisensor_scan
-        ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
-        : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : Channel.value([[id: 'scan'], []]))
+        ? channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
+        : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : channel.value([[id: 'scan'], []]))
 
     //GATK Mutect2 resources
     ch_pop_germline_resource_tbi = params.population_germline_tbi
-        ? Channel.fromPath(params.population_germline_tbi).map { it -> [[id: 'population_germline_resource_tbi'], it] }.collect()
-        : (params.population_germline_vcf ? PREPARE_INDICES.out.ch_germline_resource_tbi : Channel.value([[id: 'population_germline_resource_tbi'], []]))
+        ? channel.fromPath(params.population_germline_tbi).map { it -> [[id: 'population_germline_resource_tbi'], it] }.collect()
+        : (params.population_germline_vcf ? PREPARE_INDICES.out.ch_germline_resource_tbi : channel.value([[id: 'population_germline_resource_tbi'], []]))
 
     ch_pon_tbi = params.pon_tbi
-        ? Channel.fromPath(params.pon_tbi).map { it -> [[id: 'pon_tbi'], it] }.collect()
-        : (params.pon_vcf ? PREPARE_INDICES.out.ch_pon_tbi : Channel.value([[id: 'pon_tbi'], []]))
+        ? channel.fromPath(params.pon_tbi).map { it -> [[id: 'pon_tbi'], it] }.collect()
+        : (params.pon_vcf ? PREPARE_INDICES.out.ch_pon_tbi : channel.value([[id: 'pon_tbi'], []]))
 
     // VEP extra files
     ch_cosmic_tbi = params.cosmic_tbi
-        ? Channel.fromPath(params.cosmic_tbi).map { it -> [[id: 'cosmic_tbi'], it] }.collect()
-        : (params.cosmic_vcf ? PREPARE_INDICES.out.ch_cosmic_tbi : Channel.value([[id: 'cosmic_tbi'], []]))
+        ? channel.fromPath(params.cosmic_tbi).map { it -> [[id: 'cosmic_tbi'], it] }.collect()
+        : (params.cosmic_vcf ? PREPARE_INDICES.out.ch_cosmic_tbi : channel.value([[id: 'cosmic_tbi'], []]))
 
     ch_gnomad_tbi = params.gnomad_tbi
-        ? Channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
-        : (params.gnomad_vcf ? PREPARE_INDICES.out.ch_gnomad_tbi : Channel.value([[id: 'gnomad_tbi'], []]))
+        ? channel.fromPath(params.gnomad_tbi).map { it -> [[id: 'gnomad_tbi'], it] }.collect()
+        : (params.gnomad_vcf ? PREPARE_INDICES.out.ch_gnomad_tbi : channel.value([[id: 'gnomad_tbi'], []]))
 
     vep_extra_files = channel.empty()
     // Check for VCFs from either COSMIC or gnomAD; VCF and TBI files both get passed to VEP

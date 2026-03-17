@@ -19,7 +19,7 @@ workflow PREPARE_GENOME {
     use_msi_pro // boolean: if true, will run MSISensorPro else MSISensor2
 
     main:
-    versions = Channel.empty()
+    versions = channel.empty()
 
     BWAMEM2_INDEX(fasta)
     // If aligner is bwa-mem
@@ -31,7 +31,7 @@ workflow PREPARE_GENOME {
     }
     msi_scan = use_msi_pro
         ? MSISENSORPRO_SCAN.out.list
-        : Channel.empty()
+        : channel.empty()
 
     // Gather versions of all tools used
     versions = versions.mix(BWAMEM2_INDEX.out.versions)

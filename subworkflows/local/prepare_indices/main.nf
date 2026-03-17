@@ -22,7 +22,7 @@ workflow PREPARE_INDICES {
 
 
     main:
-    versions = Channel.empty()
+    versions = channel.empty()
 
     TABIX_POPULATION_GERMLINE(ch_pop_germline_resource)
     TABIX_PON(ch_pon_vcf)
