@@ -89,7 +89,7 @@ We follow the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format.
 Every push and pull request triggers the following GitHub Actions workflows:
 
 - **Linting** — runs pre-commit hooks and `nf-core pipelines lint` to validate pipeline structure.
-- **Pipeline tests** — executes the pipeline with the test profile across multiple Nextflow versions (`24.10.5`, `latest-everything`) and container engines (`conda`, `docker`, `singularity`).
+- **Pipeline tests** — executes the pipeline with the test profile across multiple Nextflow versions (`25.04.0`, `latest-everything`) and container engines (`conda`, `docker`, `singularity`).
 
 ## Reporting Issues
 
