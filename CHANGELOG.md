@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
 
+### Changed
+
+- Updated nf-core template to v3.5.2
+- Bumped minimum Nextflow version to 25.04.0
+- Upgraded nf-schema plugin from 2.4.2 to 2.5.1
+- Applied Nextflow strict syntax: `Channel.` to `channel.`, named closure params, explicit `script:` labels
+- Fixed closure parameter shadowing `vcf` variable for Nextflow 26.x compatibility
+
 ## 1.1.0dev
 
 ### Changes
