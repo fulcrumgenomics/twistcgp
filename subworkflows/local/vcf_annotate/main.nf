@@ -23,7 +23,7 @@ workflow VCF_ANNOTATE {
         snpeff_genome_info.map { _meta, db -> db },
         snpeff_cache,
     )
-    vcf_for_vep = VCF_ANNOTATE_SNPEFF.out.vcf_tbi.map { meta, vcf, tbi -> [meta, vcf, []] }
+    vcf_for_vep = VCF_ANNOTATE_SNPEFF.out.vcf_tbi.map { meta, snpeff_vcf, _tbi -> [meta, snpeff_vcf, []] }
     // optional custom files are provided in `vep_extra_files`
 
     VCF_ANNOTATE_ENSEMBLVEP(
