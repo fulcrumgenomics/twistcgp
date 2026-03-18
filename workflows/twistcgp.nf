@@ -143,8 +143,6 @@ workflow TWISTCGP {
         ch_fasta_fai,
         ch_dict,
     )
-    ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions.first())
-
     //
     // SUB-WORKFLOW: VCF_ANNOTATE
     //

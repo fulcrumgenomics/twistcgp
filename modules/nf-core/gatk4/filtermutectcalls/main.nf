@@ -17,7 +17,7 @@ process GATK4_FILTERMUTECTCALLS {
     tuple val(meta), path("*.vcf.gz"),             emit: vcf
     tuple val(meta), path("*.vcf.gz.tbi"),         emit: tbi
     tuple val(meta), path("*.filteringStats.tsv"), emit: stats
-    path "versions.yml",                           emit: versions
+    tuple val("${task.process}"), val('gatk4'), eval("echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//'"), topic: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -26,10 +26,10 @@ process GATK4_FILTERMUTECTCALLS {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
-    def orientationbias_command = orientationbias ? orientationbias.collect { "--orientation-bias-artifact-priors ${it}" }.join(' ') : ''
-    def segmentation_command = segmentation ? segmentation.collect { "--tumor-segmentation ${it}" }.join(' ') : ''
+    def orientationbias_command = orientationbias ? orientationbias.collect { ob -> "--orientation-bias-artifact-priors ${ob}" }.join(' ') : ''
+    def segmentation_command = segmentation ? segmentation.collect { seg -> "--tumor-segmentation ${seg}" }.join(' ') : ''
     def estimate_command = estimate ? " --contamination-estimate ${estimate} " : ''
-    def table_command = table ? table.collect { "--contamination-table ${it}" }.join(' ') : ''
+    def table_command = table ? table.collect { tbl -> "--contamination-table ${tbl}" }.join(' ') : ''
 
     def avail_mem = 3072
     if (!task.memory) {
@@ -50,11 +50,6 @@ process GATK4_FILTERMUTECTCALLS {
         ${table_command} \\
         --tmp-dir . \\
         ${args}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -63,10 +58,5 @@ process GATK4_FILTERMUTECTCALLS {
     echo "" | gzip > ${prefix}.vcf.gz
     touch ${prefix}.vcf.gz.tbi
     touch ${prefix}.vcf.gz.filteringStats.tsv
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')
-    END_VERSIONS
     """
 }
