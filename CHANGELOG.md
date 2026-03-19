@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added GATK4 FilterMutectCalls after Mutect2 variant calling
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
+- Added `--skip_cnv`, `--skip_msi`, and `--skip_tmb` parameters to allow skipping CNV calling, MSI analysis, and TMB calculation respectively
 
 ## 1.1.0dev
 
