@@ -171,6 +171,21 @@
                     "default": false,
                     "description": "If true, skip the CIVICpy annotation step."
                 },
+                "skip_cnv": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip CNV calling with CNVkit."
+                },
+                "skip_msi": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip microsatellite instability analysis (MSIsensor2 or MSIsensor-pro)."
+                },
+                "skip_tmb": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip tumor mutational burden (TMB) calculation."
+                },
                 "tmb_mutect2_config": {
                     "type": "string",
                     "exists": true,
