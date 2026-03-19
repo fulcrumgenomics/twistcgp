@@ -1,0 +1,20 @@
+nextflow_pipeline {
+
+    name "Test Help"
+    script "../main.nf"
+
+    test("Should print help message") {
+
+        when {
+            params {
+                help = true
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+
+    }
+
+}
