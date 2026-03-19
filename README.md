@@ -187,6 +187,31 @@ The following parameters control these thresholds:
 
 </details>
 
+### Skipping Analysis Steps
+
+Individual analysis steps can be skipped using the following parameters:
+
+| Parameter        | Description                                                         |
+| ---------------- | ------------------------------------------------------------------- |
+| `--skip_cnv`     | Skip CNV calling with CNVkit                                        |
+| `--skip_msi`     | Skip microsatellite instability analysis (MSIsensor2/MSIsensor-pro) |
+| `--skip_tmb`     | Skip tumor mutational burden calculation (pyTMB)                    |
+| `--skip_civicpy` | Skip CIViCpy variant annotation                                     |
+
+For example, to run the pipeline without MSI and TMB:
+
+```console
+nextflow run twistcgp/main.nf \
+   -profile docker \
+   --input samplesheet.csv \
+   --fasta hg38_giab.fa \
+   --baits baits.bed \
+   --targets targets.bed \
+   --outdir results \
+   --skip_msi \
+   --skip_tmb
+```
+
 ### Variant Filtering with FilterMutectCalls
 
 Following variant calling with Mutect2, this pipeline applies [`FilterMutectCalls`](https://gatk.broadinstitute.org/hc/en-us/articles/360036856831-FilterMutectCalls) to annotate variant quality, consistent with [GATK Best Practices for somatic variant discovery](https://www.biorxiv.org/content/biorxiv/early/2019/12/02/861054/DC1/embed/media-1.pdf?download=true) (Benjamin et al., 2019).
