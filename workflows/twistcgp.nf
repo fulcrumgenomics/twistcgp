@@ -20,7 +20,7 @@ include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
-include { TABIX_TABIX } from '../modules/nf-core/tabix/tabix'
+include { TABIX_BGZIPTABIX } from '../modules/nf-core/tabix/bgziptabix'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -173,13 +173,12 @@ workflow TWISTCGP {
 
     if (!params.skip_tmb) {
         if (!params.skip_civicpy) {
-            TABIX_TABIX(CIVICPY.out.vcf)
+            TABIX_BGZIPTABIX(CIVICPY.out.vcf)
 
-            ch_bcftools_in = CIVICPY.out.vcf
-                .join(TABIX_TABIX.out.tbi, by: 0)
-        } else {
-            ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
-        }
+            ch_bcftools_in = TABIX_BGZIPTABIX.out.gz_tbi
+    } else {
+        ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
+    }
 
         BCFTOOLS_VIEW(
             ch_bcftools_in,
