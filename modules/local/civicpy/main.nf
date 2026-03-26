@@ -28,7 +28,8 @@ process CIVICPY {
     civicpy annotate-vcf --input-vcf ${vcf} \\
         --output-vcf ${prefix}.vcf \\
         --reference ${annotation_genome_version} \\
-        --include-status accepted
+        --include-status accepted \\
+        ${args}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
