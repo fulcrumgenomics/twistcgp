@@ -5,7 +5,8 @@
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
-include { CIVICPY } from '../modules/local/civicpy/main'
+include { CIVICPY_ANNOTATE_VCF } from '../modules/local/civicpy/annotate/main'
+include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
@@ -161,9 +162,13 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
-    // MODULE: CIVICPY
-    CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
-    ch_versions = ch_versions.mix(CIVICPY.out.versions.first())
+    // MODULE: CIVICPY_UPDATE_CACHE and CIVICPY_ANNOTATE_VCF
+    if (!params.skip_civicpy) {
+        CIVICPY_UPDATE_CACHE()
+        CIVICPY_ANNOTATE_VCF(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version, CIVICPY_UPDATE_CACHE.out.cache.collect())
+        ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
+        ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
+    }
 
     //
     // MODULE: BCFTOOLS_VIEW (pre-filter for TMB) and TMB
@@ -173,7 +178,7 @@ workflow TWISTCGP {
 
     if (!params.skip_tmb) {
         if (!params.skip_civicpy) {
-            TABIX_BGZIPTABIX(CIVICPY.out.vcf)
+            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
 
             ch_bcftools_in = TABIX_BGZIPTABIX.out.gz_tbi
     } else {

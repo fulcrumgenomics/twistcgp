@@ -1,4 +1,4 @@
-process CIVICPY {
+process CIVICPY_ANNOTATE_VCF {
     tag "${meta.id}"
     label 'process_single'
 
@@ -10,6 +10,7 @@ process CIVICPY {
     input:
     tuple val(meta), path(vcf), path(tbi)
     val annotation_genome_version
+    path cache
 
     output:
     tuple val(meta), path("*.vcf"), emit: vcf
@@ -23,7 +24,7 @@ process CIVICPY {
     def prefix = task.ext.prefix ?: "${meta.id}.civic"
 
     """
-    export CIVICPY_CACHE_FILE=\$PWD/.civicpy
+    export CIVICPY_CACHE_FILE=\$PWD/${cache}
 
     civicpy annotate-vcf --input-vcf ${vcf} \\
         --output-vcf ${prefix}.vcf \\
