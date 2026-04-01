@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "civicpy_update_cache"
+
+description: Downloads the CIViC nightly cache for use with civicpy annotation
+keywords:
+  - clinical interpretation
+  - variant annotation
+  - genomics
+tools:
+  - "civicpy":
+      description: "CIViC variant knowledgebase analysis toolkit."
+      homepage: "https://docs.civicpy.org/en/latest/"
+      documentation: "https://docs.civicpy.org/en/latest/"
+      tool_dev_url: "https://github.com/griffithlab/civicpy"
+      doi: "10.1200/CCI.19.00127"
+      licence: ["MIT"]
+      identifier: biotools:CIViCpy
+
+input: []
+
+output:
+  cache:
+    - "civicpy_cache.pkl":
+        type: file
+        description: CIViC database cache file
+        pattern: "*.pkl"
+
+  versions_yml:
+    - "versions.yml":
+        type: file
+        description: File containing software versions
+        pattern: "versions.yml"
+
+authors:
+  - "@emmcauley"
+maintainers:
+  - "@emmcauley"

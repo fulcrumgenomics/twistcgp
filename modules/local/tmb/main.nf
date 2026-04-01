@@ -37,7 +37,7 @@ process TMB {
         > ${prefix}.tmb.log
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        tmb: \$(echo \$(pyTMB.py --version 2>&1) | sed 's/^.*pyTMB.py //; s/.*\$//' | sed 's|[()]||g')
+        tmb: \$(pyTMB.py --version 2>&1 | sed 's/pyTMB.py (//; s/)//')
     END_VERSIONS
     """
 
@@ -50,7 +50,7 @@ process TMB {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        tmb: \$(echo \$(pyTMB.py --version 2>&1) | sed 's/^.*pyTMB.py //; s/.*\$//' | sed 's|[()]||g')
+        tmb: \$(pyTMB.py --version 2>&1 | sed 's/pyTMB.py (//; s/)//')
     END_VERSIONS
     """
 }

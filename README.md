@@ -183,7 +183,7 @@ Prior to TMB calculation, annotated variants are pre-filtered using `bcftools vi
 The following parameters control these thresholds:
 
 - `--tmb_popaf_cutoff` (default: `3.0`): Minimum POPAF value (negative log10 of population allele frequency) to include a variant. The default of `3.0` corresponds to a population allele frequency of &le; 0.001 (0.1%), excluding common germline variants that are unlikely to be somatic. This value is derived from the Mutect2 `POPAF` INFO field.
-- `--tmb_vaf_cutoff` (default: `0.05`): Minimum variant allele frequency (FORMAT/AF) to include a variant. The default of `0.05` (5%) excludes very low frequency variants that may represent sequencing artifacts or sub-clonal noise, consistent with the [Friends of Cancer Research TMB Harmonization Project](https://friendsofcancerresearch.org/publication/in-silico-assessment-of-variation-in-tmb-quantification-across-diagnostic-platforms-phase-1-of-the-friends-of-cancer-research-harmonization-project/) recommendations.
+- `--tmb_vaf_cutoff` (default: `0.10`): Minimum variant allele frequency (FORMAT/AF) to include a variant. The [Friends of Cancer Research TMB Harmonization Project](https://friendsofcancerresearch.org/publication/in-silico-assessment-of-variation-in-tmb-quantification-across-diagnostic-platforms-phase-1-of-the-friends-of-cancer-research-harmonization-project/) recommends a minimum of 0.05 (5%). The default of 0.10 (10%) provides additional stringency to reduce sub-clonal noise in tumor-only analyses.
 
 </details>
 

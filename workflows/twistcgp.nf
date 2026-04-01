@@ -5,7 +5,8 @@
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
-include { CIVICPY } from '../modules/local/civicpy/main'
+include { CIVICPY_ANNOTATE_VCF } from '../modules/local/civicpy/annotate/main'
+include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
@@ -20,7 +21,7 @@ include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
-include { TABIX_TABIX } from '../modules/nf-core/tabix/tabix'
+include { TABIX_BGZIPTABIX } from '../modules/nf-core/tabix/bgziptabix'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -161,9 +162,13 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
-    // MODULE: CIVICPY
-    CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
-    ch_versions = ch_versions.mix(CIVICPY.out.versions.first())
+    // MODULE: CIVICPY_UPDATE_CACHE and CIVICPY_ANNOTATE_VCF
+    if (!params.skip_civicpy) {
+        CIVICPY_UPDATE_CACHE()
+        CIVICPY_ANNOTATE_VCF(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version, CIVICPY_UPDATE_CACHE.out.cache.collect())
+        ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
+        ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
+    }
 
     //
     // MODULE: BCFTOOLS_VIEW (pre-filter for TMB) and TMB
@@ -173,13 +178,12 @@ workflow TWISTCGP {
 
     if (!params.skip_tmb) {
         if (!params.skip_civicpy) {
-            TABIX_TABIX(CIVICPY.out.vcf)
+            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
 
-            ch_bcftools_in = CIVICPY.out.vcf
-                .join(TABIX_TABIX.out.tbi, by: 0)
-        } else {
-            ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
-        }
+            ch_bcftools_in = TABIX_BGZIPTABIX.out.gz_tbi
+    } else {
+        ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
+    }
 
         BCFTOOLS_VIEW(
             ch_bcftools_in,
