@@ -5,7 +5,8 @@
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
-include { CIVICPY } from '../modules/local/civicpy/main'
+include { CIVICPY_ANNOTATE_VCF } from '../modules/local/civicpy/annotate/main'
+include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
@@ -20,7 +21,7 @@ include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
-include { TABIX_TABIX } from '../modules/nf-core/tabix/tabix'
+include { TABIX_BGZIPTABIX } from '../modules/nf-core/tabix/bgziptabix'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -162,89 +163,98 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
-    // MODULE: CIVICPY
-    CIVICPY(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version)
-    ch_versions = ch_versions.mix(CIVICPY.out.versions.first())
+    // MODULE: CIVICPY_UPDATE_CACHE and CIVICPY_ANNOTATE_VCF
+    if (!params.skip_civicpy) {
+        CIVICPY_UPDATE_CACHE()
+        CIVICPY_ANNOTATE_VCF(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version, CIVICPY_UPDATE_CACHE.out.cache.collect())
+        ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
+        ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
+    }
 
     //
-    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB)
+    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB) and TMB
     // Excludes CIVIC-annotated cancer hotspots (if not --skip_civicpy);
     // applies quality/variant filters
     //
 
-    if (!params.skip_civicpy) {
-        TABIX_TABIX(CIVICPY.out.vcf)
+    if (!params.skip_tmb) {
+        if (!params.skip_civicpy) {
+            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
 
-        ch_bcftools_in = CIVICPY.out.vcf
-            .join(TABIX_TABIX.out.tbi, by: 0)
+            ch_bcftools_in = TABIX_BGZIPTABIX.out.gz_tbi
     } else {
         ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
     }
 
-    BCFTOOLS_VIEW(
-        ch_bcftools_in,
-        [], // regions (unused)
-        targets[1], // targets BED file
-        [], // samples (unused)
-    )
-    ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
-        .join(BCFTOOLS_VIEW.out.tbi)
+        BCFTOOLS_VIEW(
+            ch_bcftools_in,
+            [], // regions (unused)
+            targets[1], // targets BED file
+            [], // samples (unused)
+        )
+        ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
+            .join(BCFTOOLS_VIEW.out.tbi)
 
-    //
-    // MODULE: TMB
-    //
-    TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
-    ch_versions = ch_versions.mix(TMB.out.versions.first())
+        //
+        // MODULE: TMB
+        //
+        TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
+        ch_versions = ch_versions.mix(TMB.out.versions.first())
+    }
 
     //
     // CNVKIT_BATCH
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
     //   list is supplied for the normal BAM.
-    baits_are_bed = baits[1].getExtension() == "bed"
-    if (!baits_are_bed) {
-        BAITS_TO_BED(baits)
+    if (!params.skip_cnv) {
+        baits_are_bed = baits[1].getExtension() == "bed"
+        if (!baits_are_bed) {
+            BAITS_TO_BED(baits)
+        }
+        ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
+        ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
+        CNVKIT_BATCH(
+            ch_cnv_bam_pair,
+            ch_fasta,
+            ch_fasta_fai,
+            ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
+            tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+            false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
+        )
+        ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
     }
-    ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
-    ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
-    CNVKIT_BATCH(
-        ch_cnv_bam_pair,
-        ch_fasta,
-        ch_fasta_fai,
-        ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
-        tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
-        false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
-    )
-    ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())
 
     //
     // MODULE: MSISENSOR2_MSI or MSISENSORPRO_PRO
     //
     // MSIsensor-pro is free for non-profit use but a license is required for commercial use
     // https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/2_License.md
-    if (use_msi_pro) {
-        MSISENSORPRO_PRO(
-            ch_bam_and_index,
-            ch_msi_pro_sites,
-            [[:], []], // fasta and fai are only required for CRAM format
-            [[:], []],
-        )
-        ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
-    }
-    else {
-        // Currently the pipeline does not support matched tumor-normal analysis, so an empty
-        //   list is supplied for the normal BAM. No interval list is passed.
-        // An optional scan file can be provided via --msisensor2_scan (e.g. for non-human panels).
-        ch_bam_for_msi = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) }
-        ch_msi2_scan_file = ch_msi2_scan.map { _meta, scan -> scan }
-        GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
-        ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
-        MSISENSOR2_MSI(
-            ch_bam_for_msi,
-            ch_msi2_scan_file,
-            GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
-        )
-        ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
+    if (!params.skip_msi) {
+        if (use_msi_pro) {
+            MSISENSORPRO_PRO(
+                ch_bam_and_index,
+                ch_msi_pro_sites,
+                [[:], []], // fasta and fai are only required for CRAM format
+                [[:], []],
+            )
+            ch_versions = ch_versions.mix(MSISENSORPRO_PRO.out.versions.first())
+        }
+        else {
+            // Currently the pipeline does not support matched tumor-normal analysis, so an empty
+            //   list is supplied for the normal BAM. No interval list is passed.
+            // An optional scan file can be provided via --msisensor2_scan (e.g. for non-human panels).
+            ch_bam_for_msi = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) }
+            ch_msi2_scan_file = ch_msi2_scan.map { _meta, scan -> scan }
+            GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
+            ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
+            MSISENSOR2_MSI(
+                ch_bam_for_msi,
+                ch_msi2_scan_file,
+                GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
+            )
+            ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
+        }
     }
 
 
