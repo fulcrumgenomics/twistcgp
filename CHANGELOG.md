@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
 - Applied Nextflow strict syntax: `Channel.` to `channel.`, named closure params, explicit `script:` labels
 - Fixed closure parameter shadowing `vcf` variable for Nextflow 26.x compatibility
+- Samplesheet `sample` column is now required to be unique across rows; previously-accepted multi-row-per-sample inputs (intended for multi-lane fastqs) were silently lossy and now fail validation. Merge lane-level fastqs before running the pipeline.
 
 ## 1.1.0dev
 
