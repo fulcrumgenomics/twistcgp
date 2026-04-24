@@ -172,9 +172,13 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_vep_cache = params.ensemblvep_cache
         ? channel.fromPath(params.ensemblvep_cache).map { path -> [[id: 'vep_cache'], path] }.collect()
         : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
-    ch_msi_scan = params.msisensor_scan
-        ? channel.fromPath(params.msisensor_scan).map { path -> [[id: 'scan'], path] }.collect()
-        : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : channel.value([[id: 'scan'], []]))
+    ch_msi2_scan = params.msisensor2_scan
+        ? channel.fromPath(params.msisensor2_scan).map { path -> [[id: 'msi2_scan'], path] }.collect()
+        : channel.value([[id: 'msi2_scan'], []])
+
+    ch_msi_pro_sites = params.msisensor_pro_sites
+        ? channel.fromPath(params.msisensor_pro_sites).map { path -> [[id: 'msi_pro_sites'], path] }.collect()
+        : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : channel.value([[id: 'msi_pro_sites'], []]))
 
     //GATK Mutect2 resources
     ch_pop_germline_resource_tbi = params.population_germline_tbi
@@ -240,7 +244,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         tmb_vep_config,
         ch_vep_cache,
         vep_extra_files_no_meta,
-        ch_msi_scan,
+        ch_msi2_scan,
+        ch_msi_pro_sites,
     )
 
     emit:

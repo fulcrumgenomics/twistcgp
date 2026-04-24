@@ -62,7 +62,8 @@ workflow TWISTCGP {
     tmb_vep_config /// path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
-    ch_msi_scan // channel: tuple val(meta), path(msisensor_scan)
+    ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
+    ch_msi_pro_sites // channel: tuple val(meta), path(msisensor_pro_sites) - scan list or trained baseline for msisensor-pro
 
     main:
     ch_versions = channel.empty()
@@ -224,7 +225,7 @@ workflow TWISTCGP {
     if (use_msi_pro) {
         MSISENSORPRO_PRO(
             ch_bam_and_index,
-            ch_msi_scan,
+            ch_msi_pro_sites,
             [[:], []], // fasta and fai are only required for CRAM format
             [[:], []],
         )
@@ -233,14 +234,14 @@ workflow TWISTCGP {
     else {
         // Currently the pipeline does not support matched tumor-normal analysis, so an empty
         //   list is supplied for the normal BAM. No interval list is passed.
-        // An optional scan file can be provided via --msisensor_scan (e.g. for non-human panels).
+        // An optional scan file can be provided via --msisensor2_scan (e.g. for non-human panels).
         ch_bam_for_msi = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) }
-        ch_msi_scan_file = ch_msi_scan.map { _meta, scan -> scan }
+        ch_msi2_scan_file = ch_msi2_scan.map { _meta, scan -> scan }
         GIT_CLONEMSISENSOR2MODEL(msi_sensor2_model_name)
         ch_versions = ch_versions.mix(GIT_CLONEMSISENSOR2MODEL.out.versions.first())
         MSISENSOR2_MSI(
             ch_bam_for_msi,
-            ch_msi_scan_file,
+            ch_msi2_scan_file,
             GIT_CLONEMSISENSOR2MODEL.out.model.collect(),
         )
         ch_versions = ch_versions.mix(MSISENSOR2_MSI.out.versions.first())
