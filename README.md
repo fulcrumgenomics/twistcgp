@@ -57,7 +57,8 @@ MGI_SINGLE_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
-The sample column provides a unique identifier for the given sample.
+Values in the `sample` column must be unique across rows; samplesheets with duplicate sample IDs will fail parameter validation.
+If a sample has been sequenced across multiple lanes, merge the lane-level fastqs into a single pair (or single file, for single-end) before listing the sample in the samplesheet.
 
 ### Obtain a Genome
 
