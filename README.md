@@ -98,12 +98,12 @@ Subsequently, you may pass the index using `--bwa results/reference/bwamem2`.
 <details> <summary>MSI Scan List (Optional for MSIsensor2, Auto-Generated for MSIsensor-pro)</summary>
 
 MSIsensor2 (the default) uses ML models and does not require a scan file for human genomes.
-For non-human panels, you can optionally supply a pre-computed scan file using the `--msisensor_scan` parameter.
+For non-human panels, you can optionally supply a pre-computed scan file to MSIsensor2 using the `--msisensor2_scan` parameter.
 
-If using MSIsensor-pro (`--use_msisensor_pro_licensed`), a scan file is auto-generated from the reference genome unless one is provided via `--msisensor_scan`.
+If using MSIsensor-pro (`--use_msisensor_pro_licensed`), a scan file is auto-generated from the reference genome unless one is provided via `--msisensor_pro_sites`. That parameter also accepts a trained baseline, which is recommended for production use.
 The scan list can be saved to the output directory for future use by supplying the `--save_reference` parameter.
 
-See [docs/msisensor_scan.md](/docs/msisensor_scan.md) for details on generating a scan file.
+See [docs/msisensor_sites.md](/docs/msisensor_sites.md) for details on generating a scan file or baseline.
 
 </details>
 
@@ -223,7 +223,7 @@ nextflow run twistcgp/main.nf \
    --targets targets.bed \
    --outdir results \
    --bwa resources/hg38_giab/bwamem2 \
-   --msisensor_scan resources/hg38_giab.msisensor_scan.list \
+   --msisensor2_scan resources/hg38_giab.msisensor2_scan.list \
    --ensemblvep_cache resources/ensemblevep_cache/vep_cache \
    --snpeff_cache resources/snpeff_cache/GRCh38.105 \
    --population_germline_vcf resources/af-only-gnomad.hg38.vcf.gz \

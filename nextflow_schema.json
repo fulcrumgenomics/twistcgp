@@ -257,12 +257,20 @@
                     "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "hidden": true
                 },
-                "msisensor_scan": {
+                "msisensor2_scan": {
                     "type": "string",
                     "fa_icon": "fas fa-copy",
                     "exists": true,
-                    "description": "Path to a pre-computed msisensor2 or msisensor-pro scan file.",
-                    "help_text": "Optional for msisensor2 (e.g. for non-human panels). Required for msisensor-pro if `--use_msisensor_pro_licensed` is enabled and no auto-generated scan is desired. See [docs/msisensor_scan.md](/docs/msisensor_scan.md) for generation instructions.",
+                    "description": "Path to a pre-computed msisensor2 scan list.",
+                    "help_text": "Optional and rarely needed; primarily for non-human panels. MSIsensor2 relies on its ML model by default for human genomes (hg38, hg19, b37). See [docs/msisensor_sites.md](/docs/msisensor_sites.md) for scan generation instructions.",
+                    "hidden": true
+                },
+                "msisensor_pro_sites": {
+                    "type": "string",
+                    "fa_icon": "fas fa-copy",
+                    "exists": true,
+                    "description": "Path to a msisensor-pro scan list or trained baseline.",
+                    "help_text": "Used only when `--use_msisensor_pro_licensed` is enabled. Accepts either a scan list or a trained baseline; `msisensor-pro pro` handles both via its per-site `threshold` column. A trained baseline is recommended for production use. If omitted, the pipeline auto-generates a scan list from the reference genome. See [docs/msisensor_sites.md](/docs/msisensor_sites.md) for generation instructions.",
                     "hidden": true
                 },
                 "msisensor2_model_name": {
