@@ -100,7 +100,7 @@
                     },
                     "picard/markduplicates": {
                         "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
                         "installed_by": ["modules"]
                     },
                     "samtools/dict": {
