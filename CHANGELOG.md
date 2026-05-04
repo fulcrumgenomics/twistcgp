@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
 
+### Fixed
+
+- ALIGNBAM stub now reports the `bwa-mem2` version, matching the container and the `script:` block; previously it shelled out to `bwa` and emitted stderr into `versions.yml` (#99)
+
 ### Changed
 
 - Updated nf-core template to v3.5.2
