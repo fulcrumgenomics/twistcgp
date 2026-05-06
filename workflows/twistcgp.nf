@@ -4,7 +4,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { ALIGNBAM } from '../modules/local/alignbam'
-include { BCFTOOLS_VIEW } from '../modules/nf-core/bcftools/view/main'
+include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_PRE_CIVIC } from '../modules/nf-core/bcftools/view/main'
+include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_POST_CIVIC } from '../modules/nf-core/bcftools/view/main'
 include { CIVICPY_ANNOTATE_VCF } from '../modules/local/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
@@ -162,37 +163,60 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(VCF_ANNOTATE.out.reports)
 
     //
-    // MODULE: CIVICPY_UPDATE_CACHE and CIVICPY_ANNOTATE_VCF
-    if (!params.skip_civicpy) {
-        CIVICPY_UPDATE_CACHE()
-        CIVICPY_ANNOTATE_VCF(VCF_ANNOTATE.out.vcf_ann, params.annotation_genome_version, CIVICPY_UPDATE_CACHE.out.cache.collect())
-        ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
-        ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
-    }
-
+    // MODULE: BCFTOOLS_VIEW_PRE_CIVIC (pre-filter before CIVICPY annotation)
+    // Applies PASS/SNP/POPAF/VAF filters and targets BED to reduce variant count
+    // before the expensive CIVICPY annotation step, and serves as the sole TMB
+    // pre-filter when --skip_civicpy is used.
     //
-    // MODULE: BCFTOOLS_VIEW (pre-filter for TMB) and TMB
-    // Excludes CIVIC-annotated cancer hotspots (if not --skip_civicpy);
-    // applies quality/variant filters
-    //
-
     if (!params.skip_tmb) {
-        if (!params.skip_civicpy) {
-            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
-
-            ch_bcftools_in = TABIX_BGZIPTABIX.out.gz_tbi
-    } else {
-        ch_bcftools_in = VCF_ANNOTATE.out.vcf_ann
-    }
-
-        BCFTOOLS_VIEW(
-            ch_bcftools_in,
+        BCFTOOLS_VIEW_PRE_CIVIC(
+            VCF_ANNOTATE.out.vcf_ann,
             [], // regions (unused)
             targets[1], // targets BED file
             [], // samples (unused)
         )
-        ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW.out.vcf
-            .join(BCFTOOLS_VIEW.out.tbi)
+        ch_versions = ch_versions.mix(
+            BCFTOOLS_VIEW_PRE_CIVIC.out.versions_bcftools
+                .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+        )
+
+        // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
+        if (!params.skip_civicpy) {
+            CIVICPY_UPDATE_CACHE()
+            CIVICPY_ANNOTATE_VCF(
+                BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
+                params.annotation_genome_version,
+                CIVICPY_UPDATE_CACHE.out.cache.collect(),
+            )
+            ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
+            ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
+        }
+    }
+
+    //
+    // MODULE: BCFTOOLS_VIEW_POST_CIVIC (filter out CIVIC-annotated variants) and TMB
+    // Same skip_tmb gate as above — separated for readability (filtering vs TMB calculation)
+    //
+    if (!params.skip_tmb) {
+        if (!params.skip_civicpy) {
+            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
+            ch_versions = ch_versions.mix(TABIX_BGZIPTABIX.out.versions.first())
+            BCFTOOLS_VIEW_POST_CIVIC(
+                TABIX_BGZIPTABIX.out.gz_tbi,
+                [], // regions (unused)
+                [], // targets (not necessary -- already restricted by BCFTOOLS_VIEW_PRE_CIVIC)
+                [], // samples (unused)
+            )
+            ch_versions = ch_versions.mix(
+                BCFTOOLS_VIEW_POST_CIVIC.out.versions_bcftools
+                    .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+            )
+            ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_POST_CIVIC.out.vcf
+                .join(BCFTOOLS_VIEW_POST_CIVIC.out.tbi)
+        } else {
+            ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_PRE_CIVIC.out.vcf
+                .join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi)
+        }
 
         //
         // MODULE: TMB
@@ -200,7 +224,6 @@ workflow TWISTCGP {
         TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
         ch_versions = ch_versions.mix(TMB.out.versions.first())
     }
-
     //
     // CNVKIT_BATCH
     //
