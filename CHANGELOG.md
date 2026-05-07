@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `--ensemblvep_cache` now accepts either a pre-extracted cache directory or a `.tar.gz` archive; tarballs are automatically extracted before VEP runs
 - Added GATK4 FilterMutectCalls after Mutect2 variant calling
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters

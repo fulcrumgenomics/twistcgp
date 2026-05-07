@@ -12,26 +12,61 @@ The CIViCpy annotation cache is small and is downloaded on each pipeline run. If
 
 ## Ensembl Variant Effect Predictor (VEP) cache
 
-1. The quickest way to download the VEP cache is with `wget` and `tar`:
+The pipeline accepts either a pre-extracted cache directory or a `.tar.gz` archive via `--ensemblvep_cache`.
+If a tarball is supplied, it will be automatically extracted before VEP runs.
+Only gzip-compressed archives (`.tar.gz`) are supported; other formats (`.tgz`, `.tar.bz2`) are not.
+
+The version and build of the cache must match the `--ensemblvep_cache_version` and `--annotation_genome_version` parameters provided to the pipeline.
+
+### Option 1: Download with wget (recommended)
+
+1. Download the cache tarball:
 
 ```console
 wget https://ftp.ensembl.org/pub/release-114/variation/indexed_vep_cache/homo_sapiens_vep_114_GRCh38.tar.gz
-tar -xzf homo_sapiens_vep_114_GRCh38.tar.gz
 ```
 
-The version and build you choose should match the `--ensemblvep_cache_version` and `--annotation_genome_version` arguments provided to the pipeline, respectively.
+2. Pass the tarball directly to the pipeline:
 
-2. Alternatively, install Ensembl VEP which is available directly from [github.com/ensembl-vep](https://github.com/Ensembl/ensembl-vep.git) or install with mamba/conda, [bioconda::ensembl-vep](https://anaconda.org/bioconda/ensembl-vep). If using conda, activate your environment.
+```console
+nextflow run twistcgp/main.nf \
+   -profile <docker/singularity/conda> \
+   --fasta hg38.fa \
+   --input samplesheet.csv \
+   --baits baits.bed \
+   --targets targets.bed \
+   --ensemblvep_cache homo_sapiens_vep_114_GRCh38.tar.gz \
+   --outdir <OUTDIR>
+```
 
-3. Download the cache with Ensembl VEP, making sure that the genome version and database version match the pipeline parameters.
+Or extract it first and pass the directory:
 
-Please note that this download is rate-limited, and will take much longer than `wget`.
+```console
+tar -xzf homo_sapiens_vep_114_GRCh38.tar.gz
+
+nextflow run twistcgp/main.nf \
+   -profile <docker/singularity/conda> \
+   --fasta hg38.fa \
+   --input samplesheet.csv \
+   --baits baits.bed \
+   --targets targets.bed \
+   --ensemblvep_cache homo_sapiens/ \
+   --outdir <OUTDIR>
+```
+
+### Option 2: Download with the VEP installer
+
+1. Install Ensembl VEP, available directly from [github.com/ensembl-vep](https://github.com/Ensembl/ensembl-vep.git) or via mamba/conda ([bioconda::ensembl-vep](https://anaconda.org/bioconda/ensembl-vep)). If using conda, activate your environment.
+
+2. Download the cache, making sure the genome version and database version match the pipeline parameters.
+
+Please note that this download is rate-limited and will take much longer than `wget`.
 
 ```console
 vep_install -a cf -s homo_sapiens -y GRCh38 -c ~/vep --CONVERT
 ```
 
-3. Pass the cache to the pipeline:
+3. Pass the cache directory to the pipeline:
 
 ```console
 nextflow run twistcgp/main.nf \
@@ -44,8 +79,7 @@ nextflow run twistcgp/main.nf \
    --outdir <OUTDIR>
 ```
 
-Note that the path provided to `--ensemblvep_cache` should be the parent directory of the parent directory of the cache files.
-In this example, it would be `--ensemblvep_cache ~/vep/`:
+Note that `--ensemblvep_cache` should point to the directory containing the `homo_sapiens/` subdirectory:
 
 ```console
 $ tree -L 1 ~/vep/

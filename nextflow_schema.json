@@ -123,10 +123,9 @@
                 },
                 "ensemblvep_cache": {
                     "type": "string",
-                    "format": "directory-path",
                     "fa_icon": "fas fa-cloud-download-alt",
-                    "description": "Path to VEP cache which should contain the relevant species, genome and build directories. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/vep_cache/).",
-                    "help_text": "The VEP cache stores information about regulatory regions, attributes about different variants and transcripts, as well as predictions and scores for SIFT and PolyPhen-2."
+                    "description": "Path to VEP cache directory, or a .tar.gz archive of the cache. You have to use absolute paths to storage on Cloud infrastructure (i.e., s3://my-reference-data/cache/vep_cache/).",
+                    "help_text": "The VEP cache stores information about regulatory regions, attributes about different variants and transcripts, as well as predictions and scores for SIFT and PolyPhen-2. Accepts either a pre-extracted directory or a gzip-compressed tarball (.tar.gz); the archive will be automatically extracted before VEP runs. Only .tar.gz archives are supported — .tgz and other formats are not."
                 },
                 "ensemblvep_cache_version": {
                     "type": "string",

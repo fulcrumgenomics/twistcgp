@@ -19,6 +19,7 @@ include { PIPELINE_COMPLETION } from './subworkflows/local/utils_nfcore_twistcgp
 include { PREPARE_GENOME } from './subworkflows/local/prepare_genome'
 include { PREPARE_ANNOTATION_DB } from './subworkflows/local/prepare_annotation_db'
 include { PREPARE_INDICES } from './subworkflows/local/prepare_indices'
+include { UNTAR_VEP_CACHE } from './modules/local/untar_vep_cache/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -69,8 +70,6 @@ workflow {
             params.ensemblvep_cache_version,
         )
     )
-    ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
-
     ch_cosmic_vcf = Channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
@@ -93,7 +92,6 @@ workflow {
         snpeff_cache,
         tmb_mutect2_config,
         tmb_vep_config,
-        ensemblvep_cache,
         ch_cosmic_vcf,
         ch_gnomad_vcf,
     )
@@ -130,7 +128,6 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     snpeff_cache // channel: path(snpeff_cache)
     tmb_mutect2_config // required path to variant calling config file
     tmb_vep_config // required path to variant annotation config file
-    ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
     ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
 
@@ -166,9 +163,18 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_snpeff_cache = params.snpeff_cache
         ? Channel.fromPath(params.snpeff_cache).map { it -> [[id: 'snpeff_cache'], it] }.collect()
         : PREPARE_ANNOTATION_DB.out.snpeff_cache
-    ch_vep_cache = params.ensemblvep_cache
-        ? Channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
-        : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
+    if (params.ensemblvep_cache && params.ensemblvep_cache.endsWith('.tar.gz')) {
+        UNTAR_VEP_CACHE(
+            channel.fromPath(params.ensemblvep_cache)
+                .map { it -> [[id: 'vep_cache'], it] }
+                .collect()
+        )
+        ch_vep_cache = UNTAR_VEP_CACHE.out.cache.collect()
+    } else {
+        ch_vep_cache = params.ensemblvep_cache
+            ? channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
+            : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
+    }
     ch_msi_scan = params.msisensor_scan
         ? Channel.fromPath(params.msisensor_scan).map { it -> [[id: 'scan'], it] }.collect()
         : (params.use_msisensor_pro_licensed ? PREPARE_GENOME.out.msi_scan : Channel.value([[id: 'scan'], []]))

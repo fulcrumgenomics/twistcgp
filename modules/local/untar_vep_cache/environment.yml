@@ -1,0 +1,7 @@
+name: untar_vep_cache
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - conda-forge::gzip=1.13
+  - conda-forge::tar=1.34
