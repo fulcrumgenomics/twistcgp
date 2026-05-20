@@ -11,6 +11,7 @@ include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/mai
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
 include { GATK4_LEARNREADORIENTATIONMODEL } from '../modules/nf-core/gatk4/learnreadorientationmodel/main'
@@ -184,18 +185,43 @@ workflow TWISTCGP {
     )
 
     //
+    // MODULE: GATK4/CALCULATECONTAMINATION
+    // Estimates cross-sample contamination from pileup summaries
+    //
+    ch_contamination_in = GATK4_GETPILEUPSUMMARIES.out.table
+        .map { meta, table -> tuple(meta, table, []) } // no matched normal
+    GATK4_CALCULATECONTAMINATION(ch_contamination_in)
+    ch_versions = ch_versions.mix(
+        GATK4_CALCULATECONTAMINATION.out.versions_gatk4
+            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+    )
+
+    //
     // MODULE: GATK4/FILTERMUTECTCALLS
     //
-    ch_filtermutect_in = GATK4_MUTECT2.out.vcf
+    // When contamination estimation is skipped (no germline resource), provide empty placeholders
+    // so samples still flow through to FilterMutectCalls
+    ch_mutect2_samples = GATK4_MUTECT2.out.vcf
         .join(GATK4_MUTECT2.out.tbi)
         .join(GATK4_MUTECT2.out.stats)
-        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior)
-        .map { meta, vcf, tbi, stats, ob ->
+        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
+
+    ch_filtermutect_in = params.population_germline_vcf
+        ? ch_mutect2_samples
+            .join(GATK4_CALCULATECONTAMINATION.out.segmentation, remainder: true)
+            .map { meta, vcf, tbi, stats, artifactprior, segmentation -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation ?: []) }
+            .join(GATK4_CALCULATECONTAMINATION.out.contamination, remainder: true)
+            .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation, contamination ?: []) }
+        : ch_mutect2_samples
+            .map { meta, vcf, tbi, stats, artifactprior -> tuple(meta, vcf, tbi, stats, artifactprior, [], []) }
+
+    ch_filtermutect_in = ch_filtermutect_in
+        .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination ->
             tuple(meta, vcf, tbi, stats,
-                [ob], // orientationbias artifact prior from LearnReadOrientationModel
-                [],   // segmentation (unused)
-                [],   // contamination table (unused)
-                [],   // contamination estimate (unused)
+                artifactprior, // orientationbias
+                segmentation, // segmentation table
+                contamination, // contamination table
+                [], // contamination estimate (unused)
             )
         }
     GATK4_FILTERMUTECTCALLS(
