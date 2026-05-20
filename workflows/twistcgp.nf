@@ -6,7 +6,7 @@
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_PRE_CIVIC } from '../modules/nf-core/bcftools/view/main'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_POST_CIVIC } from '../modules/nf-core/bcftools/view/main'
-include { CIVICPY_ANNOTATE_VCF } from '../modules/local/civicpy/annotate/main'
+include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
@@ -211,13 +211,16 @@ workflow TWISTCGP {
         // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
         if (!params.skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
-            CIVICPY_ANNOTATE_VCF(
+            CIVICPY_ANNOTATE(
                 BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
                 params.annotation_genome_version,
                 CIVICPY_UPDATE_CACHE.out.cache.collect(),
             )
             ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
-            ch_versions = ch_versions.mix(CIVICPY_ANNOTATE_VCF.out.versions.first())
+            ch_versions = ch_versions.mix(
+                CIVICPY_ANNOTATE.out.versions_civicpy
+                    .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+            )
         }
     }
 
@@ -227,10 +230,8 @@ workflow TWISTCGP {
     //
     if (!params.skip_tmb) {
         if (!params.skip_civicpy) {
-            TABIX_BGZIPTABIX(CIVICPY_ANNOTATE_VCF.out.vcf)
-            ch_versions = ch_versions.mix(TABIX_BGZIPTABIX.out.versions.first())
             BCFTOOLS_VIEW_POST_CIVIC(
-                TABIX_BGZIPTABIX.out.gz_tbi,
+                CIVICPY_ANNOTATE.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) },
                 [], // regions (unused)
                 [], // targets (not necessary -- already restricted by BCFTOOLS_VIEW_PRE_CIVIC)
                 [], // samples (unused)
