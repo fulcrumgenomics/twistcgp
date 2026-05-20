@@ -157,6 +157,33 @@ workflow TWISTCGP {
     )
 
     //
+    // MODULE: GATK4/GETPILEUPSUMMARIES
+    // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
+    // If no germline resource is provided, the filtered channel is empty and the process won't run
+    //
+    ch_germline_resource_pileup = ch_pop_germline_resource
+        .filter { _meta, vcf -> vcf != [] }
+        .map { _meta, vcf -> vcf }
+    ch_germline_resource_pileup_tbi = ch_pop_germline_resource_tbi
+        .filter { _meta, tbi -> tbi != [] }
+        .map { _meta, tbi -> tbi }
+
+    ch_pileup_in = ch_bam_and_index
+        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    GATK4_GETPILEUPSUMMARIES(
+        ch_pileup_in,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+        ch_germline_resource_pileup,
+        ch_germline_resource_pileup_tbi,
+    )
+    ch_versions = ch_versions.mix(
+        GATK4_GETPILEUPSUMMARIES.out.versions_gatk4
+            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+    )
+
+    //
     // MODULE: GATK4/FILTERMUTECTCALLS
     //
     ch_filtermutect_in = GATK4_MUTECT2.out.vcf
