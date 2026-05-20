@@ -12,6 +12,7 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
+include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
 include { GATK4_LEARNREADORIENTATIONMODEL } from '../modules/nf-core/gatk4/learnreadorientationmodel/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { GIT_CLONEMSISENSOR2MODEL } from '../modules/local/git/clonemsisensor2model/main'
@@ -138,6 +139,33 @@ workflow TWISTCGP {
         GATK4_LEARNREADORIENTATIONMODEL.out.versions_gatk4
             .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
             .collectFile(name: 'learnreadorientationmodel_versions.yml', newLine: true)
+    )
+
+    //
+    // MODULE: GATK4/GETPILEUPSUMMARIES
+    // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
+    // If no germline resource is provided, the filtered channel is empty and the process won't run
+    //
+    ch_germline_resource_pileup = ch_pop_germline_resource
+        .filter { _meta, vcf -> vcf != [] }
+        .map { _meta, vcf -> vcf }
+    ch_germline_resource_pileup_tbi = ch_pop_germline_resource_tbi
+        .filter { _meta, tbi -> tbi != [] }
+        .map { _meta, tbi -> tbi }
+
+    ch_pileup_in = ch_bam_and_index
+        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
+    GATK4_GETPILEUPSUMMARIES(
+        ch_pileup_in,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+        ch_germline_resource_pileup,
+        ch_germline_resource_pileup_tbi,
+    )
+    ch_versions = ch_versions.mix(
+        GATK4_GETPILEUPSUMMARIES.out.versions_gatk4
+            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
     )
 
     //
