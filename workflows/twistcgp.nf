@@ -11,6 +11,7 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
+include { GATK4_LEARNREADORIENTATIONMODEL } from '../modules/nf-core/gatk4/learnreadorientationmodel/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { GIT_CLONEMSISENSOR2MODEL } from '../modules/local/git/clonemsisensor2model/main'
 include { MSISENSOR2_MSI } from '../modules/nf-core/msisensor2/msi/main'
@@ -123,6 +124,18 @@ workflow TWISTCGP {
         ch_pon_tbi.map { _meta, tbi -> tbi },
     )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
+
+    //
+    // MODULE: GATK4/LEARNREADORIENTATIONMODEL
+    // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
+    //
+    GATK4_LEARNREADORIENTATIONMODEL(
+        GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
+    )
+    ch_versions = ch_versions.mix(
+        GATK4_LEARNREADORIENTATIONMODEL.out.versions_gatk4
+            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+    )
 
     //
     // MODULE: GATK4/FILTERMUTECTCALLS
