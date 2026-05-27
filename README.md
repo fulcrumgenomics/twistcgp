@@ -185,7 +185,12 @@ See [docs/gnomad_vcf.md](/docs/gnomad_vcf.md) for details on how to generate a g
 
 <details> <summary>TMB Pre-filtering Options</summary>
 
-Prior to TMB calculation, annotated variants are pre-filtered using `bcftools view` to retain only PASS SNPs meeting population allele frequency and variant allele frequency thresholds. This pre-filtering step reduces noise in the TMB estimate by excluding common germline variants and low-confidence somatic calls before they reach `pyTMB`.
+Prior to TMB calculation, annotated variants are filtered in two `bcftools view` steps:
+
+1. **Pre-CIViCpy filter**: Retains only PASS SNPs meeting population allele frequency and variant allele frequency thresholds. Running this before CIViCpy annotation reduces the number of variants that need to be annotated, improving performance.
+2. **Post-CIViCpy filter**: Excludes variants annotated by CIViCpy as known cancer hotspots (`CIVIC != "."`), so they do not inflate the TMB estimate. This step is skipped when `--skip_civicpy` is used.
+
+Together these steps reduce noise in the TMB estimate by excluding common germline variants, low-confidence somatic calls, and known cancer driver variants before they reach `pyTMB`.
 
 The following parameters control these thresholds:
 
