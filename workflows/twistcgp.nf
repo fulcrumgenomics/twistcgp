@@ -135,6 +135,7 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(
         GATK4_LEARNREADORIENTATIONMODEL.out.versions_gatk4
             .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+            .collectFile(name: 'learnreadorientationmodel_versions.yml', newLine: true)
     )
 
     //
@@ -143,12 +144,13 @@ workflow TWISTCGP {
     ch_filtermutect_in = GATK4_MUTECT2.out.vcf
         .join(GATK4_MUTECT2.out.tbi)
         .join(GATK4_MUTECT2.out.stats)
-        .map { meta, vcf, tbi, stats ->
+        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior)
+        .map { meta, vcf, tbi, stats, ob ->
             tuple(meta, vcf, tbi, stats,
-                [], // orientationbias (unused)
-                [], // segmentation (unused)
-                [], // contamination table (unused)
-                [], // contamination estimate (unused)
+                [ob], // orientationbias artifact prior from LearnReadOrientationModel
+                [],   // segmentation (unused)
+                [],   // contamination table (unused)
+                [],   // contamination estimate (unused)
             )
         }
     GATK4_FILTERMUTECTCALLS(

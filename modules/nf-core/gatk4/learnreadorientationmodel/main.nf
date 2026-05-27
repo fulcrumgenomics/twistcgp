@@ -11,7 +11,7 @@ process GATK4_LEARNREADORIENTATIONMODEL {
     tuple val(meta), path(f1r2)
 
     output:
-    tuple val(meta), path("*.tar.gz"), emit: artifactprior
+    tuple val(meta), path("${task.ext.prefix ?: meta.id}.tar.gz"), emit: artifactprior
     tuple val("${task.process}"), val('gatk4'), eval("gatk --version | sed -n '/GATK.*v/s/.*v//p'"), topic: versions, emit: versions_gatk4
 
     when:
