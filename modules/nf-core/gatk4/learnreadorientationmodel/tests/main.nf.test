@@ -17,7 +17,7 @@ nextflow_process {
             process {
                 """
                 input[0] = [ [ id:'test' ], // meta map
-                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.f1r2.tar.gz', checkIfExists: true)] ]
+				[file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.f1r2.tar.gz', checkIfExists: true)] ]
                 """
             }
         }
@@ -26,7 +26,7 @@ nextflow_process {
             assert process.success
             assertAll(
                 { assert snapshot(
-                    path(process.out.artifactprior[0][1]).linesGzip[3..7],
+					path(process.out.artifactprior[0][1]).linesGzip[3..7],
                     process.out.findAll { key, val -> key.startsWith("versions") }
                 ).match() }
             )
@@ -41,7 +41,7 @@ nextflow_process {
             process {
                 """
                 input[0] = [ [ id:'test' ], // meta map
-                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.f1r2.tar.gz', checkIfExists: true)] ]
+				[file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.f1r2.tar.gz', checkIfExists: true)] ]
                 """
             }
         }
