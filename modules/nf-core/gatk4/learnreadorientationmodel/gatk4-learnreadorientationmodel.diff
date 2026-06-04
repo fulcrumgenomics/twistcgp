@@ -1,0 +1,19 @@
+Changes in component 'nf-core/gatk4/learnreadorientationmodel'
+'modules/nf-core/gatk4/learnreadorientationmodel/environment.yml' is unchanged
+'modules/nf-core/gatk4/learnreadorientationmodel/meta.yml' is unchanged
+Changes in 'gatk4/learnreadorientationmodel/main.nf':
+--- modules/nf-core/gatk4/learnreadorientationmodel/main.nf
++++ modules/nf-core/gatk4/learnreadorientationmodel/main.nf
+@@ -11,7 +11,7 @@
+     tuple val(meta), path(f1r2)
+ 
+     output:
+-    tuple val(meta), path("*.tar.gz"), emit: artifactprior
++    tuple val(meta), path("${task.ext.prefix ?: meta.id}.tar.gz"), emit: artifactprior
+     tuple val("${task.process}"), val('gatk4'), eval("gatk --version | sed -n '/GATK.*v/s/.*v//p'"), topic: versions, emit: versions_gatk4
+ 
+     when:
+'modules/nf-core/gatk4/learnreadorientationmodel/tests/main.nf.test' is unchanged
+'modules/nf-core/gatk4/learnreadorientationmodel/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/gatk4/learnreadorientationmodel/tests/nextflow.config' is unchanged
+************************************************************
