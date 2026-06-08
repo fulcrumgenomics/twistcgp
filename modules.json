@@ -53,6 +53,12 @@
                         "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
                         "installed_by": ["modules"]
                     },
+                    "gatk4/learnreadorientationmodel": {
+                        "branch": "master",
+                        "git_sha": "52b7843bd92ccf833cc12e71cd84aeccf2583852",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/gatk4/learnreadorientationmodel/gatk4-learnreadorientationmodel.diff"
+                    },
                     "gatk4/mutect2": {
                         "branch": "master",
                         "git_sha": "a97cba262e9367734e435dc07d2e3b7d6121ef3e",
