@@ -56,14 +56,14 @@ workflow TWISTCGP {
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
     ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
-    ch_pop_germline_resource_tbi /// channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pop_germline_resource_tbi // channel [optional]: val(reference_meta), path(germline_resource VCF index)
     ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
     ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     ch_snpeff_cache // channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
-    tmb_vep_config /// path(tmb_vep_config)
+    tmb_vep_config // path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
