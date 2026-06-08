@@ -214,7 +214,7 @@ workflow TWISTCGP {
             CIVICPY_ANNOTATE(
                 BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
                 params.annotation_genome_version,
-                CIVICPY_UPDATE_CACHE.out.cache.collect(),
+                CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
             ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
             ch_versions = ch_versions.mix(
