@@ -34,7 +34,7 @@ output:
           description: |
             Groovy Map containing cache information
             e.g. [ id:'vep_cache' ]
-      - "${prefix}":
+      - "cache":
           type: directory
           description: |
             Extracted VEP cache directory. VEP requires the species/ subdirectory

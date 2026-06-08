@@ -165,14 +165,13 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         : PREPARE_ANNOTATION_DB.out.snpeff_cache
     if (params.ensemblvep_cache && params.ensemblvep_cache.endsWith('.tar.gz')) {
         UNTAR_VEP_CACHE(
-            channel.fromPath(params.ensemblvep_cache)
+            channel.value(file(params.ensemblvep_cache))
                 .map { it -> [[id: 'vep_cache'], it] }
-                .collect()
         )
-        ch_vep_cache = UNTAR_VEP_CACHE.out.cache.collect()
+        ch_vep_cache = UNTAR_VEP_CACHE.out.cache.first()
     } else {
         ch_vep_cache = params.ensemblvep_cache
-            ? channel.fromPath(params.ensemblvep_cache).map { it -> [[id: 'vep_cache'], it] }.collect()
+            ? channel.fromPath(params.ensemblvep_cache).collect { it -> [[id: 'vep_cache'], it] }
             : PREPARE_ANNOTATION_DB.out.ensemblvep_cache
     }
     ch_msi_scan = params.msisensor_scan
