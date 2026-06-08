@@ -218,9 +218,9 @@ workflow TWISTCGP {
     ch_filtermutect_in = ch_filtermutect_in
         .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination ->
             tuple(meta, vcf, tbi, stats,
-                artifactprior, // orientationbias
-                segmentation, // segmentation table
-                contamination, // contamination table
+                [artifactprior],                          // orientationbias: list required for .collect() in module
+                segmentation ? [segmentation] : [],       // segmentation table: list required for .collect() in module
+                contamination ? [contamination] : [],     // contamination table: list required for .collect() in module
                 [], // contamination estimate (unused)
             )
         }
