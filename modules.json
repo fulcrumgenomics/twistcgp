@@ -129,6 +129,11 @@
                         "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
                         "installed_by": ["modules"]
                     },
+                    "riker/multi": {
+                        "branch": "master",
+                        "git_sha": "b2523041e2b941afdfbd5b3b6bc099437495f70d",
+                        "installed_by": ["modules"]
+                    },
                     "samtools/dict": {
                         "branch": "master",
                         "git_sha": "b13f07be4c508d6ff6312d354d09f2493243e208",
