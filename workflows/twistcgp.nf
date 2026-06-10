@@ -22,8 +22,7 @@ include { MSISENSORPRO_PRO } from '../modules/nf-core/msisensorpro/pro/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
-include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
-include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
+include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -323,19 +322,23 @@ workflow TWISTCGP {
 
 
     //
-    // MODULE: PICARD_COLLECTMULTIPLEMETRICS
+    // MODULE: RIKER_MULTI
     //
-    PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
-
-    //
-    // MODULE: PICARD_COLLECTHSMETRICS
-    //
-    ch_bam_and_regions = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
-    PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_fasta_gzi, ch_dict)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_COLLECTHSMETRICS.out.versions.first())
+    ch_riker_bam = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
+    RIKER_MULTI(
+        ch_riker_bam,
+        ch_fasta.join(ch_fasta_fai),
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.alignment_metrics.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.base_dist.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.mean_qual.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.qual_dist.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.gcbias_detail.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.isize_metrics.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.hybcap_metrics.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_mismatch.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_overlap.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_indel.collect { it[1] })
 
     //
     // MODULE: PERBASE
