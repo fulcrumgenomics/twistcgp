@@ -12,6 +12,7 @@ include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
+include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
 include { GATK4_LEARNREADORIENTATIONMODEL } from '../modules/nf-core/gatk4/learnreadorientationmodel/main'
 include { GATK4_MUTECT2 } from '../modules/nf-core/gatk4/mutect2/main'
 include { GIT_CLONEMSISENSOR2MODEL } from '../modules/local/git/clonemsisensor2model/main'
@@ -55,14 +56,14 @@ workflow TWISTCGP {
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
     ch_fasta_gzi // channel: val(reference meta), path(reference .gzi file)
     ch_pop_germline_resource // channel [optional]: val(reference_meta), path(germline_resource VCF)
-    ch_pop_germline_resource_tbi /// channel [optional]: val(reference_meta), path(germline_resource VCF index)
+    ch_pop_germline_resource_tbi // channel [optional]: val(reference_meta), path(germline_resource VCF index)
     ch_pon_vcf // channel [optional]: val(reference_meta), path(panel_of_normals VCF)
     ch_pon_tbi // channel [optional]: val(reference_meta), path(panel_of_normals VCF index)
     snpeff_genome_info // channel: [ val(meta), val(genome_info) ]
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
     ch_snpeff_cache // channel [optional]: path(snpeff_cache)
     tmb_mutect2_config // path(tmb_mutect2_config)
-    tmb_vep_config /// path(tmb_vep_config)
+    tmb_vep_config // path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
@@ -128,16 +129,32 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
+    // MODULE: GATK4/GETPILEUPSUMMARIES
+    // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
+    // If no germline resource is provided, the filtered channel is empty and the process won't run
+    //
+    ch_germline_resource_pileup = ch_pop_germline_resource
+        .filter { _meta, vcf -> vcf != [] }
+        .map { _meta, vcf -> vcf }
+    ch_germline_resource_pileup_tbi = ch_pop_germline_resource_tbi
+        .filter { _meta, tbi -> tbi != [] }
+        .map { _meta, tbi -> tbi }
+
+    GATK4_GETPILEUPSUMMARIES(
+        ch_bams_and_targets,
+        ch_fasta,
+        ch_fasta_fai,
+        ch_dict,
+        ch_germline_resource_pileup,
+        ch_germline_resource_pileup_tbi,
+    )
+
+    //
     // MODULE: GATK4/LEARNREADORIENTATIONMODEL
     // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
     //
     GATK4_LEARNREADORIENTATIONMODEL(
         GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
-    )
-    ch_versions = ch_versions.mix(
-        GATK4_LEARNREADORIENTATIONMODEL.out.versions_gatk4
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-            .collectFile(name: 'learnreadorientationmodel_versions.yml', newLine: true)
     )
 
     //
@@ -191,11 +208,6 @@ workflow TWISTCGP {
             targets[1], // targets BED file
             [], // samples (unused)
         )
-        ch_versions = ch_versions.mix(
-            BCFTOOLS_VIEW_PRE_CIVIC.out.versions_bcftools
-                .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-        )
-
         // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
         if (!params.skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
@@ -222,10 +234,6 @@ workflow TWISTCGP {
                 [], // regions (unused)
                 [], // targets (not necessary -- already restricted by BCFTOOLS_VIEW_PRE_CIVIC)
                 [], // samples (unused)
-            )
-            ch_versions = ch_versions.mix(
-                BCFTOOLS_VIEW_POST_CIVIC.out.versions_bcftools
-                    .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
             )
             ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_POST_CIVIC.out.vcf
                 .join(BCFTOOLS_VIEW_POST_CIVIC.out.tbi)

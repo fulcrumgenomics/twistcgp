@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added GATK4 FilterMutectCalls after Mutect2 variant calling
 - Added GATK4 LearnReadOrientationModel to learn strand artifact priors from f1r2 counts for orientation bias filtering (e.g. FFPE deamination)
+- Added GATK4 GetPileupSummaries to summarize read support at known germline variant sites for downstream contamination estimation
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
 - Added `--skip_cnv`, `--skip_msi`, and `--skip_tmb` parameters to allow skipping CNV calling, MSI analysis, and TMB calculation respectively
