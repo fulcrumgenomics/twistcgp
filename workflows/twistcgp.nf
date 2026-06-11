@@ -129,19 +129,6 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
-    // MODULE: GATK4/LEARNREADORIENTATIONMODEL
-    // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
-    //
-    GATK4_LEARNREADORIENTATIONMODEL(
-        GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
-    )
-    ch_versions = ch_versions.mix(
-        GATK4_LEARNREADORIENTATIONMODEL.out.versions_gatk4
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-            .collectFile(name: 'learnreadorientationmodel_versions.yml', newLine: true)
-    )
-
-    //
     // MODULE: GATK4/GETPILEUPSUMMARIES
     // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
     // If no germline resource is provided, the filtered channel is empty and the process won't run
@@ -153,19 +140,21 @@ workflow TWISTCGP {
         .filter { _meta, tbi -> tbi != [] }
         .map { _meta, tbi -> tbi }
 
-    ch_pileup_in = ch_bam_and_index
-        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_GETPILEUPSUMMARIES(
-        ch_pileup_in,
+        ch_bams_and_targets,
         ch_fasta,
         ch_fasta_fai,
         ch_dict,
         ch_germline_resource_pileup,
         ch_germline_resource_pileup_tbi,
     )
-    ch_versions = ch_versions.mix(
-        GATK4_GETPILEUPSUMMARIES.out.versions_gatk4
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
+
+    //
+    // MODULE: GATK4/LEARNREADORIENTATIONMODEL
+    // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
+    //
+    GATK4_LEARNREADORIENTATIONMODEL(
+        GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
     )
 
     //
@@ -219,11 +208,6 @@ workflow TWISTCGP {
             targets[1], // targets BED file
             [], // samples (unused)
         )
-        ch_versions = ch_versions.mix(
-            BCFTOOLS_VIEW_PRE_CIVIC.out.versions_bcftools
-                .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-        )
-
         // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
         if (!params.skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
@@ -250,10 +234,6 @@ workflow TWISTCGP {
                 [], // regions (unused)
                 [], // targets (not necessary -- already restricted by BCFTOOLS_VIEW_PRE_CIVIC)
                 [], // samples (unused)
-            )
-            ch_versions = ch_versions.mix(
-                BCFTOOLS_VIEW_POST_CIVIC.out.versions_bcftools
-                    .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
             )
             ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_POST_CIVIC.out.vcf
                 .join(BCFTOOLS_VIEW_POST_CIVIC.out.tbi)
