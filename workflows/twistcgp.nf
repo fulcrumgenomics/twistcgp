@@ -129,27 +129,6 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
-    // MODULE: GATK4/GETPILEUPSUMMARIES
-    // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
-    // If no germline resource is provided, the filtered channel is empty and the process won't run
-    //
-    ch_germline_resource_pileup = ch_pop_germline_resource
-        .filter { _meta, vcf -> vcf != [] }
-        .map { _meta, vcf -> vcf }
-    ch_germline_resource_pileup_tbi = ch_pop_germline_resource_tbi
-        .filter { _meta, tbi -> tbi != [] }
-        .map { _meta, tbi -> tbi }
-
-    GATK4_GETPILEUPSUMMARIES(
-        ch_bams_and_targets,
-        ch_fasta,
-        ch_fasta_fai,
-        ch_dict,
-        ch_germline_resource_pileup,
-        ch_germline_resource_pileup_tbi,
-    )
-
-    //
     // MODULE: GATK4/LEARNREADORIENTATIONMODEL
     // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
     //
@@ -191,29 +170,21 @@ workflow TWISTCGP {
     ch_contamination_in = GATK4_GETPILEUPSUMMARIES.out.table
         .map { meta, table -> tuple(meta, table, []) } // no matched normal
     GATK4_CALCULATECONTAMINATION(ch_contamination_in)
-    ch_versions = ch_versions.mix(
-        GATK4_CALCULATECONTAMINATION.out.versions_gatk4
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-    )
 
     //
     // MODULE: GATK4/FILTERMUTECTCALLS
     //
-    // When contamination estimation is skipped (no germline resource), provide empty placeholders
-    // so samples still flow through to FilterMutectCalls
     ch_mutect2_samples = GATK4_MUTECT2.out.vcf
         .join(GATK4_MUTECT2.out.tbi)
         .join(GATK4_MUTECT2.out.stats)
         .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
 
-    ch_filtermutect_in = params.population_germline_vcf
-        ? ch_mutect2_samples
-            .join(GATK4_CALCULATECONTAMINATION.out.segmentation, remainder: true)
-            .map { meta, vcf, tbi, stats, artifactprior, segmentation -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation ?: []) }
-            .join(GATK4_CALCULATECONTAMINATION.out.contamination, remainder: true)
-            .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation, contamination ?: []) }
-        : ch_mutect2_samples
-            .map { meta, vcf, tbi, stats, artifactprior -> tuple(meta, vcf, tbi, stats, artifactprior, [], []) }
+    // remainder: true ensures samples flow through even when CALCULATECONTAMINATION didn't run (no germline resource)
+    ch_filtermutect_in = ch_mutect2_samples
+        .join(GATK4_CALCULATECONTAMINATION.out.segmentation, remainder: true)
+        .map { meta, vcf, tbi, stats, artifactprior, segmentation -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation ?: []) }
+        .join(GATK4_CALCULATECONTAMINATION.out.contamination, remainder: true)
+        .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation, contamination ?: []) }
 
     ch_filtermutect_in = ch_filtermutect_in
         .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination ->
