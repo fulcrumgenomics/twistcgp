@@ -217,10 +217,6 @@ workflow TWISTCGP {
                 CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
             ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
-            ch_versions = ch_versions.mix(
-                CIVICPY_ANNOTATE.out.versions_civicpy
-                    .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-            )
         }
     }
 

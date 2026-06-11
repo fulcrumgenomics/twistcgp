@@ -1,7 +1,7 @@
 process CIVICPY_UPDATE_CACHE {
     label 'process_single'
 
-    conda "${moduleDir}/../annotate/environment.yml"
+    conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
         ? 'https://depot.galaxyproject.org/singularity/civicpy:5.2.0--pyhdfd78af_0'
         : 'docker.io/griffithlab/civicpy:v5.2.0' }"
