@@ -68,6 +68,14 @@ workflow TWISTCGP {
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
     ch_msi_pro_sites // channel: tuple val(meta), path(msisensor_pro_sites) - scan list or trained baseline for msisensor-pro
+    skip_tmb // boolean: skip TMB calculation
+    skip_civicpy // boolean: skip CIViCpy annotation
+    skip_cnv // boolean: skip CNV analysis
+    skip_msi // boolean: skip MSI analysis
+    annotation_genome_version // string: genome version for annotation (e.g. GRCh38)
+    outdir // string: pipeline output directory
+    multiqc_config // optional path to custom MultiQC config
+    multiqc_logo // optional path to custom MultiQC logo
 
     main:
     ch_versions = channel.empty()
@@ -224,7 +232,7 @@ workflow TWISTCGP {
     // before the expensive CIVICPY annotation step, and serves as the sole TMB
     // pre-filter when --skip_civicpy is used.
     //
-    if (!params.skip_tmb) {
+    if (!skip_tmb) {
         BCFTOOLS_VIEW_PRE_CIVIC(
             VCF_ANNOTATE.out.vcf_ann,
             [], // regions (unused)
@@ -232,11 +240,11 @@ workflow TWISTCGP {
             [], // samples (unused)
         )
         // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
-        if (!params.skip_civicpy) {
+        if (!skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
             CIVICPY_ANNOTATE(
                 BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
-                params.annotation_genome_version,
+                annotation_genome_version,
                 CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
         }
@@ -246,8 +254,8 @@ workflow TWISTCGP {
     // MODULE: BCFTOOLS_VIEW_POST_CIVIC (filter out CIVIC-annotated variants) and TMB
     // Same skip_tmb gate as above — separated for readability (filtering vs TMB calculation)
     //
-    if (!params.skip_tmb) {
-        if (!params.skip_civicpy) {
+    if (!skip_tmb) {
+        if (!skip_civicpy) {
             BCFTOOLS_VIEW_POST_CIVIC(
                 CIVICPY_ANNOTATE.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) },
                 [], // regions (unused)
@@ -272,7 +280,7 @@ workflow TWISTCGP {
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
     //   list is supplied for the normal BAM.
-    if (!params.skip_cnv) {
+    if (!skip_cnv) {
         baits_are_bed = baits[1].getExtension() == "bed"
         if (!baits_are_bed) {
             BAITS_TO_BED(baits)
@@ -295,7 +303,7 @@ workflow TWISTCGP {
     //
     // MSIsensor-pro is free for non-profit use but a license is required for commercial use
     // https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/2_License.md
-    if (!params.skip_msi) {
+    if (!skip_msi) {
         if (use_msi_pro) {
             MSISENSORPRO_PRO(
                 ch_bam_and_index,
@@ -367,7 +375,7 @@ workflow TWISTCGP {
     softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
         .mix(topic_versions_string)
         .collectFile(
-            storeDir: "${params.outdir}/pipeline_info",
+            storeDir: "${outdir}/pipeline_info",
             name: 'twistcgp_software_mqc_versions.yml',
             sort: true,
             newLine: true,
@@ -380,11 +388,11 @@ workflow TWISTCGP {
         "${projectDir}/assets/multiqc_config.yml",
         checkIfExists: true,
     )
-    ch_multiqc_custom_config = params.multiqc_config
-        ? channel.fromPath(params.multiqc_config, checkIfExists: true)
+    ch_multiqc_custom_config = multiqc_config
+        ? channel.fromPath(multiqc_config, checkIfExists: true)
         : channel.empty()
-    ch_multiqc_logo = params.multiqc_logo
-        ? channel.fromPath(params.multiqc_logo, checkIfExists: true)
+    ch_multiqc_logo = multiqc_logo
+        ? channel.fromPath(multiqc_logo, checkIfExists: true)
         : channel.empty()
 
     summary_params = paramsSummaryMap(
