@@ -215,7 +215,6 @@ workflow TWISTCGP {
                 params.annotation_genome_version,
                 CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
-            ch_versions = ch_versions.mix(CIVICPY_UPDATE_CACHE.out.versions.first())
         }
     }
 

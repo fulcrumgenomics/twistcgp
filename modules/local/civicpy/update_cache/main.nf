@@ -8,7 +8,7 @@ process CIVICPY_UPDATE_CACHE {
 
     output:
     path "civicpy_cache.pkl", emit: cache
-    path "versions.yml",      emit: versions
+    tuple val("${task.process}"), val('civicpy'), eval("civicpy --version | sed 's/.*version //'"), topic: versions, emit: versions_civicpy
 
     when:
     task.ext.when == null || task.ext.when
@@ -18,20 +18,10 @@ process CIVICPY_UPDATE_CACHE {
     export CIVICPY_CACHE_FILE=\$PWD/civicpy_cache.pkl
 
     civicpy update
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        civicpy: \$(civicpy --version | sed 's/.*version //')
-    END_VERSIONS
     """
 
     stub:
     """
     touch civicpy_cache.pkl
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        civicpy: \$(civicpy --version | sed 's/.*version //')
-    END_VERSIONS
     """
 }
