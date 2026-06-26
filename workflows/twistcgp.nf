@@ -11,6 +11,7 @@ include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/mai
 include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
 include { GATK4_LEARNREADORIENTATIONMODEL } from '../modules/nf-core/gatk4/learnreadorientationmodel/main'
@@ -67,6 +68,14 @@ workflow TWISTCGP {
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf)]
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
     ch_msi_pro_sites // channel: tuple val(meta), path(msisensor_pro_sites) - scan list or trained baseline for msisensor-pro
+    skip_tmb // boolean: skip TMB calculation
+    skip_civicpy // boolean: skip CIViCpy annotation
+    skip_cnv // boolean: skip CNV analysis
+    skip_msi // boolean: skip MSI analysis
+    annotation_genome_version // string: genome version for annotation (e.g. GRCh38)
+    outdir // string: pipeline output directory
+    multiqc_config // optional path to custom MultiQC config
+    multiqc_logo // optional path to custom MultiQC logo
 
     main:
     ch_versions = channel.empty()
@@ -128,6 +137,14 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
+    // MODULE: GATK4/LEARNREADORIENTATIONMODEL
+    // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
+    //
+    GATK4_LEARNREADORIENTATIONMODEL(
+        GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
+    )
+
+    //
     // MODULE: GATK4/GETPILEUPSUMMARIES
     // Summarizes read support for known variant sites across panel to estimate cross-sample contamination
     // If no germline resource is provided, the filtered channel is empty and the process won't run
@@ -149,26 +166,32 @@ workflow TWISTCGP {
     )
 
     //
-    // MODULE: GATK4/LEARNREADORIENTATIONMODEL
-    // Learns strand artifact priors from f1r2 counts to filter orientation bias artifacts (e.g. FFPE deamination)
+    // MODULE: GATK4/CALCULATECONTAMINATION
+    // Estimates cross-sample contamination from pileup summaries
     //
-    GATK4_LEARNREADORIENTATIONMODEL(
-        GATK4_MUTECT2.out.f1r2.map { meta, f1r2 -> tuple(meta, [f1r2].flatten()) } // Mutect2 emits a single Path; wrap and flatten so the module always receives List<Path>
-    )
+    ch_contamination_in = GATK4_GETPILEUPSUMMARIES.out.table
+        .map { meta, table -> tuple(meta, table, []) } // no matched normal
+    GATK4_CALCULATECONTAMINATION(ch_contamination_in)
 
     //
     // MODULE: GATK4/FILTERMUTECTCALLS
     //
-    ch_filtermutect_in = GATK4_MUTECT2.out.vcf
+    ch_mutect2_samples = GATK4_MUTECT2.out.vcf
         .join(GATK4_MUTECT2.out.tbi)
         .join(GATK4_MUTECT2.out.stats)
-        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior)
-        .map { meta, vcf, tbi, stats, ob ->
+        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
+
+    // remainder: true lets samples flow through even when CALCULATECONTAMINATION didn't run (no germline resource);
+    // the final map treats both null (unmatched) and [] as "absent", so no intermediate coercion is needed.
+    ch_filtermutect_in = ch_mutect2_samples
+        .join(GATK4_CALCULATECONTAMINATION.out.segmentation, remainder: true)
+        .join(GATK4_CALCULATECONTAMINATION.out.contamination, remainder: true)
+        .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination ->
             tuple(meta, vcf, tbi, stats,
-                [ob], // orientationbias artifact prior from LearnReadOrientationModel
-                [],   // segmentation (unused)
-                [],   // contamination table (unused)
-                [],   // contamination estimate (unused)
+                [artifactprior],                      // orientationbias: list required for .collect() in module
+                segmentation ? [segmentation] : [],   // segmentation table: list required for .collect() in module
+                contamination ? [contamination] : [], // contamination table: list required for .collect() in module
+                [],                                    // contamination estimate (unused)
             )
         }
     GATK4_FILTERMUTECTCALLS(
@@ -200,7 +223,7 @@ workflow TWISTCGP {
     // before the expensive CIVICPY annotation step, and serves as the sole TMB
     // pre-filter when --skip_civicpy is used.
     //
-    if (!params.skip_tmb) {
+    if (!skip_tmb) {
         BCFTOOLS_VIEW_PRE_CIVIC(
             VCF_ANNOTATE.out.vcf_ann,
             [], // regions (unused)
@@ -208,11 +231,11 @@ workflow TWISTCGP {
             [], // samples (unused)
         )
         // NB: CIViCpy only sees pre-filtered PASS SNPs for TMB calculation; full VCF annotations are not required.
-        if (!params.skip_civicpy) {
+        if (!skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
             CIVICPY_ANNOTATE(
                 BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
-                params.annotation_genome_version,
+                annotation_genome_version,
                 CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
         }
@@ -222,8 +245,8 @@ workflow TWISTCGP {
     // MODULE: BCFTOOLS_VIEW_POST_CIVIC (filter out CIVIC-annotated variants) and TMB
     // Same skip_tmb gate as above — separated for readability (filtering vs TMB calculation)
     //
-    if (!params.skip_tmb) {
-        if (!params.skip_civicpy) {
+    if (!skip_tmb) {
+        if (!skip_civicpy) {
             BCFTOOLS_VIEW_POST_CIVIC(
                 CIVICPY_ANNOTATE.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) },
                 [], // regions (unused)
@@ -248,7 +271,7 @@ workflow TWISTCGP {
     //
     // Currently the pipeline does not support matched tumor-normal analysis, so an empty
     //   list is supplied for the normal BAM.
-    if (!params.skip_cnv) {
+    if (!skip_cnv) {
         baits_are_bed = baits[1].getExtension() == "bed"
         if (!baits_are_bed) {
             BAITS_TO_BED(baits)
@@ -271,7 +294,7 @@ workflow TWISTCGP {
     //
     // MSIsensor-pro is free for non-profit use but a license is required for commercial use
     // https://github.com/xjtu-omics/msisensor-pro/blob/master/docs/2_License.md
-    if (!params.skip_msi) {
+    if (!skip_msi) {
         if (use_msi_pro) {
             MSISENSORPRO_PRO(
                 ch_bam_and_index,
@@ -343,7 +366,7 @@ workflow TWISTCGP {
     softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
         .mix(topic_versions_string)
         .collectFile(
-            storeDir: "${params.outdir}/pipeline_info",
+            storeDir: "${outdir}/pipeline_info",
             name: 'twistcgp_software_mqc_versions.yml',
             sort: true,
             newLine: true,
@@ -356,11 +379,11 @@ workflow TWISTCGP {
         "${projectDir}/assets/multiqc_config.yml",
         checkIfExists: true,
     )
-    ch_multiqc_custom_config = params.multiqc_config
-        ? channel.fromPath(params.multiqc_config, checkIfExists: true)
+    ch_multiqc_custom_config = multiqc_config
+        ? channel.fromPath(multiqc_config, checkIfExists: true)
         : channel.empty()
-    ch_multiqc_logo = params.multiqc_logo
-        ? channel.fromPath(params.multiqc_logo, checkIfExists: true)
+    ch_multiqc_logo = multiqc_logo
+        ? channel.fromPath(multiqc_logo, checkIfExists: true)
         : channel.empty()
 
     summary_params = paramsSummaryMap(

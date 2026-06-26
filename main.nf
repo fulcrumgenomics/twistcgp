@@ -246,6 +246,14 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         vep_extra_files_no_meta,
         ch_msi2_scan,
         ch_msi_pro_sites,
+        params.skip_tmb,
+        params.skip_civicpy,
+        params.skip_cnv,
+        params.skip_msi,
+        params.annotation_genome_version,
+        params.outdir,
+        params.multiqc_config,
+        params.multiqc_logo,
     )
 
     emit:
