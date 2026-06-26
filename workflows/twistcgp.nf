@@ -156,19 +156,13 @@ workflow TWISTCGP {
         .filter { _meta, tbi -> tbi != [] }
         .map { _meta, tbi -> tbi }
 
-    ch_pileup_in = ch_bam_and_index
-        .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_GETPILEUPSUMMARIES(
-        ch_pileup_in,
+        ch_bams_and_targets,
         ch_fasta,
         ch_fasta_fai,
         ch_dict,
         ch_germline_resource_pileup,
         ch_germline_resource_pileup_tbi,
-    )
-    ch_versions = ch_versions.mix(
-        GATK4_GETPILEUPSUMMARIES.out.versions_gatk4
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
     )
 
     //
@@ -187,20 +181,17 @@ workflow TWISTCGP {
         .join(GATK4_MUTECT2.out.stats)
         .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
 
-    // remainder: true ensures samples flow through even when CALCULATECONTAMINATION didn't run (no germline resource)
+    // remainder: true lets samples flow through even when CALCULATECONTAMINATION didn't run (no germline resource);
+    // the final map treats both null (unmatched) and [] as "absent", so no intermediate coercion is needed.
     ch_filtermutect_in = ch_mutect2_samples
         .join(GATK4_CALCULATECONTAMINATION.out.segmentation, remainder: true)
-        .map { meta, vcf, tbi, stats, artifactprior, segmentation -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation ?: []) }
         .join(GATK4_CALCULATECONTAMINATION.out.contamination, remainder: true)
-        .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination -> tuple(meta, vcf, tbi, stats, artifactprior, segmentation, contamination ?: []) }
-
-    ch_filtermutect_in = ch_filtermutect_in
         .map { meta, vcf, tbi, stats, artifactprior, segmentation, contamination ->
             tuple(meta, vcf, tbi, stats,
-                [artifactprior],                          // orientationbias: list required for .collect() in module
-                segmentation ? [segmentation] : [],       // segmentation table: list required for .collect() in module
-                contamination ? [contamination] : [],     // contamination table: list required for .collect() in module
-                [], // contamination estimate (unused)
+                [artifactprior],                      // orientationbias: list required for .collect() in module
+                segmentation ? [segmentation] : [],   // segmentation table: list required for .collect() in module
+                contamination ? [contamination] : [], // contamination table: list required for .collect() in module
+                [],                                    // contamination estimate (unused)
             )
         }
     GATK4_FILTERMUTECTCALLS(
