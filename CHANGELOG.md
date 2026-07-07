@@ -20,9 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ALIGNBAM stub now reports the `bwa-mem2` version, matching the container and the `script:` block; previously it shelled out to `bwa` and emitted stderr into `versions.yml` (#99)
 - Bumped pinned `picard/markduplicates` to nf-core/modules `2b5333d3d` so the stub emits a `.bai` alongside the `.bam`; previously the join with `.bai` was empty under `-stub` and downstream MSI / GATK steps were silently skipped (#101)
 - VEP `--custom` now references the staged file's basename, fixing failures when `--cosmic_vcf` is a remote URL (e.g. `s3://`) on Lifebit/Fusion (#95)
+- Removed a duplicate `gatk4/getpileupsummaries` key from `modules.json` (JSON silently kept the last entry, so this was latent)
 
 ### Changed
 
+- Replaced `fgbio FastqToBam` with `fgumi extract` for FASTQ-to-unaligned-BAM conversion (behavior-preserving; UMI extraction available via `--read-structures`)
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
