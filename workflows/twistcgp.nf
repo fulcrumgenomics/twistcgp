@@ -337,11 +337,10 @@ workflow TWISTCGP {
         RIKER_MULTI.out.mean_qual.collect { _meta, metric -> metric },
         RIKER_MULTI.out.qual_dist.collect { _meta, metric -> metric },
         RIKER_MULTI.out.gcbias_detail.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.gcbias_summary.collect { _meta, metric -> metric },
         RIKER_MULTI.out.isize_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.isize_histogram.collect { _meta, metric -> metric },
         RIKER_MULTI.out.hybcap_metrics.collect { _meta, metric -> metric },
-        RIKER_MULTI.out.error_mismatch.collect { _meta, metric -> metric },
-        RIKER_MULTI.out.error_overlap.collect { _meta, metric -> metric },
-        RIKER_MULTI.out.error_indel.collect { _meta, metric -> metric }
     )
 
     //
