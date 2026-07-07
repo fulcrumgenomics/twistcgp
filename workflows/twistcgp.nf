@@ -22,8 +22,8 @@ include { MSISENSORPRO_PRO } from '../modules/nf-core/msisensorpro/pro/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
-include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
+include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -324,21 +324,25 @@ workflow TWISTCGP {
     //
     // MODULE: RIKER_MULTI
     //
-    ch_riker_bam = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
+    ch_riker_bam = ch_bam_and_index.map { meta, bam, bai ->
+        tuple(meta, bam, bai, [], [], [], [], baits[1], targets[1], [], [], [])
+    }
     RIKER_MULTI(
         ch_riker_bam,
-        ch_fasta.join(ch_fasta_fai),
+        ch_fasta.join(ch_fasta_fai).first(),
     )
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.alignment_metrics.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.base_dist.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.mean_qual.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.qual_dist.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.gcbias_detail.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.isize_metrics.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.hybcap_metrics.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_mismatch.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_overlap.collect { it[1] })
-    ch_multiqc_files = ch_multiqc_files.mix(RIKER_MULTI.out.error_indel.collect { it[1] })
+    ch_multiqc_files = ch_multiqc_files.mix(
+        RIKER_MULTI.out.alignment_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.base_dist.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.mean_qual.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.qual_dist.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.gcbias_detail.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.isize_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.hybcap_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.error_mismatch.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.error_overlap.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.error_indel.collect { _meta, metric -> metric }
+    )
 
     //
     // MODULE: PERBASE
@@ -378,17 +382,6 @@ workflow TWISTCGP {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config = channel.fromPath(
-        "${projectDir}/assets/multiqc_config.yml",
-        checkIfExists: true,
-    )
-    ch_multiqc_custom_config = multiqc_config
-        ? channel.fromPath(multiqc_config, checkIfExists: true)
-        : channel.empty()
-    ch_multiqc_logo = multiqc_logo
-        ? channel.fromPath(multiqc_logo, checkIfExists: true)
-        : channel.empty()
-
     summary_params = paramsSummaryMap(
         workflow,
         parameters_schema: "nextflow_schema.json",
@@ -400,16 +393,23 @@ workflow TWISTCGP {
 
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
 
+    def multiqc_config_files = multiqc_config
+        ? [file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true), file(multiqc_config, checkIfExists: true)]
+        : file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true)
     MULTIQC(
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList(),
-        [],
-        [],
+        ch_multiqc_files.flatten().collect().map { files ->
+            [
+                [id: 'twistcgp'],
+                files,
+                multiqc_config_files,
+                multiqc_logo ? file(multiqc_logo, checkIfExists: true) : [],
+                [],
+                [],
+            ]
+        }
     )
 
     emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions = ch_versions // channel: [ path(versions.yml) ]
 }
