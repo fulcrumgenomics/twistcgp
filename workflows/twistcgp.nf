@@ -11,7 +11,7 @@ include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
-include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
@@ -94,15 +94,19 @@ workflow TWISTCGP {
     ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, json -> json })
 
     //
-    // MODULE: Run fastqtobam
+    // MODULE: Convert FASTQ to an unaligned BAM
     //
-    FGBIO_FASTQTOBAM(CHELAE_TRIM.out.reads)
-    ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
+    // fgumi/extract expects [ meta, reads, library ]; use meta.id as the library name.
+    // With no --read-structures configured, all bases are treated as template (no UMI
+    // extraction), matching the prior fgbio FastqToBam behavior. To extract UMIs, add
+    // `ext.args = '--read-structures ...'` for FGUMI_EXTRACT in conf/modules.config.
+    // Versions are emitted via the "versions" topic channel and collected below.
+    FGUMI_EXTRACT(CHELAE_TRIM.out.reads.map { meta, reads -> [meta, reads, meta.id] })
 
     //
     // MODULE: Run ALIGNBAM
     //
-    ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
+    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
     ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
 
     //
