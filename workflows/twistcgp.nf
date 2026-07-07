@@ -6,10 +6,10 @@
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_PRE_CIVIC } from '../modules/nf-core/bcftools/view/main'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_POST_CIVIC } from '../modules/nf-core/bcftools/view/main'
+include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
@@ -91,12 +91,7 @@ workflow TWISTCGP {
     // MODULE: Run chelae trim
     //
     CHELAE_TRIM(ch_samplesheet, adapters_fasta)
-    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { it[1] })
-    ch_versions = ch_versions.mix(
-        CHELAE_TRIM.out.versions_chelae
-            .map { process, tool, version -> "${process}:\n    ${tool}: ${version}" }
-            .collectFile(name: 'chelae_trim_versions.yml', newLine: true)
-    )
+    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, metrics -> metrics })
 
     //
     // MODULE: Run fastqtobam
