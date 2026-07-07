@@ -48,14 +48,9 @@
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
                         "installed_by": ["modules"]
                     },
-                    "fgbio/fastqtobam": {
+                    "fgumi/extract": {
                         "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": ["modules"]
-                    },
-                    "gatk4/getpileupsummaries": {
-                        "branch": "master",
-                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+                        "git_sha": "c3e04783b2ac99ffc011745ec092614a7bef86ca",
                         "installed_by": ["modules"]
                     },
                     "gatk4/calculatecontamination": {
