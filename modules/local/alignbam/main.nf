@@ -72,14 +72,23 @@ process ALIGNBAM {
     # The real path to the BWA index prefix`
     BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
 
+    # fgbio FastqToBam strips the trailing "/1" and "/2" mate suffixes that appear in
+    # old-style (MGI / pre-Casava-1.8 Illumina) read names; fgumi/extract does not. Because
+    # bwa-mem2 also strips those suffixes, the mapped stream and the unmapped BAM disagree on
+    # read names and fgbio ZipperBams fails ("processed all unmapped reads but there are mapped
+    # reads remaining"), most visibly on single-end data. Normalize the QNAMEs up front so both
+    # inputs to ZipperBams agree, matching fgbio FastqToBam's historical behavior.
+    samtools view -h ${unmapped_bam} \\
+        | awk -F'\\t' -v OFS='\\t' '/^@/ {print; next} {sub(/\\/[12]\$/, "", \$1); print}' \\
+        | samtools view -b -o ${prefix}.qnames_fixed.ubam -
 
-    samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
+    samtools fastq ${samtools_fastq_args} ${prefix}.qnames_fixed.ubam \\
         | bwa-mem2 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
         | fgbio -Xmx${fgbio_mem_gb}g \\
             --compression ${fgbio_zipper_bams_compression} \\
             --async-io=true \\
             ZipperBams \\
-            --unmapped ${unmapped_bam} \\
+            --unmapped ${prefix}.qnames_fixed.ubam \\
             --ref ${fasta} \\
             --output ${fgbio_zipper_bams_output} \\
             ${fgbio_args} \\
