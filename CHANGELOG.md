@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Replaced `fgbio FastqToBam` with `fgumi extract` for FASTQ-to-unaligned-BAM conversion (behavior-preserving: read structure pinned to `+T`, all-template, matching FastqToBam; UMI extraction available by changing `--read-structures`)
+- Replaced the `bwamem2/index` nf-core module with `bwamem3/index` for reference genome indexing
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
