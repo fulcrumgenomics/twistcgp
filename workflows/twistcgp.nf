@@ -91,7 +91,7 @@ workflow TWISTCGP {
     // MODULE: Run chelae trim
     //
     CHELAE_TRIM(ch_samplesheet, adapters_fasta)
-    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, metrics -> metrics })
+    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, json -> json })
 
     //
     // MODULE: Run fastqtobam

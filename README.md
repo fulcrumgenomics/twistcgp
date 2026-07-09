@@ -24,7 +24,7 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 
 1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
+1. Trim Adapters ([`chelae`](https://github.com/fulcrumgenomics/chelae))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
 1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
@@ -79,7 +79,7 @@ Targets will be padded prior to variant calling; the padding size can be adjuste
 
 ### (Optionally) Provide Adapter Sequences
 
-If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `fastp` to trim those sequences prior to alignment.
+If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `chelae` to trim those sequences prior to alignment.
 The adapter sequences can be supplied to the pipeline using the `--adapters_fasta` parameter.
 
 ### Optional Time and Resource Saving Setup
