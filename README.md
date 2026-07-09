@@ -26,7 +26,7 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. FASTQ to unaligned BAM ([`fgumi extract`](https://github.com/fulcrumgenomics/fgumi))
-1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
+1. Align ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Variant Calling via local Assembly of Haplotypes ([`gatk4/mutect2`](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Filter Variant Calls ([`gatk4/FilterMutectCalls`](https://gatk.broadinstitute.org/hc/en-us/articles/360036856831-FilterMutectCalls))

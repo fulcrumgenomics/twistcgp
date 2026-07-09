@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/70/70f229ebe22acf5254f66ecd0aa2e83c2ae450973b26cc8913ec47438d6e6659/data':
-        'community.wave.seqera.io/library/bwa-mem2_fgbio_samtools:21ba39eea59f6a7d' }"
+        'oras://community.wave.seqera.io/library/bwa-mem3_fgbio_samtools:2d7a6b2c804a1037':
+        'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools:2dcdb66e893323b2' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -79,7 +79,7 @@ process ALIGNBAM {
 
     # fgbio FastqToBam strips the trailing "/1" and "/2" mate suffixes that appear in
     # old-style (MGI / pre-Casava-1.8 Illumina) read names; fgumi/extract does not. Because
-    # bwa-mem2 also strips those suffixes, the mapped stream and the unmapped BAM disagree on
+    # bwa-mem3 also strips those suffixes, the mapped stream and the unmapped BAM disagree on
     # read names and fgbio ZipperBams fails ("processed all unmapped reads but there are mapped
     # reads remaining"), most visibly on single-end data. Normalize the QNAMEs up front so both
     # inputs to ZipperBams agree, matching fgbio FastqToBam's historical behavior.
@@ -91,7 +91,7 @@ process ALIGNBAM {
         | samtools view -b -o ${prefix}.qnames_fixed.ubam -
 
     samtools fastq ${samtools_fastq_args} ${prefix}.qnames_fixed.ubam \\
-        | bwa-mem2 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
+        | bwa-mem3 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
         | fgbio -Xmx${fgbio_mem_gb}g \\
             --compression ${fgbio_zipper_bams_compression} \\
             --async-io=true \\
@@ -105,7 +105,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem2: \$(echo \$(bwa-mem2 version 2>&1) | sed 's/.* //')
+        bwamem3: \$(bwa-mem3 version 2>/dev/null | head -n1)
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
@@ -120,7 +120,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem2: \$(echo \$(bwa-mem2 version 2>&1) | sed 's/.* //')
+        bwamem3: \$(bwa-mem3 version 2>/dev/null | head -n1)
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
