@@ -47,9 +47,19 @@
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
                         "installed_by": ["modules"]
                     },
+                    "fgumi/dedup": {
+                        "branch": "master",
+                        "git_sha": "c3e04783b2ac99ffc011745ec092614a7bef86ca",
+                        "installed_by": ["modules"]
+                    },
                     "fgumi/extract": {
                         "branch": "master",
                         "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
+                        "installed_by": ["modules"]
+                    },
+                    "fgumi/sort": {
+                        "branch": "master",
+                        "git_sha": "c3e04783b2ac99ffc011745ec092614a7bef86ca",
                         "installed_by": ["modules"]
                     },
                     "gatk4/calculatecontamination": {
@@ -104,11 +114,6 @@
                     "perbase": {
                         "branch": "master",
                         "git_sha": "be5b19747298e30ca21270ce40abb3bb16b11475",
-                        "installed_by": ["modules"]
-                    },
-                    "picard/markduplicates": {
-                        "branch": "master",
-                        "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
                         "installed_by": ["modules"]
                     },
                     "riker/multi": {
