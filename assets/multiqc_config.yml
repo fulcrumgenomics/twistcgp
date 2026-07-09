@@ -14,3 +14,29 @@ disable_version_detection: true
 
 extra_fn_clean_exts:
   - ".chelae"
+
+custom_data:
+  fgumi_dedup:
+    file_format: "tsv"
+    section_name: "fgumi Dedup"
+    description: "UMI-aware duplicate marking metrics from fgumi dedup"
+    plot_type: "table"
+    pconfig:
+      id: "fgumi_dedup_table"
+    headers:
+      duplicate_rate:
+        title: "Duplicate Rate"
+        format: "{:,.2%}"
+        min: 0
+        max: 1
+        scale: "RdYlGn-rev"
+      total_templates:
+        title: "Total Templates"
+        format: "{:,.0f}"
+      duplicate_templates:
+        title: "Duplicate Templates"
+        format: "{:,.0f}"
+
+sp:
+  fgumi_dedup:
+    fn: "*.dup_marked.metrics.txt"

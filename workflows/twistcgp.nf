@@ -121,6 +121,7 @@ workflow TWISTCGP {
     FGUMI_SORT_COORD(FGUMI_DEDUP.out.bam)
     ch_bam_and_index = FGUMI_SORT_COORD.out.bam.join(FGUMI_SORT_COORD.out.index)
     ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.metrics.collect { _meta, metrics -> metrics })
+    ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.histogram.collect { _meta, histogram -> histogram })
 
     //
     // MODULE: GATK4/MUTECT2
