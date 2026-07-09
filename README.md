@@ -22,7 +22,7 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 
 ### Pipeline Steps
 
-1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
+1. Index Genome ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3), [`samtools`](https://www.htslib.org/))
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
 1. FASTQ to unaligned BAM ([`fgumi extract`](https://github.com/fulcrumgenomics/fgumi))
@@ -86,12 +86,12 @@ The adapter sequences can be supplied to the pipeline using the `--adapters_fast
 
 <details> <summary>Pre-Generate a Genome Index</summary>
 
-Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
+Generating the human genome index with bwa-mem3 is memory intensive.
 Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
-See [docs/bwamem2_index.md](/docs/bwamem2_index.md) for details.
+See [docs/bwamem3_index.md](/docs/bwamem3_index.md) for details.
 
 Additionally, the genome index can be saved to the output directory for future use by supplying the `--save_reference` parameter.
-Subsequently, you may pass the index using `--bwa results/reference/bwamem2`.
+Subsequently, you may pass the index using `--bwa results/reference/bwamem3`.
 
 </details>
 
@@ -252,7 +252,7 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --outdir results \
-   --bwa resources/hg38_giab/bwamem2 \
+   --bwa resources/hg38_giab/bwamem3 \
    --msisensor2_scan resources/hg38_giab.msisensor2_scan.list \
    --ensemblvep_cache resources/ensemblevep_cache/vep_cache \
    --snpeff_cache resources/snpeff_cache/GRCh38.105 \
