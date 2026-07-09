@@ -60,7 +60,8 @@
                     "fgumi/sort": {
                         "branch": "master",
                         "git_sha": "c3e04783b2ac99ffc011745ec092614a7bef86ca",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/fgumi/sort/fgumi-sort.diff"
                     },
                     "gatk4/calculatecontamination": {
                         "branch": "master",

@@ -35,11 +35,14 @@ process FGUMI_SORT {
     """
 
     stub:
+    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}_sorted"
+    def create_index = args.contains('--write-index') ? "touch ${prefix}.bam.bai" : ''
     if ("${bam}" == "${prefix}.bam") {
         error("Input and output names are the same, use \"task.ext.prefix\" to disambiguate!")
     }
     """
     touch ${prefix}.bam
+    ${create_index}
     """
 }
