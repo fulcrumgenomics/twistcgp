@@ -11,7 +11,10 @@ include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
+include { FGUMI_DEDUP } from '../modules/nf-core/fgumi/dedup/main'
 include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
+include { FGUMI_SORT as FGUMI_SORT_COORD } from '../modules/nf-core/fgumi/sort/main'
+include { FGUMI_SORT as FGUMI_SORT_TEMPLATE } from '../modules/nf-core/fgumi/sort/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
@@ -24,7 +27,6 @@ include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
-include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
 include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
 include { TMB } from '../modules/local/tmb'
 include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
@@ -104,19 +106,27 @@ workflow TWISTCGP {
     ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
 
     //
-    // MODULE: PICARD_MARKDUPLICATES
+    // MODULE: FGUMI_DEDUP (mark PCR/optical duplicates using UMI information)
     //
-    PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+    // fgumi dedup requires a template-coordinate sort produced by `fgumi sort`
+    // (a samtools template-coordinate sort is not compatible), and emits an
+    // unindexed BAM. We therefore sort to template-coordinate first, then
+    // re-sort the marked BAM back to coordinate order with an index for the
+    // downstream variant-calling and metrics steps.
+    // fgumi versions flow through the `versions` topic channel collected below,
+    // so there is no per-process versions.yml to mix here.
+    //
+    FGUMI_SORT_TEMPLATE(ALIGNBAM.out.bam)
+    FGUMI_DEDUP(FGUMI_SORT_TEMPLATE.out.bam)
+    FGUMI_SORT_COORD(FGUMI_DEDUP.out.bam)
+    ch_bam_and_index = FGUMI_SORT_COORD.out.bam.join(FGUMI_SORT_COORD.out.index)
+    ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.metrics.collect { _meta, metrics -> metrics })
 
     //
     // MODULE: GATK4/MUTECT2
     //
     // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
-    ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bams_and_targets = ch_bam_and_index
         .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_MUTECT2(
         ch_bams_and_targets,
@@ -272,7 +282,7 @@ workflow TWISTCGP {
             BAITS_TO_BED(baits)
         }
         ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
-        ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
+        ch_cnv_bam_pair = FGUMI_SORT_COORD.out.bam.map { meta, bam -> tuple(meta, bam, []) }
         CNVKIT_BATCH(
             ch_cnv_bam_pair,
             ch_fasta,
