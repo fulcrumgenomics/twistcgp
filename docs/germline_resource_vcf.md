@@ -15,6 +15,5 @@ nextflow run twistcgp/main.nf \
    --targets targets.bed \
    --population_germline_vcf af-only-gnomad.hg38.vcf.gz \
    --population_germline_tbi af-only-gnomad.hg38.vcf.gz.tbi \
-
    --outdir <OUTDIR>
 ```
