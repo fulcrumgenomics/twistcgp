@@ -75,10 +75,11 @@
                     "default": null
                 },
                 "population_germline_tbi": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "pattern": "^\\S+\\.gz\\.tbi$",
-                    "description": "Optional path to the TBI of the germline resource VCF.",
-                    "default": null
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Optional path to the TBI of the germline resource VCF."
                 },
                 "pon_vcf": {
                     "type": ["string", "null"],
@@ -87,10 +88,11 @@
                     "default": null
                 },
                 "pon_tbi": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "pattern": "^\\S+\\.gz\\.tbi$",
-                    "description": "Optional path to the TBI of the compressed panel of normals VCF.",
-                    "default": null
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Optional path to the TBI of the compressed panel of normals VCF."
                 },
                 "outdir": {
                     "type": "string",
@@ -199,12 +201,15 @@
                 "tmb_popaf_cutoff": {
                     "type": "number",
                     "default": 3.0,
+                    "minimum": 0,
                     "description": "Minimum POPAF value (negative log10 of population allele frequency) for TMB pre-filtering.",
                     "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. A value of 3.0 corresponds to a population allele frequency of <= 0.001 (0.1%)."
                 },
                 "tmb_vaf_cutoff": {
                     "type": "number",
                     "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 1,
                     "description": "Minimum variant allele frequency (FORMAT/AF) for TMB pre-filtering.",
                     "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. The Friends of Cancer Research TMB Harmonization Project recommends a minimum of 0.05 (5%). The default of 0.10 (10%) provides additional stringency to reduce sub-clonal noise in tumor-only analyses."
                 }
