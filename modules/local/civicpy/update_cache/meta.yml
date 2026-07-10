@@ -26,11 +26,37 @@ output:
         description: CIViC database cache file
         pattern: "*.pkl"
 
-  versions_yml:
-    - "versions.yml":
-        type: file
-        description: File containing software versions
-        pattern: "versions.yml"
+  versions_civicpy:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - civicpy:
+          type: string
+          description: The name of the tool
+      - civicpy --version | sed 's/.*version //':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_civic_db:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - civic_db_release:
+          type: string
+          description: Provenance label for the CIViC knowledgebase snapshot date
+      - cat civic_db_release.txt:
+          type: eval
+          description: The CIViC knowledgebase snapshot date (from the cache), or 'unknown'
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - civicpy:
+          type: string
+          description: The name of the tool
+      - civicpy --version | sed 's/.*version //':
+          type: eval
+          description: The expression to obtain the version of the tool
 
 authors:
   - "@emmcauley"

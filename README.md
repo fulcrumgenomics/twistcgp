@@ -287,7 +287,7 @@ Sponsors provide support for `twistcgp` through direct funding or employing cont
 Public sponsors include:
 
 <p>
-<a href="https://fulcrumgenomics.com"><img src=".github/logos/fulcrumgenomics.svg" alt="Fulcrum Genomics" height="35"/></a>
+<a href="https://fulcrumgenomics.com"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/logos/fulcrumgenomics-dark.svg"><source media="(prefers-color-scheme: light)" srcset=".github/logos/fulcrumgenomics-light.svg"><img alt="Fulcrum Genomics" src=".github/logos/fulcrumgenomics-light.svg" height="35"></picture></a>
 &nbsp;
 <a href="https://www.twistbioscience.com"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/logos/Twist-logo-dark-mode.png"><source media="(prefers-color-scheme: light)" srcset=".github/logos/Twist-logo-light-mode.png"><img alt="Twist Biosciences" src=".github/logos/Twist-logo-light-mode.png" height="35"></picture></a>
 &nbsp;

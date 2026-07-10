@@ -82,7 +82,6 @@ workflow {
         tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
     )
 
-
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
