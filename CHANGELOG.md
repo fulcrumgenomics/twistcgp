@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added BCFTOOLS_VIEW pre-filtering step prior to TMB calculation
 - Added `--tmb_popaf_cutoff` and `--tmb_vaf_cutoff` parameters
 - Added `--skip_cnv`, `--skip_msi`, and `--skip_tmb` parameters to allow skipping CNV calling, MSI analysis, and TMB calculation respectively
+- Added gnomAD genome allele frequencies (`--af_gnomadg`) to VEP annotation so population filtering covers intronic/non-coding variants (which gnomAD exome does not); pyTMB now consumes the `gnomADg_*` fields
 
 ### Fixed
 
@@ -28,16 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
 - Applied Nextflow strict syntax: `Channel.` to `channel.`, named closure params, explicit `script:` labels
 - Fixed closure parameter shadowing `vcf` variable for Nextflow 26.x compatibility
-- Samplesheet `sample` column is now required to be unique across rows; previously-accepted multi-row-per-sample inputs (intended for multi-lane fastqs) were silently lossy and now fail validation. Merge lane-level fastqs before running the pipeline.
+- Removed the MSISENSOR2_SCAN module — MSIsensor2 no longer auto-generates a scan file and now uses only the ML model by default (no scan file or interval list required for human genomes)
+- **Breaking:** Samplesheet `sample` column is now required to be unique across rows; previously-accepted multi-row-per-sample inputs (intended for multi-lane fastqs) were silently lossy and now fail validation. Merge lane-level fastqs before running the pipeline.
 - **Breaking:** Replaced the single `--msisensor_scan` parameter with two tool-scoped parameters: `--msisensor2_scan` (MSIsensor2 optional scan, primarily for non-human panels) and `--msisensor_pro_sites` (MSIsensor-pro, accepts a scan list or a trained baseline). The MSIsensor-pro path now explicitly supports baseline inputs, which are recommended for production use. Fixes [#91](https://github.com/fulcrumgenomics/twistcgp/issues/91).
-
-## 1.1.0dev
-
-### Changes
-
-- Removed MSISENSOR2_SCAN module — msisensor2 no longer auto-generates a scan file
-- MSIsensor2 now uses only the ML model by default (no scan file or interval list required for human genomes)
-- The `--msisensor_scan` parameter is now optional for msisensor2 (useful for non-human panels) and remains used by msisensor-pro
+- **Breaking:** Renamed the `arm` profile to `emulate_amd64` (amd64 emulation under Docker) and added a new `arm64` profile for native arm64 execution via Wave. Anyone invoking `-profile arm` must switch to `-profile emulate_amd64` (or `arm64`).
 
 ## 1.0.0 - 2026-02-27
 
