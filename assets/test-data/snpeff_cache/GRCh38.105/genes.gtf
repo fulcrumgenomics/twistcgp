@@ -1,0 +1,5 @@
+7	test	gene	301	600	.	+	.	gene_id "GENE7"; gene_name "GENE7";
+7	test	transcript	301	600	.	+	.	gene_id "GENE7"; transcript_id "TX7";
+7	test	exon	301	600	.	+	.	gene_id "GENE7"; transcript_id "TX7"; exon_number "1";
+7	test	CDS	301	600	.	+	0	gene_id "GENE7"; transcript_id "TX7";
+7	test	start_codon	301	303	.	+	0	gene_id "GENE7"; transcript_id "TX7";

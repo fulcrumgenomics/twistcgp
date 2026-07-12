@@ -1,0 +1,18 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##INFO=<ID=POPAF,Number=A,Type=Float,Description="Negative log 10 population allele frequencies of alt alleles">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=AF,Number=A,Type=Float,Description="Allele fractions of alternate alleles in the tumor">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth">
+##FORMAT=<ID=AQ,Number=1,Type=Integer,Description="Systematic noise score">
+##FORMAT=<ID=tDP,Number=1,Type=Integer,Description="Tumor read depth">
+##contig=<ID=3>
+##contig=<ID=7>
+##contig=<ID=12>
+##contig=<ID=17>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	test
+7	140753336	.	A	T	.	PASS	POPAF=6.0	GT:AD:AF:DP:AQ:tDP	0/1:65,35:0.35:100:60:100
+12	25245350	.	C	T	.	PASS	POPAF=6.0	GT:AD:AF:DP:AQ:tDP	0/1:70,30:0.30:100:60:100
+3	179218303	.	G	A	.	PASS	POPAF=6.0	GT:AD:AF:DP:AQ:tDP	0/1:60,40:0.40:100:60:100
+17	7675088	.	C	T	.	PASS	POPAF=6.0	GT:AD:AF:DP:AQ:tDP	0/1:55,45:0.45:100:60:100
