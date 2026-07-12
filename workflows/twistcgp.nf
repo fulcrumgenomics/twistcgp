@@ -205,8 +205,13 @@ workflow TWISTCGP {
     //
     // SUB-WORKFLOW: VCF_ANNOTATE
     //
+    // Derive the staged COSMIC basename with file() (not resolvable inside the
+    // ENSEMBLVEP_VEP ext.args closure) and carry it on meta for VEP's --custom.
+    def vep_custom_name = params.cosmic_vcf ? file(params.cosmic_vcf).name : null
     VCF_ANNOTATE(
-        GATK4_FILTERMUTECTCALLS.out.vcf,
+        GATK4_FILTERMUTECTCALLS.out.vcf.map { meta, vcf ->
+            [meta + (vep_custom_name ? [vep_custom_name: vep_custom_name] : [:]), vcf]
+        },
         ch_fasta,
         snpeff_genome_info,
         ensemblvep_info,
