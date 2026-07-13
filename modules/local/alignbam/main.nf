@@ -83,8 +83,9 @@ process ALIGNBAM {
     # read names and fgbio ZipperBams fails ("processed all unmapped reads but there are mapped
     # reads remaining"), most visibly on single-end data. Normalize the QNAMEs up front so both
     # inputs to ZipperBams agree, matching fgbio FastqToBam's historical behavior.
-    # TODO: remove this workaround once fgumi ships https://github.com/fulcrumgenomics/fgumi/pull/486
-    # (which strips /1,/2 in `fgumi extract`) and the nf-core fgumi/extract module is bumped to it.
+    # TODO: remove this workaround once the fgumi/extract nf-core module is bumped to a release
+    # that strips /1,/2 in `fgumi extract` itself. https://github.com/fulcrumgenomics/fgumi/pull/486
+    # was merged 2026-07-09 and is expected to ship in fgumi 0.5.0; this module currently pins 0.4.0.
     samtools view -h ${unmapped_bam} \\
         | awk -F'\\t' -v OFS='\\t' '/^@/ {print; next} {sub(/\\/[12]\$/, "", \$1); print}' \\
         | samtools view -b -o ${prefix}.qnames_fixed.ubam -
