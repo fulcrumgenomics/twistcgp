@@ -21,10 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bumped pinned `picard/markduplicates` to nf-core/modules `2b5333d3d` so the stub emits a `.bai` alongside the `.bam`; previously the join with `.bai` was empty under `-stub` and downstream MSI / GATK steps were silently skipped (#101)
 - VEP `--custom` now references the staged file's basename, fixing failures when `--cosmic_vcf` is a remote URL (e.g. `s3://`) on Lifebit/Fusion (#95)
 - Removed a duplicate `gatk4/getpileupsummaries` key from `modules.json` (JSON silently kept the last entry, so this was latent)
+- ALIGNBAM now writes the ZipperBams input to a sorted intermediate file instead of streaming through `/dev/stdout`, fixing an "Exec format error" under Singularity/Apptainer
+- ALIGNBAM strips `/1` and `/2` mate suffixes from uBAM QNAMEs before alignment, so ZipperBams' read-name check no longer fails on `fgumi extract` output (workaround until fgumi#486)
 
 ### Changed
 
-- Replaced `fgbio FastqToBam` with `fgumi extract` for FASTQ-to-unaligned-BAM conversion (behavior-preserving; UMI extraction available via `--read-structures`)
+- Replaced `fgbio FastqToBam` with `fgumi extract` for FASTQ-to-unaligned-BAM conversion (behavior-preserving: read structure pinned to `+T`, all-template, matching FastqToBam; UMI extraction available by changing `--read-structures`)
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
