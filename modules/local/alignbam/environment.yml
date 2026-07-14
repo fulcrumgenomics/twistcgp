@@ -8,3 +8,9 @@ dependencies:
   - bioconda::bwa-mem3=0.5.0
   - bioconda::fgbio=4.1.0
   - bioconda::samtools=1.23.1
+  # The micromamba amazon2023 base image Wave builds on is minimal and lacks
+  # findutils/gawk/coreutils; the alignbam script needs `find`, `awk`, and the
+  # coreutils used in the versions block, so pull them in explicitly.
+  - conda-forge::findutils
+  - conda-forge::gawk
+  - conda-forge::coreutils
