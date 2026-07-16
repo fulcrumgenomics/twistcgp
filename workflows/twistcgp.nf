@@ -24,7 +24,6 @@ include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
 include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
 include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
-include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -76,9 +75,10 @@ workflow TWISTCGP {
     outdir // string: pipeline output directory
     multiqc_config // optional path to custom MultiQC config
     multiqc_logo // optional path to custom MultiQC logo
+    ch_prepare_versions // channel: versions.yml from the reference-prep subworkflows (PREPARE_GENOME/INDICES/ANNOTATION_DB)
 
     main:
-    ch_versions = channel.empty()
+    ch_versions = ch_prepare_versions
     ch_multiqc_files = channel.empty()
     //
     // MODULE: Run FastQC
@@ -112,7 +112,7 @@ workflow TWISTCGP {
     // MODULE: PICARD_MARKDUPLICATES
     //
     PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai, failOnMismatch: true, failOnDuplicate: true)
     ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { _meta, metrics -> metrics })
     ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
 
@@ -121,7 +121,7 @@ workflow TWISTCGP {
     //
     // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
     ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+        .join(PICARD_MARKDUPLICATES.out.bai, failOnMismatch: true, failOnDuplicate: true)
         .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_MUTECT2(
         ch_bams_and_targets,
@@ -177,9 +177,9 @@ workflow TWISTCGP {
     // MODULE: GATK4/FILTERMUTECTCALLS
     //
     ch_mutect2_samples = GATK4_MUTECT2.out.vcf
-        .join(GATK4_MUTECT2.out.tbi)
-        .join(GATK4_MUTECT2.out.stats)
-        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
+        .join(GATK4_MUTECT2.out.tbi, failOnMismatch: true, failOnDuplicate: true)
+        .join(GATK4_MUTECT2.out.stats, failOnMismatch: true, failOnDuplicate: true)
+        .join(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior, failOnMismatch: true, failOnDuplicate: true) // hard join: LROM always runs, so a missing artifact prior indicates a process failure rather than a valid skip — fail loudly rather than silently drop orientation bias filtering
 
     // remainder: true lets samples flow through even when CALCULATECONTAMINATION didn't run (no germline resource);
     // the final map treats both null (unmatched) and [] as "absent", so no intermediate coercion is needed.
@@ -234,7 +234,7 @@ workflow TWISTCGP {
         if (!skip_civicpy) {
             CIVICPY_UPDATE_CACHE()
             CIVICPY_ANNOTATE(
-                BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi),
+                BCFTOOLS_VIEW_PRE_CIVIC.out.vcf.join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi, failOnMismatch: true, failOnDuplicate: true),
                 annotation_genome_version,
                 CIVICPY_UPDATE_CACHE.out.cache.first(),
             )
@@ -254,10 +254,10 @@ workflow TWISTCGP {
                 [], // samples (unused)
             )
             ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_POST_CIVIC.out.vcf
-                .join(BCFTOOLS_VIEW_POST_CIVIC.out.tbi)
+                .join(BCFTOOLS_VIEW_POST_CIVIC.out.tbi, failOnMismatch: true, failOnDuplicate: true)
         } else {
             ch_pre_tmb_vcf_tbi = BCFTOOLS_VIEW_PRE_CIVIC.out.vcf
-                .join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi)
+                .join(BCFTOOLS_VIEW_PRE_CIVIC.out.tbi, failOnMismatch: true, failOnDuplicate: true)
         }
 
         //
@@ -283,7 +283,7 @@ workflow TWISTCGP {
             ch_fasta,
             ch_fasta_fai,
             ch_baits_bed, // note the process labels this "targets", however CNVkit documentation recommends using baits
-            tuple([], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
+            tuple([:], pon_cnn), // no metadata supplied for the optional panel of normal reference cnn file
             false // boolean, true indicates no tumor sample, multiple normal samples, only output a PON reference
         )
         ch_versions = ch_versions.mix(CNVKIT_BATCH.out.versions.first())

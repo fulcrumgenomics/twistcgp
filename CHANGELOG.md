@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ALIGNBAM stub now reports the `bwa-mem2` version, matching the container and the `script:` block; previously it shelled out to `bwa` and emitted stderr into `versions.yml` (#99)
 - Bumped pinned `picard/markduplicates` to nf-core/modules `2b5333d3d` so the stub emits a `.bai` alongside the `.bam`; previously the join with `.bai` was empty under `-stub` and downstream MSI / GATK steps were silently skipped (#101)
 - VEP `--custom` now references the staged file's basename, fixing failures when `--cosmic_vcf` is a remote URL (e.g. `s3://`) on Lifebit/Fusion (#95)
+- Reference-preparation subworkflow tool versions (`PREPARE_GENOME`/`PREPARE_INDICES`/`PREPARE_ANNOTATION_DB`) are now collated into the software-versions report; previously they were emitted but never captured
+- Local per-sample channel joins now use `failOnMismatch`/`failOnDuplicate` so a missing or duplicated sample fails loudly instead of being silently dropped; the optional `GATK4_CALCULATECONTAMINATION` joins intentionally stay lenient (`remainder: true`)
+- Miscellaneous refinements: `fasta_gzi` is now a channel rather than a Groovy closure; removed an unused `PICARD_INTERVALLISTTOBED` import; the CNVkit reference tuple uses an empty meta map `[:]` instead of `[]`; tightened the `pon_cnn` schema pattern (`.cnn?` → `.cnn`, was accepting `.cn`); and corrected stale template boilerplate (the `save_reference` help referenced a STAR index; aligned the `pipelines_testdata_base_path` default between `nextflow.config` and the schema)
 
 ### Changed
 
