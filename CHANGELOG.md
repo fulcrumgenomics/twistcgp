@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reference-preparation subworkflow tool versions (`PREPARE_GENOME`/`PREPARE_INDICES`/`PREPARE_ANNOTATION_DB`) are now collated into the software-versions report; previously they were emitted but never captured
 - Local per-sample channel joins now use `failOnMismatch`/`failOnDuplicate` so a missing or duplicated sample fails loudly instead of being silently dropped; the optional `GATK4_CALCULATECONTAMINATION` joins intentionally stay lenient (`remainder: true`)
 - Miscellaneous refinements: `fasta_gzi` is now a channel rather than a Groovy closure; removed an unused `PICARD_INTERVALLISTTOBED` import; the CNVkit reference tuple uses an empty meta map `[:]` instead of `[]`; tightened the `pon_cnn` schema pattern (`.cnn?` → `.cnn`, was accepting `.cn`); and corrected stale template boilerplate (the `save_reference` help referenced a STAR index; aligned the `pipelines_testdata_base_path` default between `nextflow.config` and the schema)
+- Added the missing `gnomADg_REMAINING_AF` population to the pyTMB gnomAD genome polymorphism list in `assets/pytmb_vep.yml` (the exome list already had `gnomADe_REMAINING_AF`); this gnomAD genome population is now excluded during TMB germline filtering
 
 ### Changed
 
