@@ -23,7 +23,6 @@ tools:
       documentation: https://github.com/fg-labs/bwa-mem3
       arxiv: arXiv:1303.3997
       licence: ["MIT AND Apache-2.0"]
-      identifier: ""
   - fgbio:
       description: A set of tools for working with genomic and high throughput sequencing data, including UMIs
       homepage: http://fulcrumgenomics.github.io/fgbio/

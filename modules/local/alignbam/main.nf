@@ -105,7 +105,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem3: \$(bwa-mem3 version 2>/dev/null | head -n1)
+        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
@@ -120,7 +120,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem3: \$(bwa-mem3 version 2>/dev/null | head -n1)
+        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS

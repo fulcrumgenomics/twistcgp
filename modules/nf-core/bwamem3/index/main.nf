@@ -1,12 +1,18 @@
 process BWAMEM3_INDEX {
     tag "${meta.id}"
-    // NOTE bwa-mem3 builds an FM-index with libsais; peak memory scales with the reference size.
-    memory { 280.MB * Math.ceil(fasta.size() / 10000000) * task.attempt }
+    label 'process_high'
+    // bwa-mem3 builds an FM-index with libsais; peak memory scales with the reference
+    // *sequence* length. fasta.size() is the on-disk size, so for a bgzipped reference
+    // estimate the decompressed length (~4x) to avoid under-provisioning the index build.
+    memory {
+        def bases = fasta.name.endsWith('.gz') ? fasta.size() * 4 : fasta.size()
+        280.MB * Math.ceil(bases / 10000000) * task.attempt
+    }
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
-        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/45/45a11b91903b7e31b9418ca5fe6852c82a2b1ee1b0772ad6623618cb0ba9da55/data'
-        : 'community.wave.seqera.io/library/bwa-mem3:0.3.0--89c56b3ab74a5e5c'}"
+        ? 'oras://community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:8c498507a3d50f10'
+        : 'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:8a782440315a7fe1'}"
 
     input:
     tuple val(meta), path(fasta)
@@ -35,7 +41,6 @@ process BWAMEM3_INDEX {
     def prefix = task.ext.prefix ?: "${fasta}"
     """
     mkdir bwamem3
-    touch bwamem3/${prefix}.0123
     touch bwamem3/${prefix}.amb
     touch bwamem3/${prefix}.ann
     touch bwamem3/${prefix}.bwt.2bit.64
