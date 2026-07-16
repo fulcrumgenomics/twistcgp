@@ -59,23 +59,31 @@ process ALIGNBAM {
         fgbio_zipper_bams_compression = 1
         extra_command = "samtools sort "
         extra_command += samtools_sort_args
+        extra_command += " --threads " + task.cpus
         if (sort_type == "template-coordinate") {
+            // template-coordinate order is not position-sorted, so it cannot be BAI-indexed:
+            // emit an unindexed BAM (no --write-index, and no ##idx## companion, which would
+            // otherwise be treated as a literal filename and never match the *.mapped.bam glob).
             extra_command += " --template-coordinate"
+            extra_command += " -o " + prefix + ".mapped.bam"
         }
         else {
             if (sort_type != "coordinate") {
                 log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
             }
             extra_command += " --write-index"
+            extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
         }
-        extra_command += " --threads " + task.cpus
-        extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
         extra_command += " " + prefix + ".zipped.bam"
     }
 
     """
-    # The real path to the BWA index prefix`
-    BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
+    # Derive the BWA index prefix from the staged index directory: first .amb file, strip the
+    # trailing .amb. `-print -quit` stops find after the first match (no pipe, so no SIGPIPE
+    # under `set -o pipefail`); scoped to \${bwa_dir} with an anchored suffix strip (not an
+    # unanchored sed) so it is robust to other .amb files elsewhere in the work dir.
+    BWA_INDEX_PREFIX=\$(find -L ${bwa_dir} -name "*.amb" -print -quit)
+    BWA_INDEX_PREFIX=\${BWA_INDEX_PREFIX%.amb}
 
 
     samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
