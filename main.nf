@@ -78,10 +78,6 @@ workflow {
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
     )
 
-    ch_gnomad_vcf = channel.value(
-        tuple([id: 'gnomad_vcf'], params.gnomad_vcf ? file(params.gnomad_vcf) : [])
-    )
-
     FULCRUMGENOMICS_TWISTCGP(
         PIPELINE_INITIALISATION.out.samplesheet,
         baits,
@@ -97,7 +93,6 @@ workflow {
         tmb_vep_config,
         ensemblvep_cache,
         ch_cosmic_vcf,
-        ch_gnomad_vcf,
     )
 
     //
@@ -134,7 +129,6 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     tmb_vep_config // required path to variant annotation config file
     ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
-    ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
 
     main:
     // Initialize fasta file with meta map:
@@ -145,7 +139,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     //
 
     PREPARE_GENOME(fasta, params.use_msisensor_pro_licensed)
-    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf, ch_gnomad_vcf)
+    PREPARE_INDICES(ch_pop_germline_resource, ch_pon_vcf, ch_cosmic_vcf)
     PREPARE_ANNOTATION_DB(
         ensemblvep_info,
         snpeff_genome_info,
@@ -199,29 +193,17 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ? channel.fromPath(params.cosmic_tbi).map { path -> [[id: 'cosmic_tbi'], path] }.collect()
         : (params.cosmic_vcf ? PREPARE_INDICES.out.ch_cosmic_tbi : channel.value([[id: 'cosmic_tbi'], []]))
 
-    ch_gnomad_tbi = params.gnomad_tbi
-        ? channel.fromPath(params.gnomad_tbi).map { path -> [[id: 'gnomad_tbi'], path] }.collect()
-        : (params.gnomad_vcf ? PREPARE_INDICES.out.ch_gnomad_tbi : channel.value([[id: 'gnomad_tbi'], []]))
-
     vep_extra_files = channel.empty()
-    // Check for VCFs from either COSMIC or gnomAD; VCF and TBI files both get passed to VEP
+    // Check for a COSMIC VCF; its VCF and TBI both get passed to VEP
     if (params.cosmic_vcf) {
         vep_extra_files = vep_extra_files
             .mix(ch_cosmic_vcf)
             .mix(ch_cosmic_tbi)
     }
 
-    if (params.gnomad_vcf) {
-        vep_extra_files = vep_extra_files
-            .mix(ch_gnomad_vcf)
-            .mix(ch_gnomad_tbi)
-    }
-
-    if (!params.gnomad_vcf && !params.cosmic_vcf) {
-        vep_extra_files_no_meta = channel.value([])
-    } else {
-        vep_extra_files_no_meta = vep_extra_files.map { _m, f -> f }.collect()
-    }
+    vep_extra_files_no_meta = params.cosmic_vcf
+        ? vep_extra_files.map { _m, f -> f }.collect()
+        : channel.value([])
 
     // WORKFLOW: Run pipeline
     //

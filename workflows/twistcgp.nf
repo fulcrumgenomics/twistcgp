@@ -64,7 +64,7 @@ workflow TWISTCGP {
     tmb_mutect2_config // path(tmb_mutect2_config)
     tmb_vep_config // path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
-    vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf), path(cosmic_tbi), path(gnomad_vcf), path(gnomad_tbi)] (subset depending on which params are set)
+    vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf), path(cosmic_tbi)] (present only when --cosmic_vcf is set)
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
     ch_msi_pro_sites // channel: tuple val(meta), path(msisensor_pro_sites) - scan list or trained baseline for msisensor-pro
     skip_tmb // boolean: skip TMB calculation
