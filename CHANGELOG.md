@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Replaced the local `TMB` module with the nf-core `tmb/pytmb` module (tmb pinned to 1.5.0 in both conda and container; correct `-stub` outputs; upstream nf-test). The `--export` VCF of the variants that fed the TMB calculation is now published alongside the log. Note: the published TMB log is now named `<id>.log` (previously `<id>.tmb.log`).
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1

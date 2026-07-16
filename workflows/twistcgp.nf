@@ -30,7 +30,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
 include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
-include { TMB } from '../modules/local/tmb'
+include { TMB_PYTMB } from '../modules/nf-core/tmb/pytmb/main'
 
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
 
@@ -261,10 +261,21 @@ workflow TWISTCGP {
         }
 
         //
-        // MODULE: TMB
+        // MODULE: TMB_PYTMB
         //
-        TMB(ch_pre_tmb_vcf_tbi, targets, tmb_vep_config, tmb_mutect2_config)
-        ch_versions = ch_versions.mix(TMB.out.versions.first())
+        // nf-core tmb/pytmb takes one combined tuple (meta, vcf, bed, eff_genome_size,
+        // var_config, db_config) and builds --bed/--effGenomeSize, --varConfig and --dbConfig
+        // itself. We pass the target BED and an empty eff_genome_size: [] is falsy, so the module
+        // takes the --bed branch and derives the effective genome size from it. pyTMB reads the
+        // VCF by full iteration (no region query), so the .tbi is dropped here. tmb_mutect2_config
+        // and tmb_vep_config are single-file value channels (.collect()), combined in as
+        // var_config (--varConfig) and db_config (--dbConfig) respectively. Version is emitted on
+        // the `versions` topic (collated below), so no ch_versions.mix is needed here.
+        ch_tmb_input = ch_pre_tmb_vcf_tbi
+            .map { meta, vcf, _tbi -> tuple(meta, vcf, targets[1], []) }
+            .combine(tmb_mutect2_config)
+            .combine(tmb_vep_config)
+        TMB_PYTMB(ch_tmb_input)
     }
     //
     // CNVKIT_BATCH
