@@ -6,7 +6,7 @@ channels:
   - nodefaults
 dependencies:
   - bioconda::bwa-mem3=0.8.0
-  - bioconda::fgbio=4.1.0
+  - bioconda::fgumi=0.4.0
   - bioconda::samtools=1.24
   # The micromamba amazon2023 base image Wave builds on is minimal and lacks
   # findutils/gawk/coreutils; the alignbam script needs `find`, `awk`, and the

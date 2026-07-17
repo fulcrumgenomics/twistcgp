@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/0d/0d117c5df9d7a1bdb64f707513ab4aa756db69be8b85c85072a8f5a3043814db/data':
-        'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:5f497be3cf6aaa15' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b5/b5a8afec3a524e3ceabb504ef86c7ecf922e32d7efc31dde34916dd8fda9d73b/data':
+        'community.wave.seqera.io/library/bwa-mem2_fgumi_samtools_findutils:92870b1f8418f449' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -28,35 +28,24 @@ process ALIGNBAM {
     def samtools_fastq_args = task.ext.samtools_fastq_args ?: ''
     def samtools_sort_args = task.ext.samtools_sort_args ?: ''
     def bwa_args = task.ext.bwa_args ?: ''
-    def fgbio_args = task.ext.fgbio_args ?: ''
+    def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def fgbio_mem_gb = 4
     def extra_command = ""
-    if (!task.memory) {
-        log.info('[fgbio ZipperBams] Available memory not known - defaulting to 4GB. Specify process memory requirements to change this.')
-    }
-    else if (fgbio_mem_gb > task.memory.giga) {
-        if (task.memory.giga < 2) {
-            fgbio_mem_gb = 1
-        }
-        else {
-            fgbio_mem_gb = task.memory.giga - 1
-        }
-    }
+    // fgumi zipper manages its own memory (bounded template buffer), so no JVM heap sizing is needed.
+    def zipper_output = ""
+    def zipper_compression = 1
 
     if (sort_type == "none") {
-        fgbio_zipper_bams_output = prefix + ".mapped.bam"
-        fgbio_zipper_bams_compression = 1
+        zipper_output = prefix + ".mapped.bam"
+        zipper_compression = 1
     }
     else {
-        // Write ZipperBams output to an intermediate file and sort that file, rather than
-        // piping fgbio's output through /dev/stdout. Writing to the literal /dev/stdout path
-        // is unreliable under Singularity (it is a /proc/self/fd symlink that does not resolve
-        // to the downstream pipe), so a piped `samtools sort -` receives a broken stream and
-        // fails with "Exec format error". Docker resolves /dev/stdout correctly, so this only
-        // manifests under Singularity/Apptainer. Sorting a real file works under both.
-        fgbio_zipper_bams_output = prefix + ".zipped.bam"
-        fgbio_zipper_bams_compression = 1
+        // Write zipper output to an intermediate file and sort that file, rather than piping
+        // through stdout. Sorting a real file is robust under both Docker and Singularity.
+        zipper_output = prefix + ".zipped.bam"
+        // uncompressed BGZF: this transient file is immediately re-read by samtools sort, so skip
+        // the deflate/inflate round-trip.
+        zipper_compression = 0
         extra_command = "samtools sort "
         extra_command += samtools_sort_args
         if (sort_type == "template-coordinate") {
@@ -79,21 +68,22 @@ process ALIGNBAM {
 
     samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
         | bwa-mem3 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
-        | fgbio -Xmx${fgbio_mem_gb}g \\
-            --compression ${fgbio_zipper_bams_compression} \\
-            --async-io=true \\
-            ZipperBams \\
+        | fgumi zipper \\
+            --input - \\
             --unmapped ${unmapped_bam} \\
-            --ref ${fasta} \\
-            --output ${fgbio_zipper_bams_output} \\
-            ${fgbio_args}
+            --reference ${fasta} \\
+            --compression-level ${zipper_compression} \\
+            -t ${task.cpus} \\
+            --skip-pa-tags \\
+            --output ${zipper_output} \\
+            ${fgumi_zipper_args}
 
     ${extra_command}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
+        fgumi: \$(fgumi --version 2>&1 | sed 's/^fgumi //')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
@@ -108,7 +98,7 @@ process ALIGNBAM {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
+        fgumi: \$(fgumi --version 2>&1 | sed 's/^fgumi //')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
