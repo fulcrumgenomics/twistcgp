@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/70/70f229ebe22acf5254f66ecd0aa2e83c2ae450973b26cc8913ec47438d6e6659/data':
-        'community.wave.seqera.io/library/bwa-mem2_fgbio_samtools:21ba39eea59f6a7d' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b0/b0b6971a84a5c0ec1d7928a3f32b74f9cf45f19a00326d34441876a1a20b67e6/data':
+        'community.wave.seqera.io/library/bwa-mem2_fgbio_samtools_findutils:8004d81f0e7eb031' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -49,10 +49,15 @@ process ALIGNBAM {
         fgbio_zipper_bams_compression = 1
     }
     else {
-        fgbio_zipper_bams_output = "/dev/stdout"
-        // do not compress if samtools is consuming it
+        // Write ZipperBams output to an intermediate file and sort that file, rather than piping
+        // fgbio through /dev/stdout. The literal /dev/stdout path is a /proc/self/fd symlink that
+        // does not reach the downstream pipe under Singularity (samtools sort - then fails with
+        // "Exec format error"); Docker resolves it fine. Sorting a real file works under both.
+        fgbio_zipper_bams_output = prefix + ".zipped.bam"
+        // uncompressed BGZF: this transient file is immediately re-read by samtools sort, so skip
+        // the deflate/inflate round-trip.
         fgbio_zipper_bams_compression = 0
-        extra_command = " | samtools sort "
+        extra_command = "samtools sort "
         extra_command += samtools_sort_args
         if (sort_type == "template-coordinate") {
             extra_command += " --template-coordinate"
@@ -65,7 +70,7 @@ process ALIGNBAM {
         }
         extra_command += " --threads " + task.cpus
         extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
-        extra_command += " -"
+        extra_command += " " + prefix + ".zipped.bam"
     }
 
     """
@@ -82,8 +87,9 @@ process ALIGNBAM {
             --unmapped ${unmapped_bam} \\
             --ref ${fasta} \\
             --output ${fgbio_zipper_bams_output} \\
-            ${fgbio_args} \\
-            ${extra_command};
+            ${fgbio_args}
+
+    ${extra_command}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
