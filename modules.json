@@ -53,11 +53,6 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
-                    "gatk4/getpileupsummaries": {
-                        "branch": "master",
-                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
-                        "installed_by": ["modules"]
-                    },
                     "gatk4/calculatecontamination": {
                         "branch": "master",
                         "git_sha": "86308d628760125908c5c77540517effe0f8880f",
