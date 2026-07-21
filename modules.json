@@ -99,29 +99,22 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "82a79183037a403ad1b6714e5dbcff25500efaf6",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/multiqc/multiqc.diff"
+                        "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
+                        "installed_by": ["modules"]
                     },
                     "perbase": {
                         "branch": "master",
                         "git_sha": "be5b19747298e30ca21270ce40abb3bb16b11475",
                         "installed_by": ["modules"]
                     },
-                    "picard/collecthsmetrics": {
-                        "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/picard/collecthsmetrics/picard-collecthsmetrics.diff"
-                    },
-                    "picard/collectmultiplemetrics": {
-                        "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": ["modules"]
-                    },
                     "picard/markduplicates": {
                         "branch": "master",
                         "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
+                        "installed_by": ["modules"]
+                    },
+                    "riker/multi": {
+                        "branch": "master",
+                        "git_sha": "89b094a1b914b1e0844b4c0cc901cda5eddd569b",
                         "installed_by": ["modules"]
                     },
                     "samtools/dict": {
