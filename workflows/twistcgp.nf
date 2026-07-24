@@ -6,10 +6,10 @@
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_PRE_CIVIC } from '../modules/nf-core/bcftools/view/main'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_POST_CIVIC } from '../modules/nf-core/bcftools/view/main'
+include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include { FASTP } from '../modules/nf-core/fastp/main'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
@@ -88,17 +88,15 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
-    // MODULE: Run fastp
+    // MODULE: Run chelae trim
     //
-    // Always output filtered and discarded read FASTQs, never output a merged fastq
-    FASTP(ch_samplesheet, adapters_fasta, false, true, false)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTP.out.json.collect { _meta, json -> json })
-    ch_versions = ch_versions.mix(FASTP.out.versions.first())
+    CHELAE_TRIM(ch_samplesheet, adapters_fasta)
+    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, json -> json })
 
     //
     // MODULE: Run fastqtobam
     //
-    FGBIO_FASTQTOBAM(FASTP.out.reads)
+    FGBIO_FASTQTOBAM(CHELAE_TRIM.out.reads)
     ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
 
     //
