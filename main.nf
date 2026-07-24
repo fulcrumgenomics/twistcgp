@@ -151,6 +151,12 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         snpeff_genome_info,
     )
 
+    // Collect tool versions from the reference-preparation subworkflows so they reach the
+    // software-versions report (they emit `versions` but were previously never collated).
+    ch_prepare_versions = PREPARE_GENOME.out.versions
+        .mix(PREPARE_INDICES.out.versions)
+        .mix(PREPARE_ANNOTATION_DB.out.versions)
+
     // Gather built indices or get them from the params
     // Built from the fasta file:
     dict = params.dict
@@ -161,7 +167,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         : PREPARE_GENOME.out.fasta_fai
     fasta_gzi = params.fasta_gzi
         ? channel.fromPath(params.fasta_gzi).map { path -> [[id: 'gzi'], path] }.collect()
-        : { file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : channel.value([[id: "gzi"], []]) }
+        : (file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : channel.value([[id: "gzi"], []]))
     bwa = params.bwa
         ? channel.fromPath(params.bwa).map { path -> [[id: 'bwa'], path] }.collect()
         : PREPARE_GENOME.out.bwa
@@ -253,6 +259,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         params.outdir,
         params.multiqc_config,
         params.multiqc_logo,
+        ch_prepare_versions,
     )
 
     emit:
