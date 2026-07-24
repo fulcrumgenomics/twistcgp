@@ -95,6 +95,7 @@ polymDb:
     - gnomADe_FIN_AF
     - gnomADe_MID_AF
     - gnomADe_NFE_AF
+    - gnomADe_REMAINING_AF
     - gnomADe_SAS_AF
     - gnomADg_AF
     - gnomADg_AFR_AF

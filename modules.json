@@ -16,6 +16,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
                     },
+                    "civicpy/annotate": {
+                        "branch": "master",
+                        "git_sha": "d9b102cf2037413ee4cb990d3d63eb8623758d00",
+                        "installed_by": ["modules"]
+                    },
                     "cnvkit/batch": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
@@ -48,10 +53,26 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
+                    "gatk4/calculatecontamination": {
+                        "branch": "master",
+                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+                        "installed_by": ["modules"]
+                    },
                     "gatk4/filtermutectcalls": {
                         "branch": "master",
                         "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
                         "installed_by": ["modules"]
+                    },
+                    "gatk4/getpileupsummaries": {
+                        "branch": "master",
+                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+                        "installed_by": ["modules"]
+                    },
+                    "gatk4/learnreadorientationmodel": {
+                        "branch": "master",
+                        "git_sha": "52b7843bd92ccf833cc12e71cd84aeccf2583852",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/gatk4/learnreadorientationmodel/gatk4-learnreadorientationmodel.diff"
                     },
                     "gatk4/mutect2": {
                         "branch": "master",

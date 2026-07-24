@@ -185,14 +185,44 @@ See [docs/gnomad_vcf.md](/docs/gnomad_vcf.md) for details on how to generate a g
 
 <details> <summary>TMB Pre-filtering Options</summary>
 
-Prior to TMB calculation, annotated variants are pre-filtered using `bcftools view` to retain only PASS SNPs meeting population allele frequency and variant allele frequency thresholds. This pre-filtering step reduces noise in the TMB estimate by excluding common germline variants and low-confidence somatic calls before they reach `pyTMB`.
+Prior to TMB calculation, annotated variants are filtered in two `bcftools view` steps:
+
+1. **Pre-CIViCpy filter**: Retains only PASS SNPs meeting population allele frequency and variant allele frequency thresholds. Running this before CIViCpy annotation reduces the number of variants that need to be annotated, improving performance.
+2. **Post-CIViCpy filter**: Excludes variants annotated by CIViCpy as known cancer hotspots (`CIVIC != "."`), so they do not inflate the TMB estimate. This step is skipped when `--skip_civicpy` is used.
+
+Together these steps reduce noise in the TMB estimate by excluding common germline variants, low-confidence somatic calls, and known cancer driver variants before they reach `pyTMB`.
 
 The following parameters control these thresholds:
 
 - `--tmb_popaf_cutoff` (default: `3.0`): Minimum POPAF value (negative log10 of population allele frequency) to include a variant. The default of `3.0` corresponds to a population allele frequency of &le; 0.001 (0.1%), excluding common germline variants that are unlikely to be somatic. This value is derived from the Mutect2 `POPAF` INFO field.
-- `--tmb_vaf_cutoff` (default: `0.05`): Minimum variant allele frequency (FORMAT/AF) to include a variant. The default of `0.05` (5%) excludes very low frequency variants that may represent sequencing artifacts or sub-clonal noise, consistent with the [Friends of Cancer Research TMB Harmonization Project](https://friendsofcancerresearch.org/publication/in-silico-assessment-of-variation-in-tmb-quantification-across-diagnostic-platforms-phase-1-of-the-friends-of-cancer-research-harmonization-project/) recommendations.
+- `--tmb_vaf_cutoff` (default: `0.10`): Minimum variant allele frequency (FORMAT/AF) to include a variant. The [Friends of Cancer Research TMB Harmonization Project](https://friendsofcancerresearch.org/publication/in-silico-assessment-of-variation-in-tmb-quantification-across-diagnostic-platforms-phase-1-of-the-friends-of-cancer-research-harmonization-project/) recommends a minimum of 0.05 (5%). The default of 0.10 (10%) provides additional stringency to reduce sub-clonal noise in tumor-only analyses.
 
 </details>
+
+### Skipping Analysis Steps
+
+Individual analysis steps can be skipped using the following parameters:
+
+| Parameter        | Description                                                         |
+| ---------------- | ------------------------------------------------------------------- |
+| `--skip_cnv`     | Skip CNV calling with CNVkit                                        |
+| `--skip_msi`     | Skip microsatellite instability analysis (MSIsensor2/MSIsensor-pro) |
+| `--skip_tmb`     | Skip tumor mutational burden calculation (pyTMB)                    |
+| `--skip_civicpy` | Skip CIViCpy variant annotation                                     |
+
+For example, to run the pipeline without MSI and TMB:
+
+```console
+nextflow run twistcgp/main.nf \
+   -profile docker \
+   --input samplesheet.csv \
+   --fasta hg38_giab.fa \
+   --baits baits.bed \
+   --targets targets.bed \
+   --outdir results \
+   --skip_msi \
+   --skip_tmb
+```
 
 ### Variant Filtering with FilterMutectCalls
 
@@ -257,7 +287,7 @@ Sponsors provide support for `twistcgp` through direct funding or employing cont
 Public sponsors include:
 
 <p>
-<a href="https://fulcrumgenomics.com"><img src=".github/logos/fulcrumgenomics.svg" alt="Fulcrum Genomics" height="35"/></a>
+<a href="https://fulcrumgenomics.com"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/logos/fulcrumgenomics-dark.svg"><source media="(prefers-color-scheme: light)" srcset=".github/logos/fulcrumgenomics-light.svg"><img alt="Fulcrum Genomics" src=".github/logos/fulcrumgenomics-light.svg" height="35"></picture></a>
 &nbsp;
 <a href="https://www.twistbioscience.com"><picture><source media="(prefers-color-scheme: dark)" srcset=".github/logos/Twist-logo-dark-mode.png"><source media="(prefers-color-scheme: light)" srcset=".github/logos/Twist-logo-light-mode.png"><img alt="Twist Biosciences" src=".github/logos/Twist-logo-light-mode.png" height="35"></picture></a>
 &nbsp;
