@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Replaced `fastp` with `chelae/trim` (CHELAE_TRIM) for adapter and quality trimming
+- Replaced the `bwamem2/index` nf-core module with `bwamem3/index` for reference genome indexing
+- ALIGNBAM now aligns with `bwa-mem3` 0.5.0 instead of `bwa-mem2` (`bwa-mem3 mem`). The ZipperBams (fgbio) and samtools sort steps are unchanged in role, but their tools were bumped alongside the swap: fgbio 2.5.21 → 4.1.0 (which requires Java 17+) and samtools 1.21 → 1.23.1. fgbio's ZipperBams has no documented behavioral changes across that range.
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
