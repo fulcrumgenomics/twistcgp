@@ -65,6 +65,7 @@ workflow TWISTCGP {
     tmb_vep_config // path(tmb_vep_config)
     ch_vep_cache // channel [optional]: path(vep_cache)
     vep_extra_files_no_meta // channel [optional]: [path(cosmic_vcf), path(cosmic_tbi)] (present only when --cosmic_vcf is set)
+    vep_custom_name // string [optional]: staged COSMIC basename for VEP's --custom, or null when no --cosmic_vcf
     ch_msi2_scan // channel: tuple val(meta), path(msisensor2_scan) - optional scan for non-human panels
     ch_msi_pro_sites // channel: tuple val(meta), path(msisensor_pro_sites) - scan list or trained baseline for msisensor-pro
     skip_tmb // boolean: skip TMB calculation
@@ -205,9 +206,8 @@ workflow TWISTCGP {
     //
     // SUB-WORKFLOW: VCF_ANNOTATE
     //
-    // Derive the staged COSMIC basename with file() (not resolvable inside the
-    // ENSEMBLVEP_VEP ext.args closure) and carry it on meta for VEP's --custom.
-    def vep_custom_name = params.cosmic_vcf ? file(params.cosmic_vcf).name : null
+    // vep_custom_name (the staged COSMIC basename, derived upstream in main.nf) is carried on
+    // meta for VEP's --custom, since file() is not resolvable inside the ENSEMBLVEP_VEP ext.args closure.
     VCF_ANNOTATE(
         GATK4_FILTERMUTECTCALLS.out.vcf.map { meta, vcf ->
             [meta + (vep_custom_name ? [vep_custom_name: vep_custom_name] : [:]), vcf]

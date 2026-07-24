@@ -205,6 +205,10 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         ? vep_extra_files.map { _m, f -> f }.collect()
         : channel.value([])
 
+    // Staged COSMIC basename for VEP's --custom. Derived here (params/file() are the main.nf
+    // idiom) and passed into TWISTCGP so the workflow file stays param-free for strict syntax.
+    vep_custom_name = params.cosmic_vcf ? file(params.cosmic_vcf).name : null
+
     // WORKFLOW: Run pipeline
     //
     TWISTCGP(
@@ -231,6 +235,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         tmb_vep_config,
         ch_vep_cache,
         vep_extra_files_no_meta,
+        vep_custom_name,
         ch_msi2_scan,
         ch_msi_pro_sites,
         params.skip_tmb,
