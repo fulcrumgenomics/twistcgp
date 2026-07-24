@@ -7,7 +7,7 @@ Changes in 'bwamem3/index/environment.yml':
  dependencies:
    # renovate: datasource=conda depName=bioconda/bwa-mem3
 -  - "bioconda::bwa-mem3=0.3.0"
-+  - "bioconda::bwa-mem3=0.5.0"
++  - "bioconda::bwa-mem3=0.6.0"
 
 Changes in 'bwamem3/index/meta.yml':
 --- modules/nf-core/bwamem3/index/meta.yml
@@ -43,8 +43,8 @@ Changes in 'bwamem3/index/main.nf':
      container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
 -        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/45/45a11b91903b7e31b9418ca5fe6852c82a2b1ee1b0772ad6623618cb0ba9da55/data'
 -        : 'community.wave.seqera.io/library/bwa-mem3:0.3.0--89c56b3ab74a5e5c'}"
-+        ? 'oras://community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:8c498507a3d50f10'
-+        : 'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:8a782440315a7fe1'}"
++        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b1/b11b8a7f3944d27f0f4e9a10daac5750431dd9640cb196859f0f47bb8b60ac87/data'
++        : 'community.wave.seqera.io/library/bwa-mem3:0.6.0--0742be28f9ae47ae'}"
  
      input:
      tuple val(meta), path(fasta)
