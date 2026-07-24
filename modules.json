@@ -154,6 +154,11 @@
                         "branch": "master",
                         "git_sha": "a96f42708b631dfc736f48980dbf2be418dd784b",
                         "installed_by": ["modules", "vcf_annotate_ensemblvep"]
+                    },
+                    "tmb/pytmb": {
+                        "branch": "master",
+                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "installed_by": ["modules"]
                     }
                 }
             },
