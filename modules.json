@@ -16,6 +16,11 @@
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
                     },
+                    "chelae/trim": {
+                        "branch": "master",
+                        "git_sha": "22edd7ce9462025093b25e3b55006f7720ff0d8e",
+                        "installed_by": ["modules"]
+                    },
                     "civicpy/annotate": {
                         "branch": "master",
                         "git_sha": "d9b102cf2037413ee4cb990d3d63eb8623758d00",
@@ -36,12 +41,6 @@
                         "branch": "master",
                         "git_sha": "a96f42708b631dfc736f48980dbf2be418dd784b",
                         "installed_by": ["modules", "vcf_annotate_ensemblvep"]
-                    },
-                    "fastp": {
-                        "branch": "master",
-                        "git_sha": "d082103d7976a2804f21225446cc110cbd822f4c",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/fastp/fastp.diff"
                     },
                     "fastqc": {
                         "branch": "master",
