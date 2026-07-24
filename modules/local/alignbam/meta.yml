@@ -25,10 +25,16 @@ tools:
       arxiv: arXiv:1303.3997
       licence: ["MIT AND Apache-2.0"]
   - fgumi:
-      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ, `fgumi zipper` merges mapped/unmapped BAMs and transfers tags, and `fgumi sort` sorts the result.
+      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ and `fgumi zipper` merges mapped/unmapped BAMs and transfers tags.
       homepage: https://github.com/fulcrumgenomics/fgumi
       documentation: https://github.com/fulcrumgenomics/fgumi
       tool_dev_url: https://github.com/fulcrumgenomics/fgumi
+      licence: ["MIT"]
+  - mako:
+      description: A fast SAM/BAM sorter (part of the fg-mako package), used here to coordinate-sort the zippered BAM.
+      homepage: https://github.com/fulcrumgenomics/mako
+      documentation: https://github.com/fulcrumgenomics/mako
+      tool_dev_url: https://github.com/fulcrumgenomics/mako
       licence: ["MIT"]
 
 input:
@@ -137,6 +143,16 @@ output:
         - "fgumi --version | sed 's/^fgumi //'":
             type: eval
             description: The expression to obtain the version of the tool
+  - versions_mako:
+      - - "${task.process}":
+            type: string
+            description: The name of the process
+        - "mako":
+            type: string
+            description: The name of the tool
+        - "mako --version | sed '1!d; s/^[^ ]* //; s/ .*//'":
+            type: eval
+            description: The expression to obtain the version of the tool
 
 topics:
   versions:
@@ -156,6 +172,15 @@ topics:
           type: string
           description: The name of the tool
       - "fgumi --version | sed 's/^fgumi //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "mako":
+          type: string
+          description: The name of the tool
+      - "mako --version | sed '1!d; s/^[^ ]* //; s/ .*//'":
           type: eval
           description: The expression to obtain the version of the tool
 

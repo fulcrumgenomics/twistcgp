@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/11/117f7d9a75e30ee5b1782ef06d203bb17a5a3ee8ae753e1b18d7631dbc5f5bce/data':
-        'community.wave.seqera.io/library/bwa-mem3_fgumi_findutils_coreutils:dd6120adb917639c' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d2/d25e7ca21cb17774569b9d03a2939b801c08a387ba5bd4db4c46a11fbe727098/data':
+        'community.wave.seqera.io/library/bwa-mem3_fgumi_samtools_fg-mako_pruned:ff63f2ca6754610d' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -21,32 +21,33 @@ process ALIGNBAM {
     tuple val(meta), path("*.mapped.bam"), path("*.mapped.bam.bai"), emit: bam_bai, optional: true
     tuple val("${task.process}"), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), topic: versions, emit: versions_bwamem3
     tuple val("${task.process}"), val('fgumi'), eval("fgumi --version | sed 's/^fgumi //'"), topic: versions, emit: versions_fgumi
+    tuple val("${task.process}"), val('mako'), eval("mako --version | sed '1!d; s/^[^ ]* //; s/ .*//'"), topic: versions, emit: versions_mako
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def fgumi_fastq_args = task.ext.fgumi_fastq_args ?: ''
-    def fgumi_sort_args = task.ext.fgumi_sort_args ?: ''
     def bwa_args = task.ext.bwa_args ?: ''
     def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
+    def mako_args = task.ext.mako_args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def sorting = sort_type != "none"
 
     if (sorting && sort_type != "coordinate" && sort_type != "template-coordinate") {
-        log.info('[fgumi sort] Unknown sort - defaulting to coordinate.')
+        log.info('[mako] Unknown sort - defaulting to coordinate.')
     }
 
-    // Streamed into fgumi sort, which recompresses, so write uncompressed BGZF to stdout.
+    // Streamed into mako, which recompresses, so write uncompressed BGZF to stdout.
     def zipper_output = sorting ? "-" : "${prefix}.mapped.bam"
     def zipper_compression = sorting ? 0 : 1
 
     def sort_command = ''
     if (sorting) {
         def sort_order = sort_type == "template-coordinate" ? 'template-coordinate' : 'coordinate'
-        // fgumi sort only accepts --write-index for a coordinate sort.
+        // mako only accepts --write-index for a coordinate sort.
         def index_arg = sort_order == 'coordinate' ? '--write-index' : ''
-        sort_command = "| fgumi sort --input - --output ${prefix}.mapped.bam --order ${sort_order} ${index_arg} --threads ${task.cpus} ${fgumi_sort_args}"
+        sort_command = "| mako --input - --output ${prefix}.mapped.bam --order ${sort_order} ${index_arg} --threads ${task.cpus} ${mako_args}"
     }
 
     """
