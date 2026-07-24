@@ -22,11 +22,11 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 
 ### Pipeline Steps
 
-1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
+1. Index Genome ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3), [`samtools`](https://www.htslib.org/))
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 1. Trim Adapters ([`chelae`](https://github.com/fulcrumgenomics/chelae))
 1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
-1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
+1. Align ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3))
 1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
 1. Variant Calling via local Assembly of Haplotypes ([`gatk4/mutect2`](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Filter Variant Calls ([`gatk4/FilterMutectCalls`](https://gatk.broadinstitute.org/hc/en-us/articles/360036856831-FilterMutectCalls))
@@ -86,12 +86,12 @@ The adapter sequences can be supplied to the pipeline using the `--adapters_fast
 
 <details> <summary>Pre-Generate a Genome Index</summary>
 
-Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
+Generating the human genome index with bwa-mem3 is memory intensive.
 Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
-See [docs/bwamem2_index.md](/docs/bwamem2_index.md) for details.
+See [docs/bwamem3_index.md](/docs/bwamem3_index.md) for details.
 
 Additionally, the genome index can be saved to the output directory for future use by supplying the `--save_reference` parameter.
-Subsequently, you may pass the index using `--bwa results/reference/bwamem2`.
+Subsequently, you may pass the index using `--bwa results/reference/bwamem3`.
 
 </details>
 
@@ -252,7 +252,7 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --outdir results \
-   --bwa resources/hg38_giab/bwamem2 \
+   --bwa resources/hg38_giab/bwamem3 \
    --msisensor2_scan resources/hg38_giab.msisensor2_scan.list \
    --ensemblvep_cache resources/ensemblevep_cache/vep_cache \
    --snpeff_cache resources/snpeff_cache/GRCh38.105 \
