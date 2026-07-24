@@ -8,20 +8,21 @@ keywords:
   - zipperbams
   - mem
   - bwa
-  - bwa-mem2
+  - bwa-mem3
   - alignment
   - map
   - bam
 tools:
   - bwa:
       description: |
-        BWA-mem2 is a software package for mapping DNA sequences against
-        a large reference genome, such as the human genome.
-      homepage: https://github.com/bwa-mem2/bwa-mem2
-      documentation: http://www.htslib.org/doc/samtools.html
+        bwa-mem3 is a short-read aligner derived from bwa-mem2 with correctness
+        fixes, performance improvements, and methylation-aware alignment, for
+        mapping DNA sequences against a large reference genome such as the human
+        genome.
+      homepage: https://github.com/fg-labs/bwa-mem3
+      documentation: https://github.com/fg-labs/bwa-mem3
       arxiv: arXiv:1303.3997
-      licence: ["MIT"]
-      identifier: "biotools:bwa-mem2"
+      licence: ["MIT AND Apache-2.0"]
   - fgbio:
       description: A set of tools for working with genomic and high throughput sequencing data, including UMIs
       homepage: http://fulcrumgenomics.github.io/fgbio/
@@ -111,6 +112,20 @@ output:
           type: file
           description: Optional BAI file output if sort_type == coordinate
           pattern: "*.{bai}"
+  - bam_bai:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.mapped.bam":
+          type: file
+          description: Sorted aligned BAM, emitted together with its index when sort_type == coordinate
+          pattern: "*.mapped.bam"
+      - "*.mapped.bam.bai":
+          type: file
+          description: BAI index emitted alongside the BAM when sort_type == coordinate
+          pattern: "*.mapped.bam.bai"
   - versions:
       - "versions.yml":
           type: file

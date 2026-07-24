@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced the local `TMB` module with the nf-core `tmb/pytmb` module (tmb pinned to 1.5.0 in both conda and container; correct `-stub` outputs; upstream nf-test). The `--export` VCF of the variants that fed the TMB calculation is now published alongside the log. Note: the published TMB log is now named `<id>.log` (previously `<id>.tmb.log`).
 - **Fix:** Removed the unused `--gnomad_vcf` / `--gnomad_tbi` parameters and the gnomAD `TABIX` staging step. The staged gnomAD VCF was handed to VEP but never referenced (VEP only adds `--custom` for COSMIC); gnomAD allele frequencies come from the VEP cache via `--af_gnomade`/`--af_gnomadg`. Also removed the now-orphaned `docs/gnomad_vcf.md`.
 - Replaced `fastp` with `chelae/trim` (CHELAE_TRIM) for adapter and quality trimming
+- Replaced the `bwamem2/index` nf-core module with `bwamem3/index` for reference genome indexing
+- ALIGNBAM now aligns with `bwa-mem3` 0.5.0 instead of `bwa-mem2` (`bwa-mem3 mem`). The ZipperBams (fgbio) and samtools sort steps are unchanged in role, but their tools were bumped alongside the swap: fgbio 2.5.21 → 4.1.0 (which requires Java 17+) and samtools 1.21 → 1.23.1. fgbio's ZipperBams has no documented behavioral changes across that range.
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1

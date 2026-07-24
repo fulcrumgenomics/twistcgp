@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b0/b0b6971a84a5c0ec1d7928a3f32b74f9cf45f19a00326d34441876a1a20b67e6/data':
-        'community.wave.seqera.io/library/bwa-mem2_fgbio_samtools_findutils:8004d81f0e7eb031' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/a7/a70d709f15f47d5e3a73b87aa59aed7c4462c4dc8e366a819fd617e02db91273/data':
+        'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:5340d8d5085bf337' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -49,14 +49,14 @@ process ALIGNBAM {
         fgbio_zipper_bams_compression = 1
     }
     else {
-        // Write ZipperBams output to an intermediate file and sort that file, rather than piping
-        // fgbio through /dev/stdout. The literal /dev/stdout path is a /proc/self/fd symlink that
-        // does not reach the downstream pipe under Singularity (samtools sort - then fails with
-        // "Exec format error"); Docker resolves it fine. Sorting a real file works under both.
+        // Write ZipperBams output to an intermediate file and sort that file, rather than
+        // piping fgbio's output through /dev/stdout. Writing to the literal /dev/stdout path
+        // is unreliable under Singularity (it is a /proc/self/fd symlink that does not resolve
+        // to the downstream pipe), so a piped `samtools sort -` receives a broken stream and
+        // fails with "Exec format error". Docker resolves /dev/stdout correctly, so this only
+        // manifests under Singularity/Apptainer. Sorting a real file works under both.
         fgbio_zipper_bams_output = prefix + ".zipped.bam"
-        // uncompressed BGZF: this transient file is immediately re-read by samtools sort, so skip
-        // the deflate/inflate round-trip.
-        fgbio_zipper_bams_compression = 0
+        fgbio_zipper_bams_compression = 1
         extra_command = "samtools sort "
         extra_command += samtools_sort_args
         if (sort_type == "template-coordinate") {
@@ -77,9 +77,8 @@ process ALIGNBAM {
     # The real path to the BWA index prefix`
     BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
 
-
     samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
-        | bwa-mem2 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
+        | bwa-mem3 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
         | fgbio -Xmx${fgbio_mem_gb}g \\
             --compression ${fgbio_zipper_bams_compression} \\
             --async-io=true \\
@@ -93,7 +92,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem2: \$(echo \$(bwa-mem2 version 2>&1) | sed 's/.* //')
+        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
@@ -108,7 +107,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwamem2: \$(echo \$(bwa-mem2 version 2>&1) | sed 's/.* //')
+        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS

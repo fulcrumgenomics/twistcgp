@@ -49,7 +49,7 @@ workflow TWISTCGP {
     msi_sensor2_model_name // name of desired model directory in https://github.com/niu-lab/msisensor2.git
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
-    ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
+    ch_bwa // channel: val(reference meta), path(bwamem3 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
