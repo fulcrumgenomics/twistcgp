@@ -49,7 +49,7 @@
                     },
                     "fgumi/extract": {
                         "branch": "master",
-                        "git_sha": "c3e04783b2ac99ffc011745ec092614a7bef86ca",
+                        "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
                         "installed_by": ["modules"]
                     },
                     "gatk4/calculatecontamination": {
