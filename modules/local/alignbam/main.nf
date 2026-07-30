@@ -19,7 +19,9 @@ process ALIGNBAM {
     tuple val(meta), path("*.mapped.bam"), emit: bam
     tuple val(meta), path("*.mapped.bam.bai"), emit: bai, optional: true
     tuple val(meta), path("*.mapped.bam"), path("*.mapped.bam.bai"), emit: bam_bai, optional: true
-    path "versions.yml", emit: versions
+    tuple val("${task.process}"), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), topic: versions, emit: versions_bwamem3
+    tuple val("${task.process}"), val('fgumi'), eval("fgumi --version | sed 's/^fgumi //'"), topic: versions, emit: versions_fgumi
+    tuple val("${task.process}"), val('samtools'), eval("samtools --version | sed -n '1s/^samtools //p'"), topic: versions, emit: versions_samtools
 
     when:
     task.ext.when == null || task.ext.when
@@ -30,36 +32,20 @@ process ALIGNBAM {
     def bwa_args = task.ext.bwa_args ?: ''
     def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def extra_command = ""
-    // fgumi zipper manages its own memory (bounded template buffer), so no JVM heap sizing is needed.
-    def zipper_output = ""
-    def zipper_compression = 1
+    def sorting = sort_type != "none"
 
-    if (sort_type == "none") {
-        zipper_output = prefix + ".mapped.bam"
-        zipper_compression = 1
+    if (sorting && sort_type != "coordinate" && sort_type != "template-coordinate") {
+        log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
     }
-    else {
-        // Write zipper output to an intermediate file and sort that file, rather than piping
-        // through stdout. Sorting a real file is robust under both Docker and Singularity.
-        zipper_output = prefix + ".zipped.bam"
-        // uncompressed BGZF: this transient file is immediately re-read by samtools sort, so skip
-        // the deflate/inflate round-trip.
-        zipper_compression = 0
-        extra_command = "samtools sort "
-        extra_command += samtools_sort_args
-        if (sort_type == "template-coordinate") {
-            extra_command += " --template-coordinate"
-        }
-        else {
-            if (sort_type != "coordinate") {
-                log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
-            }
-            extra_command += " --write-index"
-        }
-        extra_command += " --threads " + task.cpus
-        extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
-        extra_command += " " + prefix + ".zipped.bam"
+
+    // Uncompressed: samtools sort re-reads this file immediately.
+    def zipper_output = sorting ? "${prefix}.zipped.bam" : "${prefix}.mapped.bam"
+    def zipper_compression = sorting ? 0 : 1
+
+    def extra_command = ''
+    if (sorting) {
+        def sort_order_arg = sort_type == "template-coordinate" ? '--template-coordinate' : '--write-index'
+        extra_command = "samtools sort ${samtools_sort_args} ${sort_order_arg} --threads ${task.cpus} -o ${prefix}.mapped.bam##idx##${prefix}.mapped.bam.bai ${zipper_output}"
     }
 
     """
@@ -79,13 +65,6 @@ process ALIGNBAM {
             ${fgumi_zipper_args}
 
     ${extra_command}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgumi: \$(fgumi --version 2>&1 | sed 's/^fgumi //')
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -94,12 +73,5 @@ process ALIGNBAM {
     """
     touch ${prefix}.mapped.bam
     ${index_command}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgumi: \$(fgumi --version 2>&1 | sed 's/^fgumi //')
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
     """
 }
