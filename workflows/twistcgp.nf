@@ -97,12 +97,10 @@ workflow TWISTCGP {
     // MODULE: Convert FASTQ to an unaligned BAM
     //
     // fgumi/extract expects [ meta, reads, library ]; use meta.id as the library name.
-    // Read structure is pinned to +T (all-template, no UMI extraction) via FGUMI_EXTRACT
-    // ext.args in conf/modules.config, matching the prior fgbio FastqToBam behavior.
     // Versions are emitted via the "versions" topic channel and collected below.
-    // Coerce reads to a list so fgumi's `--inputs ${reads.join(' ')}` works for single-end too:
-    // CHELAE_TRIM.out.reads emits a bare Path (not a 1-element list) for single-end, which .join() would mangle.
-    FGUMI_EXTRACT(CHELAE_TRIM.out.reads.map { meta, reads -> [meta, reads instanceof List ? reads : [reads], meta.id] })
+    // `[reads].flatten()` normalizes arity: CHELAE_TRIM.out.reads emits a bare Path (not a
+    // 1-element list) for single-end, which fgumi's `--inputs ${reads.join(' ')}` would mangle.
+    FGUMI_EXTRACT(CHELAE_TRIM.out.reads.map { meta, reads -> [meta, [reads].flatten(), meta.id] })
 
     //
     // MODULE: Run ALIGNBAM
