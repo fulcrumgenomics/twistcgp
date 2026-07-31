@@ -60,7 +60,6 @@ process ALIGNBAM {
             --reference ${fasta} \\
             --compression-level ${zipper_compression} \\
             -t ${task.cpus} \\
-            --skip-pa-tags \\
             --output ${zipper_output} \\
             ${fgumi_zipper_args}
 
