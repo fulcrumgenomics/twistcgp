@@ -37,7 +37,7 @@ output:
       - bwamem3:
           type: directory
           description: bwa-mem3 genome index files
-          pattern: "*.{amb,ann,bwt.2bit.64,pac}"
+          pattern: "*.{0123,amb,ann,bwt.2bit.64,pac}"
           ontologies:
             - edam: "http://edamontology.org/data_3210"
   versions_bwamem3:

@@ -1,61 +1,18 @@
 Changes in component 'nf-core/bwamem3/index'
-Changes in 'bwamem3/index/environment.yml':
---- modules/nf-core/bwamem3/index/environment.yml
-+++ modules/nf-core/bwamem3/index/environment.yml
-@@ -5,4 +5,4 @@
-   - bioconda
- dependencies:
-   # renovate: datasource=conda depName=bioconda/bwa-mem3
--  - "bioconda::bwa-mem3=0.3.0"
-+  - "bioconda::bwa-mem3=0.6.0"
-
-Changes in 'bwamem3/index/meta.yml':
---- modules/nf-core/bwamem3/index/meta.yml
-+++ modules/nf-core/bwamem3/index/meta.yml
-@@ -37,7 +37,7 @@
-       - bwamem3:
-           type: directory
-           description: bwa-mem3 genome index files
--          pattern: "*.{0123,amb,ann,bwt.2bit.64,pac}"
-+          pattern: "*.{amb,ann,bwt.2bit.64,pac}"
-           ontologies:
-             - edam: "http://edamontology.org/data_3210"
-   versions_bwamem3:
-
+'modules/nf-core/bwamem3/index/environment.yml' is unchanged
+'modules/nf-core/bwamem3/index/meta.yml' is unchanged
 Changes in 'bwamem3/index/main.nf':
 --- modules/nf-core/bwamem3/index/main.nf
 +++ modules/nf-core/bwamem3/index/main.nf
-@@ -1,12 +1,18 @@
+@@ -1,7 +1,6 @@
  process BWAMEM3_INDEX {
      tag "${meta.id}"
 -    // NOTE bwa-mem3 builds an FM-index with libsais; peak memory scales with the reference size.
 -    memory { 280.MB * Math.ceil(fasta.size() / 10000000) * task.attempt }
 +    label 'process_high'
-+    // bwa-mem3 builds an FM-index with libsais; peak memory scales with the reference
-+    // *sequence* length. fasta.size() is the on-disk size, so for a bgzipped reference
-+    // estimate the decompressed length (~4x) to avoid under-provisioning the index build.
-+    memory {
-+        def bases = fasta.name.endsWith('.gz') ? fasta.size() * 4 : fasta.size()
-+        280.MB * Math.ceil(bases / 10000000) * task.attempt
-+    }
  
      conda "${moduleDir}/environment.yml"
      container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
--        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/45/45a11b91903b7e31b9418ca5fe6852c82a2b1ee1b0772ad6623618cb0ba9da55/data'
--        : 'community.wave.seqera.io/library/bwa-mem3:0.3.0--89c56b3ab74a5e5c'}"
-+        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b1/b11b8a7f3944d27f0f4e9a10daac5750431dd9640cb196859f0f47bb8b60ac87/data'
-+        : 'community.wave.seqera.io/library/bwa-mem3:0.6.0--0742be28f9ae47ae'}"
- 
-     input:
-     tuple val(meta), path(fasta)
-@@ -35,7 +41,6 @@
-     def prefix = task.ext.prefix ?: "${fasta}"
-     """
-     mkdir bwamem3
--    touch bwamem3/${prefix}.0123
-     touch bwamem3/${prefix}.amb
-     touch bwamem3/${prefix}.ann
-     touch bwamem3/${prefix}.bwt.2bit.64
 
 'modules/nf-core/bwamem3/index/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/bwamem3/index/tests/main.nf.test' is unchanged
