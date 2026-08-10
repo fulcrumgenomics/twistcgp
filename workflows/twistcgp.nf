@@ -96,10 +96,6 @@ workflow TWISTCGP {
     //
     // MODULE: Convert FASTQ to an unaligned BAM
     //
-    // fgumi/extract expects [ meta, reads, library ]; use meta.id as the library name.
-    // Versions are emitted via the "versions" topic channel and collected below.
-    // `[reads].flatten()` normalizes arity: CHELAE_TRIM.out.reads emits a bare Path (not a
-    // 1-element list) for single-end, which fgumi's `--inputs ${reads.join(' ')}` would mangle.
     FGUMI_EXTRACT(CHELAE_TRIM.out.reads.map { meta, reads -> [meta, [reads].flatten(), meta.id] })
 
     //
