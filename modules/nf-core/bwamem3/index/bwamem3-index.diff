@@ -1,6 +1,18 @@
 Changes in component 'nf-core/bwamem3/index'
 'modules/nf-core/bwamem3/index/environment.yml' is unchanged
-'modules/nf-core/bwamem3/index/meta.yml' is unchanged
+Changes in 'bwamem3/index/meta.yml':
+--- modules/nf-core/bwamem3/index/meta.yml
++++ modules/nf-core/bwamem3/index/meta.yml
+@@ -37,7 +37,7 @@
+       - bwamem3:
+           type: directory
+           description: bwa-mem3 genome index files
+-          pattern: "*.{0123,amb,ann,bwt.2bit.64,pac}"
++          pattern: "*.{amb,ann,bwt.2bit.64,pac}"
+           ontologies:
+             - edam: "http://edamontology.org/data_3210"
+   versions_bwamem3:
+
 Changes in 'bwamem3/index/main.nf':
 --- modules/nf-core/bwamem3/index/main.nf
 +++ modules/nf-core/bwamem3/index/main.nf
@@ -13,7 +25,26 @@ Changes in 'bwamem3/index/main.nf':
  
      conda "${moduleDir}/environment.yml"
      container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+@@ -35,7 +34,6 @@
+     def prefix = task.ext.prefix ?: "${fasta}"
+     """
+     mkdir bwamem3
+-    touch bwamem3/${prefix}.0123
+     touch bwamem3/${prefix}.amb
+     touch bwamem3/${prefix}.ann
+     touch bwamem3/${prefix}.bwt.2bit.64
 
-'modules/nf-core/bwamem3/index/tests/main.nf.test.snap' is unchanged
+Changes in 'bwamem3/index/tests/main.nf.test.snap':
+--- modules/nf-core/bwamem3/index/tests/main.nf.test.snap
++++ modules/nf-core/bwamem3/index/tests/main.nf.test.snap
+@@ -8,7 +8,6 @@
+                             "id": "test"
+                         },
+                         [
+-                            "genome.fasta.0123:md5,d41d8cd98f00b204e9800998ecf8427e",
+                             "genome.fasta.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
+                             "genome.fasta.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
+                             "genome.fasta.bwt.2bit.64:md5,d41d8cd98f00b204e9800998ecf8427e",
+
 'modules/nf-core/bwamem3/index/tests/main.nf.test' is unchanged
 ************************************************************

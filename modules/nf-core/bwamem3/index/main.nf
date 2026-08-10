@@ -34,7 +34,6 @@ process BWAMEM3_INDEX {
     def prefix = task.ext.prefix ?: "${fasta}"
     """
     mkdir bwamem3
-    touch bwamem3/${prefix}.0123
     touch bwamem3/${prefix}.amb
     touch bwamem3/${prefix}.ann
     touch bwamem3/${prefix}.bwt.2bit.64

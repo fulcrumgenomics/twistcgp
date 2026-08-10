@@ -8,7 +8,6 @@
                             "id": "test"
                         },
                         [
-                            "genome.fasta.0123:md5,d41d8cd98f00b204e9800998ecf8427e",
                             "genome.fasta.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
                             "genome.fasta.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
                             "genome.fasta.bwt.2bit.64:md5,d41d8cd98f00b204e9800998ecf8427e",
