@@ -59,9 +59,10 @@ process ALIGNBAM {
             --unmapped ${unmapped_bam} \\
             --reference ${fasta} \\
             --compression-level ${zipper_compression} \\
-            -t ${task.cpus} \\
+            --threads ${task.cpus} \\
             --output ${zipper_output} \\
-            ${fgumi_zipper_args} ${sort_command}
+            ${fgumi_zipper_args} \\
+        ${sort_command}
     """
 
     stub:
