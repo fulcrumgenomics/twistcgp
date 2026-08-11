@@ -38,18 +38,18 @@ process ALIGNBAM {
         log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
     }
 
-    // Uncompressed: samtools sort re-reads this file immediately.
-    def zipper_output = sorting ? "${prefix}.zipped.bam" : "${prefix}.mapped.bam"
+    // Streamed into samtools sort, which recompresses, so write uncompressed BGZF to stdout.
+    def zipper_output = sorting ? "-" : "${prefix}.mapped.bam"
     def zipper_compression = sorting ? 0 : 1
 
-    def extra_command = ''
+    def sort_command = ''
     if (sorting) {
         def sort_order_arg = sort_type == "template-coordinate" ? '--template-coordinate' : '--write-index'
-        extra_command = "samtools sort ${samtools_sort_args} ${sort_order_arg} --threads ${task.cpus} -o ${prefix}.mapped.bam##idx##${prefix}.mapped.bam.bai ${zipper_output}"
+        sort_command = "| samtools sort ${samtools_sort_args} ${sort_order_arg} --threads ${task.cpus} -o ${prefix}.mapped.bam##idx##${prefix}.mapped.bam.bai -"
     }
 
     """
-    # The real path to the BWA index prefix`
+    # The real path to the BWA index prefix
     BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
 
     samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
@@ -61,9 +61,7 @@ process ALIGNBAM {
             --compression-level ${zipper_compression} \\
             -t ${task.cpus} \\
             --output ${zipper_output} \\
-            ${fgumi_zipper_args}
-
-    ${extra_command}
+            ${fgumi_zipper_args} ${sort_command}
     """
 
     stub:
