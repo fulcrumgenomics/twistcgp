@@ -102,7 +102,6 @@ workflow TWISTCGP {
     // MODULE: Run ALIGNBAM
     //
     ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
-    ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
 
     //
     // MODULE: PICARD_MARKDUPLICATES

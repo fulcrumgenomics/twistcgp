@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/0d/0d117c5df9d7a1bdb64f707513ab4aa756db69be8b85c85072a8f5a3043814db/data':
-        'community.wave.seqera.io/library/bwa-mem3_fgbio_samtools_findutils_pruned:5f497be3cf6aaa15' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b4/b482cd2a22b688627cf5888380181fa8f04bc013c3294afbe00cd03e95441f97/data':
+        'community.wave.seqera.io/library/bwa-mem3_fgumi_samtools_findutils_coreutils:d5847203075663d7' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
@@ -19,7 +19,9 @@ process ALIGNBAM {
     tuple val(meta), path("*.mapped.bam"), emit: bam
     tuple val(meta), path("*.mapped.bam.bai"), emit: bai, optional: true
     tuple val(meta), path("*.mapped.bam"), path("*.mapped.bam.bai"), emit: bam_bai, optional: true
-    path "versions.yml", emit: versions
+    tuple val("${task.process}"), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), topic: versions, emit: versions_bwamem3
+    tuple val("${task.process}"), val('fgumi'), eval("fgumi --version | sed 's/^fgumi //'"), topic: versions, emit: versions_fgumi
+    tuple val("${task.process}"), val('samtools'), eval("samtools --version | sed -n '1s/^samtools //p'"), topic: versions, emit: versions_samtools
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,74 +30,39 @@ process ALIGNBAM {
     def samtools_fastq_args = task.ext.samtools_fastq_args ?: ''
     def samtools_sort_args = task.ext.samtools_sort_args ?: ''
     def bwa_args = task.ext.bwa_args ?: ''
-    def fgbio_args = task.ext.fgbio_args ?: ''
+    def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def fgbio_mem_gb = 4
-    def extra_command = ""
-    if (!task.memory) {
-        log.info('[fgbio ZipperBams] Available memory not known - defaulting to 4GB. Specify process memory requirements to change this.')
-    }
-    else if (fgbio_mem_gb > task.memory.giga) {
-        if (task.memory.giga < 2) {
-            fgbio_mem_gb = 1
-        }
-        else {
-            fgbio_mem_gb = task.memory.giga - 1
-        }
+    def sorting = sort_type != "none"
+
+    if (sorting && sort_type != "coordinate" && sort_type != "template-coordinate") {
+        log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
     }
 
-    if (sort_type == "none") {
-        fgbio_zipper_bams_output = prefix + ".mapped.bam"
-        fgbio_zipper_bams_compression = 1
-    }
-    else {
-        // Write ZipperBams output to an intermediate file and sort that file, rather than
-        // piping fgbio's output through /dev/stdout. Writing to the literal /dev/stdout path
-        // is unreliable under Singularity (it is a /proc/self/fd symlink that does not resolve
-        // to the downstream pipe), so a piped `samtools sort -` receives a broken stream and
-        // fails with "Exec format error". Docker resolves /dev/stdout correctly, so this only
-        // manifests under Singularity/Apptainer. Sorting a real file works under both.
-        fgbio_zipper_bams_output = prefix + ".zipped.bam"
-        fgbio_zipper_bams_compression = 1
-        extra_command = "samtools sort "
-        extra_command += samtools_sort_args
-        if (sort_type == "template-coordinate") {
-            extra_command += " --template-coordinate"
-        }
-        else {
-            if (sort_type != "coordinate") {
-                log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
-            }
-            extra_command += " --write-index"
-        }
-        extra_command += " --threads " + task.cpus
-        extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
-        extra_command += " " + prefix + ".zipped.bam"
+    // Streamed into samtools sort, which recompresses, so write uncompressed BGZF to stdout.
+    def zipper_output = sorting ? "-" : "${prefix}.mapped.bam"
+    def zipper_compression = sorting ? 0 : 1
+
+    def sort_command = ''
+    if (sorting) {
+        def sort_order_arg = sort_type == "template-coordinate" ? '--template-coordinate' : '--write-index'
+        sort_command = "| samtools sort ${samtools_sort_args} ${sort_order_arg} --threads ${task.cpus} -o ${prefix}.mapped.bam##idx##${prefix}.mapped.bam.bai -"
     }
 
     """
-    # The real path to the BWA index prefix`
+    # The real path to the BWA index prefix
     BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
 
     samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
         | bwa-mem3 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
-        | fgbio -Xmx${fgbio_mem_gb}g \\
-            --compression ${fgbio_zipper_bams_compression} \\
-            --async-io=true \\
-            ZipperBams \\
+        | fgumi zipper \\
+            --input - \\
             --unmapped ${unmapped_bam} \\
-            --ref ${fasta} \\
-            --output ${fgbio_zipper_bams_output} \\
-            ${fgbio_args}
-
-    ${extra_command}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
+            --reference ${fasta} \\
+            --compression-level ${zipper_compression} \\
+            --threads ${task.cpus} \\
+            --output ${zipper_output} \\
+            ${fgumi_zipper_args} \\
+        ${sort_command}
     """
 
     stub:
@@ -104,12 +71,5 @@ process ALIGNBAM {
     """
     touch ${prefix}.mapped.bam
     ${index_command}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bwamem3: \$(bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p')
-        fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
     """
 }
