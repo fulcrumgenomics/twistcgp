@@ -106,7 +106,7 @@ workflow TWISTCGP {
     ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
 
     //
-    // MODULE: FGUMI_DEDUP (mark PCR/optical duplicates using UMI information)
+    // MODULE: FGUMI_DEDUP (mark duplicates by position; see --no-umi in modules.config)
     //
     // fgumi dedup requires a template-coordinate sort produced by `fgumi sort`
     // (a samtools template-coordinate sort is not compatible), and emits an
@@ -120,7 +120,7 @@ workflow TWISTCGP {
     FGUMI_DEDUP(FGUMI_SORT_TEMPLATE.out.bam)
     FGUMI_SORT_COORD(FGUMI_DEDUP.out.bam)
     ch_bam_and_index = FGUMI_SORT_COORD.out.bam.join(FGUMI_SORT_COORD.out.index)
-    ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.metrics.collect { _meta, metrics -> metrics })
+    // MultiQC can't parse fgumi's metrics TSV (no sample-name column); histogram only.
     ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.histogram.collect { _meta, histogram -> histogram })
 
     //

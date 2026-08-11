@@ -8,6 +8,12 @@ report_section_order:
   "fulcrumgenomics-twistcgp-summary":
     order: -1002
 
+module_order:
+  # fgumi dedup's histogram is parsed by MultiQC's fgbio module.
+  - fgbio:
+      name: "fgumi dedup"
+      info: "Family size histogram produced by fgumi dedup."
+
 export_plots: true
 
 disable_version_detection: true
