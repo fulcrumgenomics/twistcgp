@@ -7,6 +7,7 @@ keywords:
   - samtools
   - fastq
   - zipper
+  - sort
   - mem
   - bwa
   - bwa-mem3
@@ -25,7 +26,7 @@ tools:
       arxiv: arXiv:1303.3997
       licence: ["MIT AND Apache-2.0"]
   - fgumi:
-      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ and `fgumi zipper` merges mapped/unmapped BAMs and transfers tags.
+      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ, `fgumi zipper` merges mapped/unmapped BAMs and transfers tags, and `fgumi sort` sorts the result.
       homepage: https://github.com/fulcrumgenomics/fgumi
       documentation: https://github.com/fulcrumgenomics/fgumi
       tool_dev_url: https://github.com/fulcrumgenomics/fgumi

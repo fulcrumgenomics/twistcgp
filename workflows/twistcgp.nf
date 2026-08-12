@@ -14,7 +14,6 @@ include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGUMI_DEDUP } from '../modules/nf-core/fgumi/dedup/main'
 include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
 include { FGUMI_SORT as FGUMI_SORT_COORD } from '../modules/nf-core/fgumi/sort/main'
-include { FGUMI_SORT as FGUMI_SORT_TEMPLATE } from '../modules/nf-core/fgumi/sort/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
@@ -103,21 +102,19 @@ workflow TWISTCGP {
     //
     // MODULE: Run ALIGNBAM
     //
-    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
+    // ALIGNBAM sorts with `fgumi sort`, so it can emit the template-coordinate order
+    // `fgumi dedup` requires directly (a samtools template-coordinate sort is not compatible).
+    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
     // MODULE: FGUMI_DEDUP (mark duplicates by position; see --no-umi in modules.config)
     //
-    // fgumi dedup requires a template-coordinate sort produced by `fgumi sort`
-    // (a samtools template-coordinate sort is not compatible), and emits an
-    // unindexed BAM. We therefore sort to template-coordinate first, then
-    // re-sort the marked BAM back to coordinate order with an index for the
-    // downstream variant-calling and metrics steps.
+    // dedup emits an unindexed BAM, so re-sort back to coordinate order with an index
+    // for the downstream variant-calling and metrics steps.
     // fgumi versions flow through the `versions` topic channel collected below,
     // so there is no per-process versions.yml to mix here.
     //
-    FGUMI_SORT_TEMPLATE(ALIGNBAM.out.bam)
-    FGUMI_DEDUP(FGUMI_SORT_TEMPLATE.out.bam)
+    FGUMI_DEDUP(ALIGNBAM.out.bam)
     FGUMI_SORT_COORD(FGUMI_DEDUP.out.bam)
     ch_bam_and_index = FGUMI_SORT_COORD.out.bam.join(FGUMI_SORT_COORD.out.index)
     // MultiQC can't parse fgumi's metrics TSV (no sample-name column); histogram only.
@@ -353,7 +350,7 @@ workflow TWISTCGP {
     //
     // MODULE: PERBASE
     //
-    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.join(ch_fasta_fai).first())
+    PERBASE(ch_bam_and_index, ch_fasta.join(ch_fasta_fai).first())
     ch_versions = ch_versions.mix(PERBASE.out.versions.first())
 
     //

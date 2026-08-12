@@ -20,3 +20,4 @@ disable_version_detection: true
 
 extra_fn_clean_exts:
   - ".chelae"
+  - ".dup_marked"

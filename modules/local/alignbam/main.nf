@@ -28,24 +28,26 @@ process ALIGNBAM {
 
     script:
     def fgumi_fastq_args = task.ext.fgumi_fastq_args ?: ''
-    def samtools_sort_args = task.ext.samtools_sort_args ?: ''
+    def fgumi_sort_args = task.ext.fgumi_sort_args ?: ''
     def bwa_args = task.ext.bwa_args ?: ''
     def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def sorting = sort_type != "none"
 
     if (sorting && sort_type != "coordinate" && sort_type != "template-coordinate") {
-        log.info('[samtools sort] Unknown sort - defaulting to coordinate.')
+        log.info('[fgumi sort] Unknown sort - defaulting to coordinate.')
     }
 
-    // Streamed into samtools sort, which recompresses, so write uncompressed BGZF to stdout.
+    // Streamed into fgumi sort, which recompresses, so write uncompressed BGZF to stdout.
     def zipper_output = sorting ? "-" : "${prefix}.mapped.bam"
     def zipper_compression = sorting ? 0 : 1
 
     def sort_command = ''
     if (sorting) {
-        def sort_order_arg = sort_type == "template-coordinate" ? '--template-coordinate' : '--write-index'
-        sort_command = "| samtools sort ${samtools_sort_args} ${sort_order_arg} --threads ${task.cpus} -o ${prefix}.mapped.bam##idx##${prefix}.mapped.bam.bai -"
+        def sort_order = sort_type == "template-coordinate" ? 'template-coordinate' : 'coordinate'
+        // fgumi sort only accepts --write-index for a coordinate sort.
+        def index_arg = sort_order == 'coordinate' ? '--write-index' : ''
+        sort_command = "| fgumi sort --input - --output ${prefix}.mapped.bam --order ${sort_order} ${index_arg} --threads ${task.cpus} ${fgumi_sort_args}"
     }
 
     """
