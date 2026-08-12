@@ -20,4 +20,7 @@ disable_version_detection: true
 
 extra_fn_clean_exts:
   - ".chelae"
+  # DEDUPBAM names its metrics off the BAM (`<id>.mapped.dup_marked.*`), so both are
+  # trimmed to leave `<id>`, matching the `meta.id` names the other modules emit.
+  - ".mapped"
   - ".dup_marked"

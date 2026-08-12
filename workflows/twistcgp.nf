@@ -10,10 +10,9 @@ include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
+include { DEDUPBAM } from '../modules/local/dedupbam'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
-include { FGUMI_DEDUP } from '../modules/nf-core/fgumi/dedup/main'
 include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
-include { FGUMI_SORT as FGUMI_SORT_COORD } from '../modules/nf-core/fgumi/sort/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
@@ -107,18 +106,17 @@ workflow TWISTCGP {
     ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
-    // MODULE: FGUMI_DEDUP (mark duplicates by position; see --no-umi in modules.config)
+    // MODULE: DEDUPBAM (mark duplicates by position; see --no-umi in modules.config)
     //
-    // dedup emits an unindexed BAM, so re-sort back to coordinate order with an index
-    // for the downstream variant-calling and metrics steps.
+    // fgumi dedup emits an unindexed BAM, so DEDUPBAM streams it straight into a
+    // coordinate sort that indexes it for the downstream variant-calling and metrics steps.
     // fgumi versions flow through the `versions` topic channel collected below,
     // so there is no per-process versions.yml to mix here.
     //
-    FGUMI_DEDUP(ALIGNBAM.out.bam)
-    FGUMI_SORT_COORD(FGUMI_DEDUP.out.bam)
-    ch_bam_and_index = FGUMI_SORT_COORD.out.bam.join(FGUMI_SORT_COORD.out.index)
+    DEDUPBAM(ALIGNBAM.out.bam)
+    ch_bam_and_index = DEDUPBAM.out.bam_bai
     // MultiQC can't parse fgumi's metrics TSV (no sample-name column); histogram only.
-    ch_multiqc_files = ch_multiqc_files.mix(FGUMI_DEDUP.out.histogram.collect { _meta, histogram -> histogram })
+    ch_multiqc_files = ch_multiqc_files.mix(DEDUPBAM.out.histogram.collect { _meta, histogram -> histogram })
 
     //
     // MODULE: GATK4/MUTECT2
@@ -280,7 +278,7 @@ workflow TWISTCGP {
             BAITS_TO_BED(baits)
         }
         ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
-        ch_cnv_bam_pair = FGUMI_SORT_COORD.out.bam.map { meta, bam -> tuple(meta, bam, []) }
+        ch_cnv_bam_pair = DEDUPBAM.out.bam.map { meta, bam -> tuple(meta, bam, []) }
         CNVKIT_BATCH(
             ch_cnv_bam_pair,
             ch_fasta,

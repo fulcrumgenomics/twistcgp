@@ -47,21 +47,10 @@
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
                         "installed_by": ["modules"]
                     },
-                    "fgumi/dedup": {
-                        "branch": "master",
-                        "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
-                        "installed_by": ["modules"]
-                    },
                     "fgumi/extract": {
                         "branch": "master",
                         "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
                         "installed_by": ["modules"]
-                    },
-                    "fgumi/sort": {
-                        "branch": "master",
-                        "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/fgumi/sort/fgumi-sort.diff"
                     },
                     "gatk4/calculatecontamination": {
                         "branch": "master",
