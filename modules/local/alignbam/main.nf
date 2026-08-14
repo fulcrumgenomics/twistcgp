@@ -27,7 +27,7 @@ process ALIGNBAM {
     task.ext.when == null || task.ext.when
 
     script:
-    def samtools_fastq_args = task.ext.samtools_fastq_args ?: ''
+    def fgumi_fastq_args = task.ext.fgumi_fastq_args ?: ''
     def samtools_sort_args = task.ext.samtools_sort_args ?: ''
     def bwa_args = task.ext.bwa_args ?: ''
     def fgumi_zipper_args = task.ext.fgumi_zipper_args ?: ''
@@ -52,7 +52,8 @@ process ALIGNBAM {
     # The real path to the BWA index prefix
     BWA_INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
 
-    samtools fastq ${samtools_fastq_args} ${unmapped_bam} \\
+    # fgumi fastq's default --bwa-chunk-size (150M) sizes its output buffer to match bwa mem -K below; keep the two in sync.
+    fgumi fastq --input ${unmapped_bam} --threads ${task.cpus} ${fgumi_fastq_args} \\
         | bwa-mem3 mem ${bwa_args} -t ${task.cpus} -p -K 150000000 -Y \$BWA_INDEX_PREFIX - \\
         | fgumi zipper \\
             --input - \\

@@ -5,6 +5,7 @@ description: Aligns an unmapped BAM to a reference genome
 keywords:
   - fgumi
   - samtools
+  - fastq
   - zipper
   - mem
   - bwa
@@ -24,7 +25,7 @@ tools:
       arxiv: arXiv:1303.3997
       licence: ["MIT AND Apache-2.0"]
   - fgumi:
-      description: High-performance UMI tools for NGS data analysis; `fgumi zipper` merges mapped/unmapped BAMs and transfers tags.
+      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ and `fgumi zipper` merges mapped/unmapped BAMs and transfers tags.
       homepage: https://github.com/fulcrumgenomics/fgumi
       documentation: https://github.com/fulcrumgenomics/fgumi
       tool_dev_url: https://github.com/fulcrumgenomics/fgumi
