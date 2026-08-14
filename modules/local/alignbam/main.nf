@@ -4,8 +4,8 @@ process ALIGNBAM {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/b4/b482cd2a22b688627cf5888380181fa8f04bc013c3294afbe00cd03e95441f97/data':
-        'community.wave.seqera.io/library/bwa-mem3_fgumi_samtools_findutils_coreutils:d5847203075663d7' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/11/117f7d9a75e30ee5b1782ef06d203bb17a5a3ee8ae753e1b18d7631dbc5f5bce/data':
+        'community.wave.seqera.io/library/bwa-mem3_fgumi_findutils_coreutils:dd6120adb917639c' }"
 
     input:
     tuple val(meta), path(unmapped_bam)
