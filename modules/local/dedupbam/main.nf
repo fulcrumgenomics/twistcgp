@@ -30,12 +30,10 @@ process DEDUPBAM {
         error("Input and output names are the same, use \"task.ext.prefix\" to disambiguate!")
     }
 
-    // fgumi dedup has no `-` stdout mode, but it writes BGZF to /dev/stdout and logs to stderr,
-    // so the pipe carries only the BAM. Uncompressed, since the sort recompresses.
     """
     fgumi dedup \\
         --input ${template_coordinate_bam} \\
-        --output /dev/stdout \\
+        --output - \\
         --metrics ${prefix}.metrics.txt \\
         --family-size-histogram ${prefix}.family_size_histogram.txt \\
         --compression-level 0 \\

@@ -101,17 +101,10 @@ workflow TWISTCGP {
     //
     // MODULE: Run ALIGNBAM
     //
-    // ALIGNBAM sorts with `fgumi sort`, so it can emit the template-coordinate order
-    // `fgumi dedup` requires directly (a samtools template-coordinate sort is not compatible).
     ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
     // MODULE: DEDUPBAM (mark duplicates by position; see --no-umi in modules.config)
-    //
-    // fgumi dedup emits an unindexed BAM, so DEDUPBAM streams it straight into a
-    // coordinate sort that indexes it for the downstream variant-calling and metrics steps.
-    // fgumi versions flow through the `versions` topic channel collected below,
-    // so there is no per-process versions.yml to mix here.
     //
     DEDUPBAM(ALIGNBAM.out.bam)
     ch_bam_and_index = DEDUPBAM.out.bam_bai
