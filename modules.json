@@ -106,11 +106,6 @@
                         "git_sha": "be5b19747298e30ca21270ce40abb3bb16b11475",
                         "installed_by": ["modules"]
                     },
-                    "picard/markduplicates": {
-                        "branch": "master",
-                        "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
-                        "installed_by": ["modules"]
-                    },
                     "riker/multi": {
                         "branch": "master",
                         "git_sha": "89b094a1b914b1e0844b4c0cc901cda5eddd569b",

@@ -4,9 +4,9 @@ name: "alignbam"
 description: Aligns an unmapped BAM to a reference genome
 keywords:
   - fgumi
-  - samtools
   - fastq
   - zipper
+  - sort
   - mem
   - bwa
   - bwa-mem3
@@ -25,19 +25,10 @@ tools:
       arxiv: arXiv:1303.3997
       licence: ["MIT AND Apache-2.0"]
   - fgumi:
-      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ and `fgumi zipper` merges mapped/unmapped BAMs and transfers tags.
+      description: High-performance UMI tools for NGS data analysis; `fgumi fastq` converts BAM to interleaved FASTQ, `fgumi zipper` merges mapped/unmapped BAMs and transfers tags, and `fgumi sort` sorts the result.
       homepage: https://github.com/fulcrumgenomics/fgumi
       documentation: https://github.com/fulcrumgenomics/fgumi
       tool_dev_url: https://github.com/fulcrumgenomics/fgumi
-      licence: ["MIT"]
-  - samtools:
-      description: |
-        SAMtools is a set of utilities for interacting with and post-processing
-        short DNA sequence read alignments in the SAM, BAM and CRAM formats, written by Heng Li.
-        These files are generated as output by short read aligners like BWA.
-      homepage: http://www.htslib.org/
-      documentation: http://www.htslib.org/doc/samtools.html
-      doi: 10.1093/bioinformatics/btp352
       licence: ["MIT"]
 
 input:
@@ -146,16 +137,6 @@ output:
         - "fgumi --version | sed 's/^fgumi //'":
             type: eval
             description: The expression to obtain the version of the tool
-  - versions_samtools:
-      - - "${task.process}":
-            type: string
-            description: The name of the process
-        - "samtools":
-            type: string
-            description: The name of the tool
-        - "samtools --version | sed -n '1s/^samtools //p'":
-            type: eval
-            description: The expression to obtain the version of the tool
 
 topics:
   versions:
@@ -175,15 +156,6 @@ topics:
           type: string
           description: The name of the tool
       - "fgumi --version | sed 's/^fgumi //'":
-          type: eval
-          description: The expression to obtain the version of the tool
-    - - "${task.process}":
-          type: string
-          description: The name of the process
-      - "samtools":
-          type: string
-          description: The name of the tool
-      - "samtools --version | sed -n '1s/^samtools //p'":
           type: eval
           description: The expression to obtain the version of the tool
 

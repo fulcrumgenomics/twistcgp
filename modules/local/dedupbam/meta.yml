@@ -1,0 +1,111 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "dedupbam"
+description: Marks duplicates in a template-coordinate sorted BAM and sorts the result back to coordinate order
+keywords:
+  - fgumi
+  - dedup
+  - duplicates
+  - sort
+  - bam
+tools:
+  - fgumi:
+      description: High-performance UMI tools for NGS data analysis; `fgumi dedup` marks duplicates and `fgumi sort` sorts the marked records.
+      homepage: https://github.com/fulcrumgenomics/fgumi
+      documentation: https://github.com/fulcrumgenomics/fgumi
+      tool_dev_url: https://github.com/fulcrumgenomics/fgumi
+      licence: ["MIT"]
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', single_end:false ]
+    - template_coordinate_bam:
+        type: file
+        description: BAM sorted into template-coordinate order by `fgumi sort` (or `mako`)
+        pattern: "*.bam"
+
+output:
+  - bam:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.bam":
+          type: file
+          description: Duplicate-marked, coordinate sorted BAM
+          pattern: "*.bam"
+  - bai:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.bam.bai":
+          type: file
+          description: BAI index for the duplicate-marked BAM
+          pattern: "*.bam.bai"
+  - bam_bai:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.bam":
+          type: file
+          description: Duplicate-marked, coordinate sorted BAM
+          pattern: "*.bam"
+      - "*.bam.bai":
+          type: file
+          description: BAI index emitted alongside the BAM
+          pattern: "*.bam.bai"
+  - metrics:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.metrics.txt":
+          type: file
+          description: Duplicate marking metrics
+          pattern: "*.metrics.txt"
+  - histogram:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1', single_end:false ]`
+      - "*.family_size_histogram.txt":
+          type: file
+          description: Family size histogram, parsed by MultiQC's fgbio module
+          pattern: "*.family_size_histogram.txt"
+  - versions_fgumi:
+      - - "${task.process}":
+            type: string
+            description: The name of the process
+        - "fgumi":
+            type: string
+            description: The name of the tool
+        - "fgumi --version | sed 's/^fgumi //'":
+            type: eval
+            description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "fgumi":
+          type: string
+          description: The name of the tool
+      - "fgumi --version | sed 's/^fgumi //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@emmcauley"
+maintainers:
+  - "@emmcauley"
