@@ -10,6 +10,7 @@ include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
 include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
+include { DEDUPBAM } from '../modules/local/dedupbam'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
 include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
@@ -24,7 +25,6 @@ include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
 include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
 include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
-include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
 include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
 include { TMB } from '../modules/local/tmb'
 include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
@@ -101,22 +101,21 @@ workflow TWISTCGP {
     //
     // MODULE: Run ALIGNBAM
     //
-    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
+    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
-    // MODULE: PICARD_MARKDUPLICATES
+    // MODULE: DEDUPBAM (mark duplicates by position; see --no-umi in modules.config)
     //
-    PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+    DEDUPBAM(ALIGNBAM.out.bam)
+    ch_bam_and_index = DEDUPBAM.out.bam_bai
+    // MultiQC can't parse fgumi's metrics TSV (no sample-name column); histogram only.
+    ch_multiqc_files = ch_multiqc_files.mix(DEDUPBAM.out.histogram.collect { _meta, histogram -> histogram })
 
     //
     // MODULE: GATK4/MUTECT2
     //
     // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
-    ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bams_and_targets = ch_bam_and_index
         .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_MUTECT2(
         ch_bams_and_targets,
@@ -272,7 +271,7 @@ workflow TWISTCGP {
             BAITS_TO_BED(baits)
         }
         ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
-        ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
+        ch_cnv_bam_pair = DEDUPBAM.out.bam.map { meta, bam -> tuple(meta, bam, []) }
         CNVKIT_BATCH(
             ch_cnv_bam_pair,
             ch_fasta,
@@ -342,7 +341,7 @@ workflow TWISTCGP {
     //
     // MODULE: PERBASE
     //
-    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.join(ch_fasta_fai).first())
+    PERBASE(ch_bam_and_index, ch_fasta.join(ch_fasta_fai).first())
     ch_versions = ch_versions.mix(PERBASE.out.versions.first())
 
     //
