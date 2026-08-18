@@ -155,9 +155,7 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         : PREPARE_GENOME.out.fasta_fai
     fasta_gzi = params.fasta_gzi
         ? channel.fromPath(params.fasta_gzi).map { path -> [[id: 'gzi'], path] }.collect()
-        : file(params.fasta).getExtension() == 'gz'
-            ? PREPARE_GENOME.out.fasta_gzi
-            : channel.value([[id: 'gzi'], []])
+        : { file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : channel.value([[id: "gzi"], []]) }
     bwa = params.bwa
         ? channel.fromPath(params.bwa).map { path -> [[id: 'bwa'], path] }.collect()
         : PREPARE_GENOME.out.bwa
