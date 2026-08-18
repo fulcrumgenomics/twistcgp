@@ -74,7 +74,7 @@ Targets will be padded prior to variant calling; the padding size can be adjuste
 
 > [!NOTE]
 > If you lack the baits file, you can provide the panel targets for both arguments.
-> Providing the targets as the baits will invalidate the bait specific metrics in `riker multi`'s hybrid-capture (`hybcap`) metrics.
+> Providing the targets as the baits will invalidate the bait-specific fields in `riker multi`'s hybrid-capture (`hybcap`) metrics.
 > Additionally, CNV calls from CNVkit may be noiser due to inaccurate modeling of bait locations.
 
 ### (Optionally) Provide Adapter Sequences
