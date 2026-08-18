@@ -59,7 +59,6 @@ workflow {
 
     // VCF Annotation Parameters (SnpEff + VEP)
     snpeff_genome_info = channel.value([[id: "${params.annotation_genome_version}.${params.snpeff_db}"], "${params.annotation_genome_version}.${params.snpeff_db}"])
-    snpeff_cache = params.snpeff_cache ? file(params.snpeff_cache) : []
 
     tmb_mutect2_config = channel.fromPath(params.tmb_mutect2_config).collect()
     tmb_vep_config = channel.fromPath(params.tmb_vep_config).collect()
@@ -72,7 +71,6 @@ workflow {
             params.ensemblvep_cache_version,
         )
     )
-    ensemblvep_cache = params.ensemblvep_cache ? file(params.ensemblvep_cache) : []
 
     ch_cosmic_vcf = channel.value(
         tuple([id: 'cosmic_vcf'], params.cosmic_vcf ? file(params.cosmic_vcf) : [])
