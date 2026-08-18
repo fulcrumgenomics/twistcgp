@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced `fgbio ZipperBams` with `fgumi zipper` in ALIGNBAM, streamed straight into sort; fgbio and its Java runtime are no longer used ([#132](https://github.com/fulcrumgenomics/twistcgp/pull/132))
 - Replaced `samtools fastq` with `fgumi fastq` in ALIGNBAM ([#131](https://github.com/fulcrumgenomics/twistcgp/pull/131))
 - Replaced `picard/markduplicates` with `fgumi dedup` in a new local DEDUPBAM module, and `samtools sort` with `fgumi sort`; samtools and picard are no longer used for alignment or duplicate marking ([#135](https://github.com/fulcrumgenomics/twistcgp/pull/135))
+- Raised the `--tmb_vaf_cutoff` default from 0.05 to 0.10, tightening TMB pre-filtering ([#84](https://github.com/fulcrumgenomics/twistcgp/pull/84))
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1
