@@ -92,10 +92,8 @@ workflow {
         ch_pon_vcf,
         snpeff_genome_info,
         ensemblvep_info,
-        snpeff_cache,
         tmb_mutect2_config,
         tmb_vep_config,
-        ensemblvep_cache,
         ch_cosmic_vcf,
         ch_gnomad_vcf,
     )
@@ -129,10 +127,8 @@ workflow FULCRUMGENOMICS_TWISTCGP {
     ch_pon_vcf // optional val(reference meta), path(panel_of_normals VCF)
     snpeff_genome_info // channel: tuple val(meta), val(snpeff_db)
     ensemblvep_info // channel: [ val(meta), val(genome_version), val(vep_species), val(cache_version) ]
-    snpeff_cache // channel: path(snpeff_cache)
     tmb_mutect2_config // required path to variant calling config file
     tmb_vep_config // required path to variant annotation config file
-    ensemblvep_cache // channel: path(ensemblvep_cache)
     ch_cosmic_vcf // optional val(reference meta), path(cosmic VCF)
     ch_gnomad_vcf // optional val(reference meta), path(gnomAD VCF)
 
@@ -161,7 +157,9 @@ workflow FULCRUMGENOMICS_TWISTCGP {
         : PREPARE_GENOME.out.fasta_fai
     fasta_gzi = params.fasta_gzi
         ? channel.fromPath(params.fasta_gzi).map { path -> [[id: 'gzi'], path] }.collect()
-        : { file(params.fasta).getExtension() == 'gz' ? PREPARE_GENOME.out.fasta_gzi : channel.value([[id: "gzi"], []]) }
+        : file(params.fasta).getExtension() == 'gz'
+            ? PREPARE_GENOME.out.fasta_gzi
+            : channel.value([[id: 'gzi'], []])
     bwa = params.bwa
         ? channel.fromPath(params.bwa).map { path -> [[id: 'bwa'], path] }.collect()
         : PREPARE_GENOME.out.bwa
