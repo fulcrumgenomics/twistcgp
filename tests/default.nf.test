@@ -14,7 +14,13 @@ nextflow_pipeline {
             outputDir,
             relative: true,
             includeDir: true,
-            ignore: ['pipeline_info/*.{html,json,txt}']
+            ignore: [
+                'pipeline_info/*.{html,json,txt}',
+                // MultiQC renders these plot files only where its plotting backend
+                // works (amd64 CI), not under local arm64 emulation; the pdf/png/svg
+                // dirs themselves are listed, their contents excluded (also .nftignore'd).
+                'multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}',
+            ]
         )
         def stable_path = getAllFilesFromDir(
             outputDir,
