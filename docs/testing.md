@@ -107,8 +107,6 @@ Every scenario also snapshots the stable output tree and the content-MD5s of its
 | `straight_run` | none | Baseline: align → dedup → Mutect2 → filter → CNV, no optional inputs. |
 | `vep_cache_dir` | `ensemblvep_cache` (dir) + `ensemblvep_cache_version` | VEP driven from a pre-extracted cache directory rather than a downloaded archive. |
 | `tmb_only` | `skip_tmb=false`, `skip_civicpy=true` | `BCFTOOLS_VIEW → TMB_PYTMB`; bcftools reads VEP output directly, CIViCpy is skipped. |
-| `skip_cnv` | `skip_cnv=true` | Confirms no `CNVKIT_BATCH` outputs are produced. |
-| `cnv_with_bed_baits` | `baits` (BED) | Baits already in BED, so `BAITS_TO_BED` (`PICARD_INTERVALLISTTOBED`) is skipped. |
 
 One component test runs the same fixtures against a single subworkflow:
 
@@ -121,6 +119,9 @@ TMB uses the nf-core `tmb/pytmb` module; its component test lives upstream and i
 
 - `civicpy_only` / `tmb_with_civicpy` — the CIViCpy cache update is unrunnable offline.
 - `msi_msisensor2` — msisensor2 segfaults on the chr21 test data.
+- `skip_cnv` (no CNVKIT_BATCH outputs) and `cnv_with_bed_baits` (BED baits skip `BAITS_TO_BED`)
+  are written but temporarily removed: their snapshots stall under local arm64 emulation and
+  need recording on native amd64. Re-add the scenarios once the snapshots exist.
 
 ## Running the suite
 
