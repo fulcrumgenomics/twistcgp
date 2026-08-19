@@ -1,0 +1,112 @@
+name: nf-test
+# Runs the nf-test suite (tests/, modules/local, subworkflows/local) against the
+# committed fixtures under assets/test-data/. Two tiers:
+#   fast — component tests + the straight_run pipeline scenario; gates every PR.
+#   full — all pipeline scenarios, sharded; nightly, on-demand, or on a "full-test" label.
+on:
+  pull_request:
+    # 'labeled' is needed so adding the full-test label triggers the full suite
+    # immediately; the other three are pull_request's default activity types.
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [dev, main]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+env:
+  NXF_ANSI_LOG: false
+  NXF_VER: "25.04.0"
+  NFT_VER: "0.9.2"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect pipeline changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes to testable code
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"   # always run on push/schedule/dispatch
+            exit 0
+          fi
+          git fetch --quiet origin "${{ github.event.pull_request.base.ref }}"
+          if git diff --name-only "origin/${{ github.event.pull_request.base.ref }}...HEAD" \
+              | grep -qE '\.(nf|config)$|^tests/|^assets/test-data/|^modules/|^subworkflows/|^workflows/|^nf-test\.config$|^\.github/workflows/nf-test\.yml$'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  fast:
+    name: "nf-test fast gate"
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@561fcfc7146dcb12e3871909b635ab092a781f34 # v2
+        with:
+          version: "${{ env.NXF_VER }}"
+
+      - name: Install nf-test
+        run: |
+          curl -fsSL https://get.nf-test.com | bash -s -- "${NFT_VER}"
+          sudo mv nf-test /usr/local/bin/
+
+      - name: Clean up disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+
+      - name: Run fast tier (vcf_annotate + straight_run + tmb_only)
+        run: nf-test test --tag vcf_annotate,straight_run,tmb_only --profile docker,test --ci
+
+  full:
+    name: "nf-test full (shard ${{ matrix.shard }}/3)"
+    needs: changes
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'full-test')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@561fcfc7146dcb12e3871909b635ab092a781f34 # v2
+        with:
+          version: "${{ env.NXF_VER }}"
+
+      - name: Install nf-test
+        run: |
+          curl -fsSL https://get.nf-test.com | bash -s -- "${NFT_VER}"
+          sudo mv nf-test /usr/local/bin/
+
+      - name: Clean up disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+
+      - name: Run full suite shard
+        run: nf-test test --profile docker,test --ci --shard ${{ matrix.shard }}/3
