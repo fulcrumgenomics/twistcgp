@@ -1,8 +1,8 @@
-name: nf-test
+name: Integration tests
 # Runs the nf-test suite (tests/, modules/local, subworkflows/local) against the
 # committed fixtures under assets/test-data/. Two tiers:
 #   fast — component tests + the straight_run pipeline scenario; gates every PR.
-#   full — all pipeline scenarios, sharded; nightly, on-demand, or on a "full-test" label.
+#   full — all pipeline scenarios, sharded; on-demand via workflow_dispatch or a "full-test" label.
 on:
   pull_request:
     # 'labeled' is needed so adding the full-test label triggers the full suite
@@ -10,8 +10,6 @@ on:
     types: [opened, synchronize, reopened, labeled]
   push:
     branches: [dev, main]
-  schedule:
-    - cron: "0 3 * * *"
   workflow_dispatch:
 
 env:
@@ -39,19 +37,19 @@ jobs:
         id: filter
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "code=true" >> "$GITHUB_OUTPUT"   # always run on push/schedule/dispatch
+            echo "code=true" >> "$GITHUB_OUTPUT"   # always run on push/dispatch
             exit 0
           fi
           git fetch --quiet origin "${{ github.event.pull_request.base.ref }}"
           if git diff --name-only "origin/${{ github.event.pull_request.base.ref }}...HEAD" \
-              | grep -qE '\.(nf|config)$|^tests/|^assets/test-data/|^modules/|^subworkflows/|^workflows/|^nf-test\.config$|^\.github/workflows/nf-test\.yml$'; then
+              | grep -qE '\.(nf|config)$|^tests/|^assets/test-data/|^modules/|^subworkflows/|^workflows/|^nf-test\.config$|^\.github/workflows/integration_tests\.yml$'; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
             echo "code=false" >> "$GITHUB_OUTPUT"
           fi
 
   fast:
-    name: "nf-test fast gate"
+    name: "Fast gate"
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
@@ -78,10 +76,9 @@ jobs:
         run: nf-test test --tag vcf_annotate,straight_run,tmb_only --profile docker,test --ci
 
   full:
-    name: "nf-test full (shard ${{ matrix.shard }}/3)"
+    name: "Full suite (shard ${{ matrix.shard }}/3)"
     needs: changes
     if: >-
-      github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       contains(github.event.pull_request.labels.*.name, 'full-test')
     runs-on: ubuntu-latest
