@@ -42,9 +42,9 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.
-> Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `nextflow run twistcpg/main.nf -profile "test,[docker|singularity|conda]" --outdir ./results` before running the workflow on actual data.
+> Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `nextflow run twistcgp/main.nf -profile "test,[docker|singularity|conda]" --outdir ./results` before running the workflow on actual data.
 
-For a full list of available options run `nextflow run twistcpg/main.nf --help --show_hidden`.
+For a full list of available options run `nextflow run twistcgp/main.nf --help --show_hidden`.
 
 ### Prepare a Samplesheet
 
@@ -74,7 +74,7 @@ Targets will be padded prior to variant calling; the padding size can be adjuste
 
 > [!NOTE]
 > If you lack the baits file, you can provide the panel targets for both arguments.
-> Providing the targets as the baits will invalidate the bait specific metrics in the picard `HsMetrics`.
+> Providing the targets as the baits will invalidate the bait-specific fields in `riker multi`'s hybrid-capture (`hybcap`) metrics.
 > Additionally, CNV calls from CNVkit may be noiser due to inaccurate modeling of bait locations.
 
 ### (Optionally) Provide Adapter Sequences
