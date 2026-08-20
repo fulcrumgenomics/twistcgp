@@ -29,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced `picard/collectmultiplemetrics` and `picard/collecthsmetrics` with `riker/multi` (RIKER_MULTI) for metrics collection ([#110](https://github.com/fulcrumgenomics/twistcgp/pull/110))
 - Replaced the `bwamem2/index` nf-core module with `bwamem3/index` for reference genome indexing ([#125](https://github.com/fulcrumgenomics/twistcgp/pull/125))
 - ALIGNBAM now aligns with `bwa-mem3 mem` instead of `bwa-mem2` ([#125](https://github.com/fulcrumgenomics/twistcgp/pull/125))
-- Bumped `bwa-mem3` to 0.8.0 ([#137](https://github.com/fulcrumgenomics/twistcgp/pull/137))
 - Replaced `fgbio/fastqtobam` with `fgumi/extract` (FGUMI_EXTRACT) for FASTQ to unmapped BAM conversion ([#113](https://github.com/fulcrumgenomics/twistcgp/pull/113))
 - Replaced `fgbio ZipperBams` with `fgumi zipper` in ALIGNBAM, streamed straight into sort; fgbio and its Java runtime are no longer used ([#132](https://github.com/fulcrumgenomics/twistcgp/pull/132))
 - Replaced `samtools fastq` with `fgumi fastq` in ALIGNBAM ([#131](https://github.com/fulcrumgenomics/twistcgp/pull/131))
