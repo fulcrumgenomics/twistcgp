@@ -5,3 +5,6 @@ channels:
   - bioconda
 dependencies:
   - "bioconda::fgumi=0.5.0"
+  # fgumi's own --write-index produces a .bai that older htslib builds (e.g.
+  # msisensor2's) reject; index with samtools instead for a portable index.
+  - "bioconda::samtools=1.21"
