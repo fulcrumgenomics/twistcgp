@@ -18,7 +18,7 @@ workflow PREPARE_ANNOTATION_DB {
     snpeff_db // channel: [mandatory] tuple val(meta), val(snpeff_db)
 
     main:
-    versions = Channel.empty()
+    versions = channel.empty()
 
     ENSEMBLVEP_DOWNLOAD(ensembl_cache_version)
     SNPEFF_DOWNLOAD(snpeff_db)

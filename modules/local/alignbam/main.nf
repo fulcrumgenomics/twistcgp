@@ -49,10 +49,15 @@ process ALIGNBAM {
         fgbio_zipper_bams_compression = 1
     }
     else {
-        fgbio_zipper_bams_output = "/dev/stdout"
-        // do not compress if samtools is consuming it
-        fgbio_zipper_bams_compression = 0
-        extra_command = " | samtools sort "
+        // Write ZipperBams output to an intermediate file and sort that file, rather than
+        // piping fgbio's output through /dev/stdout. Writing to the literal /dev/stdout path
+        // is unreliable under Singularity (it is a /proc/self/fd symlink that does not resolve
+        // to the downstream pipe), so a piped `samtools sort -` receives a broken stream and
+        // fails with "Exec format error". Docker resolves /dev/stdout correctly, so this only
+        // manifests under Singularity/Apptainer. Sorting a real file works under both.
+        fgbio_zipper_bams_output = prefix + ".zipped.bam"
+        fgbio_zipper_bams_compression = 1
+        extra_command = "samtools sort "
         extra_command += samtools_sort_args
         if (sort_type == "template-coordinate") {
             extra_command += " --template-coordinate"
@@ -65,7 +70,7 @@ process ALIGNBAM {
         }
         extra_command += " --threads " + task.cpus
         extra_command += " -o " + prefix + ".mapped.bam##idx##" + prefix + ".mapped.bam.bai"
-        extra_command += " -"
+        extra_command += " " + prefix + ".zipped.bam"
     }
 
     """
@@ -82,8 +87,9 @@ process ALIGNBAM {
             --unmapped ${unmapped_bam} \\
             --ref ${fasta} \\
             --output ${fgbio_zipper_bams_output} \\
-            ${fgbio_args} \\
-            ${extra_command};
+            ${fgbio_args}
+
+    ${extra_command}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -102,7 +108,7 @@ process ALIGNBAM {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
+        bwamem2: \$(echo \$(bwa-mem2 version 2>&1) | sed 's/.* //')
         fgbio: \$( echo \$(fgbio --version 2>&1 | tr -d '[:cntrl:]' ) | sed -e 's/^.*Version: //;s/\\[.*\$//')
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS

@@ -16,22 +16,22 @@ workflow VCF_ANNOTATE {
     vep_extra_files // channel: [ path(file1), path(file2)... ] (optional)
 
     main:
-    versions = Channel.empty()
+    versions = channel.empty()
 
     VCF_ANNOTATE_SNPEFF(
         vcf,
-        snpeff_genome_info.map { it[-1] },
+        snpeff_genome_info.map { _meta, db -> db },
         snpeff_cache,
     )
-    vcf_for_vep = VCF_ANNOTATE_SNPEFF.out.vcf_tbi.map { meta, vcf, tbi -> [meta, vcf, []] }
+    vcf_for_vep = VCF_ANNOTATE_SNPEFF.out.vcf_tbi.map { meta, snpeff_vcf, _tbi -> [meta, snpeff_vcf, []] }
     // optional custom files are provided in `vep_extra_files`
 
     VCF_ANNOTATE_ENSEMBLVEP(
         vcf_for_vep,
         fasta,
-        ensemblvep_info.map { it[1] }, // annotation_genome_version,
-        ensemblvep_info.map { it[2] }, // species
-        ensemblvep_info.map { it[-1] }, // cache version
+        ensemblvep_info.map { _meta, genome, _species, _cache -> genome }, // annotation_genome_version,
+        ensemblvep_info.map { _meta, _genome, species, _cache -> species }, // species
+        ensemblvep_info.map { _meta, _genome, _species, cache -> cache }, // cache version
         vep_cache.map { _meta, cache -> cache }, // path to cache if given
         vep_extra_files,
     )

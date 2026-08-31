@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         NXF_VER:
-          - "24.10.5"
+          - "25.04.0"
           - "latest-everything"
         profile:
           - "conda"
@@ -38,13 +38,13 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Nextflow
-        uses: nf-core/setup-nextflow@v2
+        uses: nf-core/setup-nextflow@561fcfc7146dcb12e3871909b635ab092a781f34 # v2
         with:
           version: "${{ matrix.NXF_VER }}"
 
       - name: Set up Apptainer
         if: matrix.profile == 'singularity'
-        uses: eWaterCycle/setup-apptainer@main
+        uses: eWaterCycle/setup-apptainer@3f706d898c9db585b1d741b4692e66755f3a1b40 # v2
 
       - name: Set up Singularity
         if: matrix.profile == 'singularity'

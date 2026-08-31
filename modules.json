@@ -5,11 +5,21 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bcftools/view": {
+                        "branch": "master",
+                        "git_sha": "6383d8fe58f9498eecd5aa303e71a4a932d1e9f6",
+                        "installed_by": ["modules"]
+                    },
                     "bwamem2/index": {
                         "branch": "master",
                         "git_sha": "a29f18660f5e3748d44d6f716241e70c942c065d",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
+                    },
+                    "civicpy/annotate": {
+                        "branch": "master",
+                        "git_sha": "d9b102cf2037413ee4cb990d3d63eb8623758d00",
+                        "installed_by": ["modules"]
                     },
                     "cnvkit/batch": {
                         "branch": "master",
@@ -43,6 +53,27 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
+                    "gatk4/calculatecontamination": {
+                        "branch": "master",
+                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+                        "installed_by": ["modules"]
+                    },
+                    "gatk4/filtermutectcalls": {
+                        "branch": "master",
+                        "git_sha": "a57253204b8f4022edfeaa3ae2f5e2abecd8858b",
+                        "installed_by": ["modules"]
+                    },
+                    "gatk4/getpileupsummaries": {
+                        "branch": "master",
+                        "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+                        "installed_by": ["modules"]
+                    },
+                    "gatk4/learnreadorientationmodel": {
+                        "branch": "master",
+                        "git_sha": "52b7843bd92ccf833cc12e71cd84aeccf2583852",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/gatk4/learnreadorientationmodel/gatk4-learnreadorientationmodel.diff"
+                    },
                     "gatk4/mutect2": {
                         "branch": "master",
                         "git_sha": "a97cba262e9367734e435dc07d2e3b7d6121ef3e",
@@ -53,12 +84,6 @@
                         "branch": "master",
                         "git_sha": "1c4ba174446aa5777727611d0e63dae2fd91be3c",
                         "installed_by": ["modules"]
-                    },
-                    "msisensor2/scan": {
-                        "branch": "master",
-                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/msisensor2/scan/msisensor2-scan.diff"
                     },
                     "msisensorpro/pro": {
                         "branch": "master",
@@ -96,7 +121,7 @@
                     },
                     "picard/markduplicates": {
                         "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
                         "installed_by": ["modules"]
                     },
                     "samtools/dict": {
@@ -136,17 +161,17 @@
                 "nf-core": {
                     "utils_nextflow_pipeline": {
                         "branch": "master",
-                        "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",
+                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
-                        "git_sha": "51ae5406a030d4da1e49e4dab49756844fdd6c7a",
+                        "git_sha": "271e7fc14eb1320364416d996fb077421f3faed2",
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nfschema_plugin": {
                         "branch": "master",
-                        "git_sha": "2fd2cd6d0e7b273747f32e465fdc6bcc3ae0814e",
+                        "git_sha": "4b406a74dc0449c0401ed87d5bfff4252fd277fd",
                         "installed_by": ["subworkflows"]
                     },
                     "vcf_annotate_ensemblvep": {

@@ -29,7 +29,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. Each row must use a unique value in the `sample` column; if a sample was sequenced across multiple lanes, merge the lane-level fastqs before listing the sample.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "adapters_fasta": {
@@ -75,10 +75,11 @@
                     "default": null
                 },
                 "population_germline_tbi": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "pattern": "^\\S+\\.gz\\.tbi$",
-                    "description": "Optional path to the TBI of the germline resource VCF.",
-                    "default": null
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Optional path to the TBI of the germline resource VCF."
                 },
                 "pon_vcf": {
                     "type": ["string", "null"],
@@ -87,10 +88,11 @@
                     "default": null
                 },
                 "pon_tbi": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "pattern": "^\\S+\\.gz\\.tbi$",
-                    "description": "Optional path to the TBI of the compressed panel of normals VCF.",
-                    "default": null
+                    "format": "file-path",
+                    "fa_icon": "fas fa-file",
+                    "description": "Optional path to the TBI of the compressed panel of normals VCF."
                 },
                 "outdir": {
                     "type": "string",
@@ -171,6 +173,21 @@
                     "default": false,
                     "description": "If true, skip the CIVICpy annotation step."
                 },
+                "skip_cnv": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip CNV calling with CNVkit."
+                },
+                "skip_msi": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip microsatellite instability analysis (MSIsensor2 or MSIsensor-pro)."
+                },
+                "skip_tmb": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, skip tumor mutational burden (TMB) calculation."
+                },
                 "tmb_mutect2_config": {
                     "type": "string",
                     "exists": true,
@@ -180,6 +197,21 @@
                     "type": "string",
                     "exists": true,
                     "description": "Path to the variant annotation config file that describes how pyTMB should parse functional annotations in a VCF annotated by VEP."
+                },
+                "tmb_popaf_cutoff": {
+                    "type": "number",
+                    "default": 3.0,
+                    "minimum": 0,
+                    "description": "Minimum POPAF value (negative log10 of population allele frequency) for TMB pre-filtering.",
+                    "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. A value of 3.0 corresponds to a population allele frequency of <= 0.001 (0.1%)."
+                },
+                "tmb_vaf_cutoff": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Minimum variant allele frequency (FORMAT/AF) for TMB pre-filtering.",
+                    "help_text": "Used by bcftools view to pre-filter variants before TMB calculation. The Friends of Cancer Research TMB Harmonization Project recommends a minimum of 0.05 (5%). The default of 0.10 (10%) provides additional stringency to reduce sub-clonal noise in tumor-only analyses."
                 }
             }
         },
@@ -245,12 +277,20 @@
                     "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
                     "hidden": true
                 },
-                "msisensor_scan": {
+                "msisensor2_scan": {
                     "type": "string",
                     "fa_icon": "fas fa-copy",
                     "exists": true,
-                    "description": "Path to msisensor2 (or msisensor-pro) scan file.",
-                    "help_text": "**NB** If none provided, will be generated automatically from the FASTA reference. Combine with `--save_reference` to save for future runs.",
+                    "description": "Path to a pre-computed msisensor2 scan list.",
+                    "help_text": "Optional and rarely needed; primarily for non-human panels. MSIsensor2 relies on its ML model by default for human genomes (hg38, hg19, b37). See [docs/msisensor_sites.md](/docs/msisensor_sites.md) for scan generation instructions.",
+                    "hidden": true
+                },
+                "msisensor_pro_sites": {
+                    "type": "string",
+                    "fa_icon": "fas fa-copy",
+                    "exists": true,
+                    "description": "Path to a msisensor-pro scan list or trained baseline.",
+                    "help_text": "Used only when `--use_msisensor_pro_licensed` is enabled. Accepts either a scan list or a trained baseline; `msisensor-pro pro` handles both via its per-site `threshold` column. A trained baseline is recommended for production use. If omitted, the pipeline auto-generates a scan list from the reference genome. See [docs/msisensor_sites.md](/docs/msisensor_sites.md) for generation instructions.",
                     "hidden": true
                 },
                 "msisensor2_model_name": {
@@ -335,6 +375,18 @@
                     "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
+                },
+                "help": {
+                    "type": ["boolean", "string"],
+                    "description": "Display the help message."
+                },
+                "help_full": {
+                    "type": "boolean",
+                    "description": "Display the full detailed help message."
+                },
+                "show_hidden": {
+                    "type": "boolean",
+                    "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
                 }
             }
         }

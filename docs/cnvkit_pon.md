@@ -20,7 +20,7 @@ Using those files, run:
 
 ```console
 cnvkit.py autobin  \
-    *normal.bam
+    *normal.bam \
     --targets baits.bed \
     --method hybrid
 ```
