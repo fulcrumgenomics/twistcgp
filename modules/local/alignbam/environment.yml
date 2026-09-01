@@ -5,6 +5,10 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - bioconda::bwa-mem2=2.2.1
-  - bioconda::fgbio=2.5.21
-  - bioconda::samtools=1.21
+  - bioconda::bwa-mem3=0.8.0
+  - bioconda::fgumi=0.5.0
+  # The micromamba amazon2023 base image Wave builds on is minimal and lacks
+  # findutils/coreutils; the alignbam script needs `find` and the coreutils
+  # used in the versions block, so pull them in explicitly.
+  - conda-forge::findutils=4.10.0
+  - conda-forge::coreutils=9.5

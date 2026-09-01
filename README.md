@@ -22,12 +22,12 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 
 ### Pipeline Steps
 
-1. Index Genome ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2), [`samtools`](https://www.htslib.org/))
+1. Index Genome ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3), [`samtools`](https://www.htslib.org/))
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-1. Trim Adapters ([`fastp`](https://github.com/OpenGene/fastp))
-1. Fastq to BAM ([`fgbio FastqToBam`](http://fulcrumgenomics.github.io/fgbio/tools/latest/FastqToBam.html))
-1. Align ([`bwa-mem2`](https://github.com/bwa-mem2/bwa-mem2))
-1. Mark Duplicates ([`picard MarkDuplicates`](https://broadinstitute.github.io/picard/command-line-overview.html#MarkDuplicates))
+1. Trim Adapters ([`chelae`](https://github.com/fulcrumgenomics/chelae))
+1. FASTQ to unaligned BAM ([`fgumi extract`](https://github.com/fulcrumgenomics/fgumi))
+1. Align ([`bwa-mem3`](https://github.com/fg-labs/bwa-mem3))
+1. Mark Duplicates ([`fgumi dedup`](https://github.com/fulcrumgenomics/fgumi))
 1. Variant Calling via local Assembly of Haplotypes ([`gatk4/mutect2`](https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2))
 1. Filter Variant Calls ([`gatk4/FilterMutectCalls`](https://gatk.broadinstitute.org/hc/en-us/articles/360036856831-FilterMutectCalls))
 1. Annotate Variants ([`SnpEff`](https://pcingola.github.io/SnpEff/), [`Ensembl VEP`](https://useast.ensembl.org/info/docs/tools/vep/index.html), [`CIViCpy`](https://github.com/griffithlab/civicpy))
@@ -35,16 +35,16 @@ A bioinformatics pipeline for processing data from [Twist Bioscience's](https://
 1. Calculate Tumor Mutational Burden ([`pyTMB`](https://github.com/bioinfo-pf-curie/TMB))
 1. Call CNVs ([`CNVkit`](https://cnvkit.readthedocs.io/en/stable/index.html))
 1. Identify MSI ([`MSIsensor2`](https://github.com/niu-lab/msisensor2) or [`MSIsensor-pro`](https://github.com/xjtu-omics/msisensor-pro))
-1. Collect Metrics ([`picard CollectHsMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectHsMetrics), [`picard CollectMultipleMetrics`](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics), [`perbase`](https://github.com/sstadick/perbase))
+1. Collect Metrics ([`riker multi`](https://github.com/fulcrumgenomics/riker), [`perbase`](https://github.com/sstadick/perbase))
 1. Present QC ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow.
-> Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `nextflow run twistcpg/main.nf -profile "test,[docker|singularity|conda]" --outdir ./results` before running the workflow on actual data.
+> Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `nextflow run twistcgp/main.nf -profile "test,[docker|singularity|conda]" --outdir ./results` before running the workflow on actual data.
 
-For a full list of available options run `nextflow run twistcpg/main.nf --help --show_hidden`.
+For a full list of available options run `nextflow run twistcgp/main.nf --help --show_hidden`.
 
 ### Prepare a Samplesheet
 
@@ -74,24 +74,24 @@ Targets will be padded prior to variant calling; the padding size can be adjuste
 
 > [!NOTE]
 > If you lack the baits file, you can provide the panel targets for both arguments.
-> Providing the targets as the baits will invalidate the bait specific metrics in the picard `HsMetrics`.
+> Providing the targets as the baits will invalidate the bait-specific fields in `riker multi`'s hybrid-capture (`hybcap`) metrics.
 > Additionally, CNV calls from CNVkit may be noiser due to inaccurate modeling of bait locations.
 
 ### (Optionally) Provide Adapter Sequences
 
-If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `fastp` to trim those sequences prior to alignment.
+If sequencing data is likely to include adapter sequences, providing these sequences in FASTA format will allow `chelae` to trim those sequences prior to alignment.
 The adapter sequences can be supplied to the pipeline using the `--adapters_fasta` parameter.
 
 ### Optional Time and Resource Saving Setup
 
 <details> <summary>Pre-Generate a Genome Index</summary>
 
-Because this pipeline uses bwa-mem2 for alignment, 87GB of memory are required to generate the human genome index.
+Generating the human genome index with bwa-mem3 is memory intensive.
 Alternatively, this index can be built without the pipeline and the directory supplied using the `--bwa` parameter.
-See [docs/bwamem2_index.md](/docs/bwamem2_index.md) for details.
+See [docs/bwamem3_index.md](/docs/bwamem3_index.md) for details.
 
 Additionally, the genome index can be saved to the output directory for future use by supplying the `--save_reference` parameter.
-Subsequently, you may pass the index using `--bwa results/reference/bwamem2`.
+Subsequently, you may pass the index using `--bwa results/reference/bwamem3`.
 
 </details>
 
@@ -252,7 +252,7 @@ nextflow run twistcgp/main.nf \
    --baits baits.bed \
    --targets targets.bed \
    --outdir results \
-   --bwa resources/hg38_giab/bwamem2 \
+   --bwa resources/hg38_giab/bwamem3 \
    --msisensor2_scan resources/hg38_giab.msisensor2_scan.list \
    --ensemblvep_cache resources/ensemblevep_cache/vep_cache \
    --snpeff_cache resources/snpeff_cache/GRCh38.105 \

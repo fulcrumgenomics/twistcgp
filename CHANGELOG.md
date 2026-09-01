@@ -20,12 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- ALIGNBAM now runs under Singularity: `findutils` and `coreutils` are added to the container, so `find`/`cat`/`touch` are present in the conda-only Singularity image (which has no base OS)
 - ALIGNBAM stub now reports the `bwa-mem2` version, matching the container and the `script:` block; previously it shelled out to `bwa` and emitted stderr into `versions.yml` (#99)
 - Bumped pinned `picard/markduplicates` to nf-core/modules `2b5333d3d` so the stub emits a `.bai` alongside the `.bam`; previously the join with `.bai` was empty under `-stub` and downstream MSI / GATK steps were silently skipped (#101)
 - VEP `--custom` now references the staged file's basename, fixing failures when `--cosmic_vcf` is a remote URL (e.g. `s3://`) on Lifebit/Fusion (#95)
 
 ### Changed
 
+- Replaced `fastp` with `chelae/trim` (CHELAE_TRIM) for adapter and quality trimming ([#112](https://github.com/fulcrumgenomics/twistcgp/pull/112))
+- Replaced `picard/collectmultiplemetrics` and `picard/collecthsmetrics` with `riker/multi` (RIKER_MULTI) for metrics collection ([#110](https://github.com/fulcrumgenomics/twistcgp/pull/110))
+- Replaced the `bwamem2/index` nf-core module with `bwamem3/index` for reference genome indexing ([#125](https://github.com/fulcrumgenomics/twistcgp/pull/125))
+- ALIGNBAM now aligns with `bwa-mem3 mem` instead of `bwa-mem2` ([#125](https://github.com/fulcrumgenomics/twistcgp/pull/125))
+- Replaced `fgbio/fastqtobam` with `fgumi/extract` (FGUMI_EXTRACT) for FASTQ to unmapped BAM conversion ([#113](https://github.com/fulcrumgenomics/twistcgp/pull/113))
+- Replaced `fgbio ZipperBams` with `fgumi zipper` in ALIGNBAM, streamed straight into sort; fgbio and its Java runtime are no longer used ([#132](https://github.com/fulcrumgenomics/twistcgp/pull/132))
+- Replaced `samtools fastq` with `fgumi fastq` in ALIGNBAM ([#131](https://github.com/fulcrumgenomics/twistcgp/pull/131))
+- Replaced `picard/markduplicates` with `fgumi dedup` in a new local DEDUPBAM module, and `samtools sort` with `fgumi sort`; samtools and picard are no longer used for alignment or duplicate marking ([#135](https://github.com/fulcrumgenomics/twistcgp/pull/135))
+- Raised the `--tmb_vaf_cutoff` default from 0.05 to 0.10, tightening TMB pre-filtering ([#84](https://github.com/fulcrumgenomics/twistcgp/pull/84))
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1

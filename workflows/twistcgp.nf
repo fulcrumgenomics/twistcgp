@@ -6,11 +6,13 @@
 include { ALIGNBAM } from '../modules/local/alignbam'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_PRE_CIVIC } from '../modules/nf-core/bcftools/view/main'
 include { BCFTOOLS_VIEW as BCFTOOLS_VIEW_POST_CIVIC } from '../modules/nf-core/bcftools/view/main'
+include { CHELAE_TRIM } from '../modules/nf-core/chelae/trim/main'
 include { CIVICPY_ANNOTATE } from '../modules/nf-core/civicpy/annotate/main'
 include { CIVICPY_UPDATE_CACHE } from '../modules/local/civicpy/update_cache/main'
-include { FASTP } from '../modules/nf-core/fastp/main'
+include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
+include { DEDUPBAM } from '../modules/local/dedupbam'
 include { FASTQC } from '../modules/nf-core/fastqc/main'
-include { FGBIO_FASTQTOBAM } from '../modules/nf-core/fgbio/fastqtobam/main'
+include { FGUMI_EXTRACT } from '../modules/nf-core/fgumi/extract/main'
 include { GATK4_CALCULATECONTAMINATION } from '../modules/nf-core/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS } from '../modules/nf-core/gatk4/filtermutectcalls/main'
 include { GATK4_GETPILEUPSUMMARIES } from '../modules/nf-core/gatk4/getpileupsummaries/main'
@@ -21,19 +23,15 @@ include { MSISENSOR2_MSI } from '../modules/nf-core/msisensor2/msi/main'
 include { MSISENSORPRO_PRO } from '../modules/nf-core/msisensorpro/pro/main'
 include { MULTIQC } from '../modules/nf-core/multiqc/main'
 include { PERBASE } from '../modules/nf-core/perbase/main'
-include { PICARD_MARKDUPLICATES } from '../modules/nf-core/picard/markduplicates'
-include { PICARD_COLLECTMULTIPLEMETRICS } from '../modules/nf-core/picard/collectmultiplemetrics'
-include { PICARD_COLLECTHSMETRICS } from '../modules/nf-core/picard/collecthsmetrics/main'
-include { PICARD_INTERVALLISTTOBED } from '../modules/local/picard/intervallisttobed'
+include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
+include { RIKER_MULTI } from '../modules/nf-core/riker/multi/main'
+include { TMB } from '../modules/local/tmb'
+include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
 include { paramsSummaryMap } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_twistcgp_pipeline'
-include { CNVKIT_BATCH } from '../modules/nf-core/cnvkit/batch/main'
-include { VCF_ANNOTATE } from '../subworkflows/local/vcf_annotate/main'
-include { TMB } from '../modules/local/tmb'
 
-include { PICARD_INTERVALLISTTOBED as BAITS_TO_BED } from '../modules/local/picard/intervallisttobed'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,7 +48,7 @@ workflow TWISTCGP {
     msi_sensor2_model_name // name of desired model directory in https://github.com/niu-lab/msisensor2.git
     adapters_fasta // optional path to adapter sequences
     pon_cnn // optional path to panel of normal reference CNN file for use with CNVkit
-    ch_bwa // channel: val(reference meta), path(bwamem2 index directory)
+    ch_bwa // channel: val(reference meta), path(bwamem3 index directory)
     ch_dict // channel: val(reference meta), path(reference .dict file)
     ch_fasta // channel: val(reference meta), path(reference FASTA file)
     ch_fasta_fai // channel: val(reference meta), path(reference .fai file)
@@ -89,39 +87,34 @@ workflow TWISTCGP {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
-    // MODULE: Run fastp
+    // MODULE: Run chelae trim
     //
-    // Always output filtered and discarded read FASTQs, never output a merged fastq
-    FASTP(ch_samplesheet, adapters_fasta, false, true, false)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTP.out.json.collect { _meta, json -> json })
-    ch_versions = ch_versions.mix(FASTP.out.versions.first())
+    CHELAE_TRIM(ch_samplesheet, adapters_fasta)
+    ch_multiqc_files = ch_multiqc_files.mix(CHELAE_TRIM.out.json.collect { _meta, json -> json })
 
     //
-    // MODULE: Run fastqtobam
+    // MODULE: Convert FASTQ to an unaligned BAM
     //
-    FGBIO_FASTQTOBAM(FASTP.out.reads)
-    ch_versions = ch_versions.mix(FGBIO_FASTQTOBAM.out.versions.first())
+    FGUMI_EXTRACT(CHELAE_TRIM.out.reads.map { meta, reads -> [meta, [reads].flatten(), meta.id] })
 
     //
     // MODULE: Run ALIGNBAM
     //
-    ALIGNBAM(FGBIO_FASTQTOBAM.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "coordinate")
-    ch_versions = ch_versions.mix(ALIGNBAM.out.versions.first())
+    ALIGNBAM(FGUMI_EXTRACT.out.bam, ch_fasta, ch_fasta_fai, ch_dict, ch_bwa, "template-coordinate")
 
     //
-    // MODULE: PICARD_MARKDUPLICATES
+    // MODULE: DEDUPBAM (mark duplicates by position; see --no-umi in modules.config)
     //
-    PICARD_MARKDUPLICATES(ALIGNBAM.out.bam, ch_fasta, ch_fasta_fai)
-    ch_bam_and_index = PICARD_MARKDUPLICATES.out.bam.join(PICARD_MARKDUPLICATES.out.bai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_MARKDUPLICATES.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_MARKDUPLICATES.out.versions.first())
+    DEDUPBAM(ALIGNBAM.out.bam)
+    ch_bam_and_index = DEDUPBAM.out.bam_bai
+    // MultiQC can't parse fgumi's metrics TSV (no sample-name column); histogram only.
+    ch_multiqc_files = ch_multiqc_files.mix(DEDUPBAM.out.histogram.collect { _meta, histogram -> histogram })
 
     //
     // MODULE: GATK4/MUTECT2
     //
     // GATK4_MUTECT2 expects just the path for each of the VCF files, no meta
-    ch_bams_and_targets = PICARD_MARKDUPLICATES.out.bam
-        .join(PICARD_MARKDUPLICATES.out.bai)
+    ch_bams_and_targets = ch_bam_and_index
         .map { meta, bam, bai -> tuple(meta, bam, bai, targets[1]) }
     GATK4_MUTECT2(
         ch_bams_and_targets,
@@ -277,7 +270,7 @@ workflow TWISTCGP {
             BAITS_TO_BED(baits)
         }
         ch_baits_bed = baits_are_bed ? baits : BAITS_TO_BED.out.bed.collect()
-        ch_cnv_bam_pair = PICARD_MARKDUPLICATES.out.bam.map { meta, bam -> tuple(meta, bam, []) }
+        ch_cnv_bam_pair = DEDUPBAM.out.bam.map { meta, bam -> tuple(meta, bam, []) }
         CNVKIT_BATCH(
             ch_cnv_bam_pair,
             ch_fasta,
@@ -323,24 +316,31 @@ workflow TWISTCGP {
 
 
     //
-    // MODULE: PICARD_COLLECTMULTIPLEMETRICS
+    // MODULE: RIKER_MULTI
     //
-    PICARD_COLLECTMULTIPLEMETRICS(ALIGNBAM.out.bam_bai, ch_fasta, ch_fasta_fai)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTMULTIPLEMETRICS.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_COLLECTMULTIPLEMETRICS.out.versions.first())
-
-    //
-    // MODULE: PICARD_COLLECTHSMETRICS
-    //
-    ch_bam_and_regions = ch_bam_and_index.map { meta, bam, bai -> tuple(meta, bam, bai, baits[1], targets[1]) }
-    PICARD_COLLECTHSMETRICS(ch_bam_and_regions, ch_fasta, ch_fasta_fai, ch_fasta_gzi, ch_dict)
-    ch_multiqc_files = ch_multiqc_files.mix(PICARD_COLLECTHSMETRICS.out.metrics.collect { _meta, metrics -> metrics })
-    ch_versions = ch_versions.mix(PICARD_COLLECTHSMETRICS.out.versions.first())
+    ch_riker_bam = ch_bam_and_index.map { meta, bam, bai ->
+        tuple(meta, bam, bai, [], [], [], [], baits[1], targets[1], [], [], [])
+    }
+    RIKER_MULTI(
+        ch_riker_bam,
+        ch_fasta.join(ch_fasta_fai).first(),
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(
+        RIKER_MULTI.out.alignment_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.base_dist.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.mean_qual.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.qual_dist.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.gcbias_detail.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.gcbias_summary.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.isize_metrics.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.isize_histogram.collect { _meta, metric -> metric },
+        RIKER_MULTI.out.hybcap_metrics.collect { _meta, metric -> metric },
+    )
 
     //
     // MODULE: PERBASE
     //
-    PERBASE(ALIGNBAM.out.bam_bai, ch_fasta.join(ch_fasta_fai).first())
+    PERBASE(ch_bam_and_index, ch_fasta.join(ch_fasta_fai).first())
     ch_versions = ch_versions.mix(PERBASE.out.versions.first())
 
     //
@@ -374,17 +374,6 @@ workflow TWISTCGP {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config = channel.fromPath(
-        "${projectDir}/assets/multiqc_config.yml",
-        checkIfExists: true,
-    )
-    ch_multiqc_custom_config = multiqc_config
-        ? channel.fromPath(multiqc_config, checkIfExists: true)
-        : channel.empty()
-    ch_multiqc_logo = multiqc_logo
-        ? channel.fromPath(multiqc_logo, checkIfExists: true)
-        : channel.empty()
-
     summary_params = paramsSummaryMap(
         workflow,
         parameters_schema: "nextflow_schema.json",
@@ -396,16 +385,23 @@ workflow TWISTCGP {
 
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
 
+    def multiqc_config_files = multiqc_config
+        ? [file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true), file(multiqc_config, checkIfExists: true)]
+        : file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true)
     MULTIQC(
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList(),
-        [],
-        [],
+        ch_multiqc_files.flatten().collect().map { files ->
+            [
+                [id: 'twistcgp'],
+                files,
+                multiqc_config_files,
+                multiqc_logo ? file(multiqc_logo, checkIfExists: true) : [],
+                [],
+                [],
+            ]
+        }
     )
 
     emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions = ch_versions // channel: [ path(versions.yml) ]
 }
