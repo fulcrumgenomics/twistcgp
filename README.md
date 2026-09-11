@@ -170,19 +170,6 @@ For details on how to generate this file see [docs/cnvkit_pon.md](/docs/cnvkit_p
 
 </details>
 
-<details> <summary>Generate a gnomAD VCF for TMB Calculation</summary>
-
-Tumor mutational burden (TMB) is measure of the total number of somatic mutations present within the cancer genome.
-It is crucial to exclude germline variants for the calculation of TMB.
-This pipeline expects a VCF derived from [gnomAD](https://gnomad.broadinstitute.org/).
-
-The gnomAD VCF can be supplied to the pipeline using the `--gnomad_vcf` parameter.
-Its corresponding TBI file can be supplied using the `--gnomad_tbi` parameter.
-
-See [docs/gnomad_vcf.md](/docs/gnomad_vcf.md) for details on how to generate a gnomAD VCF.
-
-</details>
-
 <details> <summary>TMB Pre-filtering Options</summary>
 
 Prior to TMB calculation, annotated variants are filtered in two `bcftools view` steps:
@@ -260,9 +247,7 @@ nextflow run twistcgp/main.nf \
    --population_germline_tbi resources/af-only-gnomad.hg38.vcf.gz.tbi \
    --pon_vcf resources/1000g_pon.hg38.vcf.gz \
    --pon_tbi resources/1000g_pon.hg38.vcf.gz.tbi \
-   --pon_cnn resources/pon.cnn \
-   --gnomad_vcf resources/all_chromosomes.intersect.vcf.bgz \
-   --gnomad_tbi resources/all_chromosomes.intersect.vcf.bgz.tbi
+   --pon_cnn resources/pon.cnn
 ```
 
 > [!WARNING]
