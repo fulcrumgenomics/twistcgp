@@ -1,5 +1,2 @@
 sample,fastq_1,fastq_2
-ILLUMINA_PAIRED_END,assets/test-data/fastq/Illumina_TestReads_R1_001.fastq.gz,assets/test-data/fastq/Illumina_TestReads_R2_001.fastq.gz
-ILLUMINA_SINGLE_END,assets/test-data/fastq/Illumina_TestReads_R1_001.fastq.gz
-MGI_PAIRED_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz,assets/test-data/fastq/MGI_TestReads_2.fq.gz
-MGI_SINGLE_END,assets/test-data/fastq/MGI_TestReads_1.fq.gz
+test,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/fastq/test_1.fastq.gz,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/fastq/test_2.fastq.gz

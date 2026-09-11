@@ -5,8 +5,31 @@ multiqc/multiqc_data/multiqc.log
 multiqc/multiqc_data/multiqc_data.json
 multiqc/multiqc_data/multiqc_sources.txt
 multiqc/multiqc_data/multiqc_software_versions.txt
-multiqc/multiqc_data/llms-full.txt
 multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 fastqc/*_fastqc.{html,zip}
 pipeline_info/*.{html,json,txt,yml}
+**/*.vcf.gz
+**/*.vcf.gz.tbi
+**/*.fastq.gz
+**/*.tsv.gz
+**/*.tar.gz
+**/*.bam
+**/*.bai
+# annotation report files embed run timestamps (non-deterministic content)
+**/snpEff_summary.html
+**/*.snpeff.csv
+**/*_summary.html
+# reports / metrics / plots that embed timestamps or are non-reproducible binaries
+**/*.pdf
+**/*.coverage_metrics
+**/*.MarkDuplicates.metrics.txt
+**/*.fastp.html
+**/*.fastp.log
+**/*.log
+**/*_fastqc.zip
+**/*_fastqc.html
+multiqc/multiqc_data/llms-full.txt
+# MultiQC aggregated data tables embed run metadata / vary run-to-run (presence still
+# checked via the file listing); exclude their content from the reproducible md5 set
+multiqc/multiqc_data/*.txt

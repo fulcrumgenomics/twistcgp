@@ -1,0 +1,44 @@
+nextflow_workflow {
+
+    name "Test subworkflow VCF_ANNOTATE"
+    script "../main.nf"
+    workflow "VCF_ANNOTATE"
+    config "./nextflow.config"
+    tag "subworkflows_local"
+    tag "vcf_annotate"
+
+    test("hotspots - snpeff + vep annotate real variants") {
+        when {
+            workflow {
+                """
+                // small fixture of canonical cancer hotspots at real GRCh38 coords
+                // (BRAF V600E, KRAS G12D, PIK3CA E545K, TP53 R175H) so SnpEff + VEP
+                // annotate real records — the empty Mutect2 VCF from the plumbing run
+                // cannot exercise this path.
+                input[0] = Channel.of([ [id:'test'], file("\$projectDir/assets/test-data/hotspots.vcf.gz", checkIfExists: true) ])
+                input[1] = Channel.value([ [id:'fasta'], [] ])
+                input[2] = Channel.value([ [id:'GRCh38.105'], 'GRCh38.105' ])
+                input[3] = Channel.value([ [id:'114_GRCh38'], 'GRCh38', 'homo_sapiens', '114' ])
+                input[4] = Channel.value([ [id:'snpeff_cache'], file("\$projectDir/assets/test-data/snpeff_cache", checkIfExists: true) ])
+                input[5] = Channel.value([ [id:'vep_cache'], file("\$projectDir/assets/test-data/vep_cache", checkIfExists: true) ])
+                input[6] = []
+                """
+            }
+        }
+        then {
+            // The annotated VCF is bgzipped and non-deterministic at the byte level
+            // (VEP embeds a version/time header), so assert on decompressed CONTENT:
+            // every hotspot gene must appear in the VEP CSQ.
+            def vepVcf = workflow.out.vcf_ann.get(0).get(1)
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf_ann.size() == 1 },
+                { assert path(vepVcf).linesGzip.findAll { it.contains('CSQ=') }.size() == 4 },
+                { assert path(vepVcf).linesGzip.any { it.contains('BRAF')   && it.contains('missense_variant') } },
+                { assert path(vepVcf).linesGzip.any { it.contains('KRAS')   && it.contains('missense_variant') } },
+                { assert path(vepVcf).linesGzip.any { it.contains('PIK3CA') && it.contains('missense_variant') } },
+                { assert path(vepVcf).linesGzip.any { it.contains('TP53')   && it.contains('missense_variant') } },
+            )
+        }
+    }
+}

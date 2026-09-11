@@ -253,6 +253,10 @@ nextflow run twistcgp/main.nf \
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
 
+## Testing
+
+The pipeline ships an [nf-test](https://www.nf-test.com/) integration suite that runs entirely from small fixtures committed under [`assets/test-data/`](/assets/test-data), so it needs no external caches or reference data. Several of those fixtures are synthetic or trimmed from real resources; see [docs/testing.md](/docs/testing.md) for what each custom file is and how to regenerate it.
+
 ## Contributing
 
 If you're interested in contributing, please read our [contributing guide](docs/CONTRIBUTING.md).

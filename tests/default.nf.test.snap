@@ -1,0 +1,670 @@
+{
+    "vep_cache_dir": {
+        "content": [
+            {
+                "ALIGNBAM": {
+                    "bwamem2": "2.2.1",
+                    "fgbio": "2.5.21",
+                    "samtools": 1.21
+                },
+                "BWAMEM2_INDEX": {
+                    "bwamem2": "2.2.1"
+                },
+                "CNVKIT_BATCH": {
+                    "cnvkit": "0.9.10"
+                },
+                "FASTP": {
+                    "fastp": "0.24.0"
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FGBIO_FASTQTOBAM": {
+                    "fgbio": "2.4.0"
+                },
+                "GATK4_FILTERMUTECTCALLS": {
+                    "gatk4": "4.6.1.0"
+                },
+                "GATK4_LEARNREADORIENTATIONMODEL": {
+                    "gatk4": "4.6.2.0"
+                },
+                "GATK4_MUTECT2": {
+                    "gatk4": "4.6.1.0"
+                },
+                "PICARD_COLLECTHSMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_COLLECTMULTIPLEMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_MARKDUPLICATES": {
+                    "picard": "3.4.0"
+                },
+                "SNPEFF_SNPEFF": {
+                    "snpeff": "5.3a"
+                },
+                "Workflow": {
+                    "fulcrumgenomics/twistcgp": "v1.1.0dev"
+                }
+            },
+            [
+                "baits",
+                "baits/baits.bed",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/consequences_all__plot_Coding_consequences.txt",
+                "multiqc/multiqc_data/consequences_all__plot_Consequences_most_severe_.txt",
+                "multiqc/multiqc_data/fastp-insert-size-plot.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp_filtered_reads_plot.txt",
+                "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
+                "multiqc/multiqc_data/fastqc_adapter_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_counts_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_fastp.txt",
+                "multiqc/multiqc_data/multiqc_fastqc.txt",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_picard_AlignmentSummaryMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_HsMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_QualityYieldMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_baseContent.txt",
+                "multiqc/multiqc_data/multiqc_picard_dups.txt",
+                "multiqc/multiqc_data/multiqc_picard_gcbias.txt",
+                "multiqc/multiqc_data/multiqc_picard_insertSize.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/picard_MarkIlluminaAdapters_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram_1.txt",
+                "multiqc/multiqc_data/picard_QualityScoreDistribution_histogram.txt",
+                "multiqc/multiqc_data/picard_alignment_readlength_plot.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Bases.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Reads.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Adenine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Cytosine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Guanine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Thymine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Undetermined.txt",
+                "multiqc/multiqc_data/picard_deduplication.txt",
+                "multiqc/multiqc_data/picard_gcbias_plot.txt",
+                "multiqc/multiqc_data/picard_hsmetrics_table.txt",
+                "multiqc/multiqc_data/picard_insert_size_Counts.txt",
+                "multiqc/multiqc_data/picard_insert_size_Percentages.txt",
+                "multiqc/multiqc_data/picard_percentage_target_bases.txt",
+                "multiqc/multiqc_data/picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/variant_classes_plot.txt",
+                "multiqc/multiqc_data/variants_by_chromosome_plot.txt",
+                "multiqc/multiqc_data/vep-general-stats.txt",
+                "multiqc/multiqc_data/vep.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/twistcgp_software_mqc_versions.yml",
+                "test",
+                "test/baits.antitarget.bed",
+                "test/baits.target.bed",
+                "test/reference.cnn",
+                "test/snpEff_summary.html",
+                "test/test.CollectHsMetrics.coverage_metrics",
+                "test/test.CollectHsMetrics.per_target_metrics",
+                "test/test.CollectMultipleMetrics.base_distribution_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.gc_bias.pdf",
+                "test/test.CollectMultipleMetrics.insert_size_histogram.pdf",
+                "test/test.CollectMultipleMetrics.quality_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.quality_distribution.pdf",
+                "test/test.CollectMultipleMetrics.read_length_histogram.pdf",
+                "test/test.MarkDuplicates.metrics.txt",
+                "test/test.bam",
+                "test/test.f1r2.tar.gz",
+                "test/test.fastp.html",
+                "test/test.fastp.json",
+                "test/test.fastp.log",
+                "test/test.labeled.vcf.gz",
+                "test/test.labeled.vcf.gz.filteringStats.tsv",
+                "test/test.labeled.vcf.gz.tbi",
+                "test/test.mapped.bam",
+                "test/test.mapped.bam.bai",
+                "test/test.mapped.dup_marked.antitargetcoverage.cnn",
+                "test/test.mapped.dup_marked.bai",
+                "test/test.mapped.dup_marked.bam",
+                "test/test.mapped.dup_marked.bintest.cns",
+                "test/test.mapped.dup_marked.call.cns",
+                "test/test.mapped.dup_marked.cnr",
+                "test/test.mapped.dup_marked.cns",
+                "test/test.mapped.dup_marked.targetcoverage.cnn",
+                "test/test.paired.fail.fastq.gz",
+                "test/test.read_orientations.tar.gz",
+                "test/test.snpeff.csv",
+                "test/test.snpeff.genes.txt",
+                "test/test.snpeff.vcf.gz",
+                "test/test.snpeff.vcf.gz.tbi",
+                "test/test.vcf.gz",
+                "test/test.vcf.gz.stats",
+                "test/test.vcf.gz.tbi",
+                "test/test.vep.vcf.gz",
+                "test/test.vep.vcf.gz.tbi",
+                "test/test.vep.vcf.gz_summary.html",
+                "test/test_1.fail.fastq.gz",
+                "test/test_1.fastp.fastq.gz",
+                "test/test_1_fastqc.html",
+                "test/test_1_fastqc.zip",
+                "test/test_2.fail.fastq.gz",
+                "test/test_2.fastp.fastq.gz",
+                "test/test_2_fastqc.html",
+                "test/test_2_fastqc.zip"
+            ],
+            [
+                "baits.bed:md5,9046675d01199fbbee79f2bc1c5dce52",
+                "baits.antitarget.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                "baits.target.bed:md5,c51a2c66a976029571f53075e0fbe7d0",
+                "reference.cnn:md5,f2f451c5e57ca2a7f0c2133e770c9e92",
+                "test.CollectHsMetrics.per_target_metrics:md5,c263916cf167df9af5060cebfbd50c1a",
+                "test.fastp.json:md5,84ce51b96dc1f1b5da4dd693ef11b315",
+                "test.labeled.vcf.gz.filteringStats.tsv:md5,52716e3ec003c3f3e8e8a2c245106df1",
+                "test.mapped.dup_marked.antitargetcoverage.cnn:md5,203caf8cef6935bb50b4138097955cb8",
+                "test.mapped.dup_marked.bintest.cns:md5,bd0738a0477028e3778b1e67c9c2867b",
+                "test.mapped.dup_marked.call.cns:md5,b628e17c63c3f39f8f7c546521214171",
+                "test.mapped.dup_marked.cnr:md5,a79eb3b41c4a1f97117735383f3f701a",
+                "test.mapped.dup_marked.cns:md5,38246d6b97ce3d0b53b4212bc244d4fc",
+                "test.mapped.dup_marked.targetcoverage.cnn:md5,809d6f82780f9cd0ec9b0fb7d3c36658",
+                "test.snpeff.genes.txt:md5,130536bf0237d7f3f746d32aaa32840a",
+                "test.vcf.gz.stats:md5,5a28dcacee9317836ceb9e4b2d926c39"
+            ],
+            [
+                [
+                    "test.bam",
+                    "f62ffff8845cb5a4e61c349064a61843"
+                ],
+                [
+                    "test.mapped.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ],
+                [
+                    "test.mapped.dup_marked.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ]
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.2"
+        },
+        "timestamp": "2026-08-18T18:08:51.874742"
+    },
+    "straight_run": {
+        "content": [
+            {
+                "ALIGNBAM": {
+                    "bwamem2": "2.2.1",
+                    "fgbio": "2.5.21",
+                    "samtools": 1.21
+                },
+                "BWAMEM2_INDEX": {
+                    "bwamem2": "2.2.1"
+                },
+                "CNVKIT_BATCH": {
+                    "cnvkit": "0.9.10"
+                },
+                "FASTP": {
+                    "fastp": "0.24.0"
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FGBIO_FASTQTOBAM": {
+                    "fgbio": "2.4.0"
+                },
+                "GATK4_FILTERMUTECTCALLS": {
+                    "gatk4": "4.6.1.0"
+                },
+                "GATK4_LEARNREADORIENTATIONMODEL": {
+                    "gatk4": "4.6.2.0"
+                },
+                "GATK4_MUTECT2": {
+                    "gatk4": "4.6.1.0"
+                },
+                "PICARD_COLLECTHSMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_COLLECTMULTIPLEMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_MARKDUPLICATES": {
+                    "picard": "3.4.0"
+                },
+                "SNPEFF_SNPEFF": {
+                    "snpeff": "5.3a"
+                },
+                "Workflow": {
+                    "fulcrumgenomics/twistcgp": "v1.1.0dev"
+                }
+            },
+            [
+                "baits",
+                "baits/baits.bed",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/consequences_all__plot_Coding_consequences.txt",
+                "multiqc/multiqc_data/consequences_all__plot_Consequences_most_severe_.txt",
+                "multiqc/multiqc_data/fastp-insert-size-plot.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp_filtered_reads_plot.txt",
+                "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
+                "multiqc/multiqc_data/fastqc_adapter_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_counts_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_fastp.txt",
+                "multiqc/multiqc_data/multiqc_fastqc.txt",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_picard_AlignmentSummaryMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_HsMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_QualityYieldMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_baseContent.txt",
+                "multiqc/multiqc_data/multiqc_picard_dups.txt",
+                "multiqc/multiqc_data/multiqc_picard_gcbias.txt",
+                "multiqc/multiqc_data/multiqc_picard_insertSize.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/picard_MarkIlluminaAdapters_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram_1.txt",
+                "multiqc/multiqc_data/picard_QualityScoreDistribution_histogram.txt",
+                "multiqc/multiqc_data/picard_alignment_readlength_plot.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Bases.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Reads.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Adenine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Cytosine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Guanine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Thymine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Undetermined.txt",
+                "multiqc/multiqc_data/picard_deduplication.txt",
+                "multiqc/multiqc_data/picard_gcbias_plot.txt",
+                "multiqc/multiqc_data/picard_hsmetrics_table.txt",
+                "multiqc/multiqc_data/picard_insert_size_Counts.txt",
+                "multiqc/multiqc_data/picard_insert_size_Percentages.txt",
+                "multiqc/multiqc_data/picard_percentage_target_bases.txt",
+                "multiqc/multiqc_data/picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/variant_classes_plot.txt",
+                "multiqc/multiqc_data/variants_by_chromosome_plot.txt",
+                "multiqc/multiqc_data/vep-general-stats.txt",
+                "multiqc/multiqc_data/vep.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/twistcgp_software_mqc_versions.yml",
+                "test",
+                "test/baits.antitarget.bed",
+                "test/baits.target.bed",
+                "test/reference.cnn",
+                "test/snpEff_summary.html",
+                "test/test.CollectHsMetrics.coverage_metrics",
+                "test/test.CollectHsMetrics.per_target_metrics",
+                "test/test.CollectMultipleMetrics.base_distribution_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.gc_bias.pdf",
+                "test/test.CollectMultipleMetrics.insert_size_histogram.pdf",
+                "test/test.CollectMultipleMetrics.quality_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.quality_distribution.pdf",
+                "test/test.CollectMultipleMetrics.read_length_histogram.pdf",
+                "test/test.MarkDuplicates.metrics.txt",
+                "test/test.bam",
+                "test/test.f1r2.tar.gz",
+                "test/test.fastp.html",
+                "test/test.fastp.json",
+                "test/test.fastp.log",
+                "test/test.labeled.vcf.gz",
+                "test/test.labeled.vcf.gz.filteringStats.tsv",
+                "test/test.labeled.vcf.gz.tbi",
+                "test/test.mapped.bam",
+                "test/test.mapped.bam.bai",
+                "test/test.mapped.dup_marked.antitargetcoverage.cnn",
+                "test/test.mapped.dup_marked.bai",
+                "test/test.mapped.dup_marked.bam",
+                "test/test.mapped.dup_marked.bintest.cns",
+                "test/test.mapped.dup_marked.call.cns",
+                "test/test.mapped.dup_marked.cnr",
+                "test/test.mapped.dup_marked.cns",
+                "test/test.mapped.dup_marked.targetcoverage.cnn",
+                "test/test.paired.fail.fastq.gz",
+                "test/test.read_orientations.tar.gz",
+                "test/test.snpeff.csv",
+                "test/test.snpeff.genes.txt",
+                "test/test.snpeff.vcf.gz",
+                "test/test.snpeff.vcf.gz.tbi",
+                "test/test.vcf.gz",
+                "test/test.vcf.gz.stats",
+                "test/test.vcf.gz.tbi",
+                "test/test.vep.vcf.gz",
+                "test/test.vep.vcf.gz.tbi",
+                "test/test.vep.vcf.gz_summary.html",
+                "test/test_1.fail.fastq.gz",
+                "test/test_1.fastp.fastq.gz",
+                "test/test_1_fastqc.html",
+                "test/test_1_fastqc.zip",
+                "test/test_2.fail.fastq.gz",
+                "test/test_2.fastp.fastq.gz",
+                "test/test_2_fastqc.html",
+                "test/test_2_fastqc.zip"
+            ],
+            [
+                "baits.bed:md5,9046675d01199fbbee79f2bc1c5dce52",
+                "baits.antitarget.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                "baits.target.bed:md5,c51a2c66a976029571f53075e0fbe7d0",
+                "reference.cnn:md5,f2f451c5e57ca2a7f0c2133e770c9e92",
+                "test.CollectHsMetrics.per_target_metrics:md5,c263916cf167df9af5060cebfbd50c1a",
+                "test.fastp.json:md5,84ce51b96dc1f1b5da4dd693ef11b315",
+                "test.labeled.vcf.gz.filteringStats.tsv:md5,52716e3ec003c3f3e8e8a2c245106df1",
+                "test.mapped.dup_marked.antitargetcoverage.cnn:md5,203caf8cef6935bb50b4138097955cb8",
+                "test.mapped.dup_marked.bintest.cns:md5,bd0738a0477028e3778b1e67c9c2867b",
+                "test.mapped.dup_marked.call.cns:md5,b628e17c63c3f39f8f7c546521214171",
+                "test.mapped.dup_marked.cnr:md5,a79eb3b41c4a1f97117735383f3f701a",
+                "test.mapped.dup_marked.cns:md5,38246d6b97ce3d0b53b4212bc244d4fc",
+                "test.mapped.dup_marked.targetcoverage.cnn:md5,809d6f82780f9cd0ec9b0fb7d3c36658",
+                "test.snpeff.genes.txt:md5,130536bf0237d7f3f746d32aaa32840a",
+                "test.vcf.gz.stats:md5,5a28dcacee9317836ceb9e4b2d926c39"
+            ],
+            [
+                [
+                    "test.bam",
+                    "f62ffff8845cb5a4e61c349064a61843"
+                ],
+                [
+                    "test.mapped.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ],
+                [
+                    "test.mapped.dup_marked.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ]
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.2"
+        },
+        "timestamp": "2026-08-18T18:02:41.158096"
+    },
+    "tmb_only": {
+        "content": [
+            {
+                "ALIGNBAM": {
+                    "bwamem2": "2.2.1",
+                    "fgbio": "2.5.21",
+                    "samtools": 1.21
+                },
+                "BCFTOOLS_VIEW_PRE_CIVIC": {
+                    "bcftools": 1.22
+                },
+                "BWAMEM2_INDEX": {
+                    "bwamem2": "2.2.1"
+                },
+                "CNVKIT_BATCH": {
+                    "cnvkit": "0.9.10"
+                },
+                "FASTP": {
+                    "fastp": "0.24.0"
+                },
+                "FASTQC": {
+                    "fastqc": "0.12.1"
+                },
+                "FGBIO_FASTQTOBAM": {
+                    "fgbio": "2.4.0"
+                },
+                "GATK4_FILTERMUTECTCALLS": {
+                    "gatk4": "4.6.1.0"
+                },
+                "GATK4_LEARNREADORIENTATIONMODEL": {
+                    "gatk4": "4.6.2.0"
+                },
+                "GATK4_MUTECT2": {
+                    "gatk4": "4.6.1.0"
+                },
+                "PICARD_COLLECTHSMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_COLLECTMULTIPLEMETRICS": {
+                    "picard": "3.3.0"
+                },
+                "PICARD_MARKDUPLICATES": {
+                    "picard": "3.4.0"
+                },
+                "SNPEFF_SNPEFF": {
+                    "snpeff": "5.3a"
+                },
+                "TMB_PYTMB": {
+                    "tmb": "pyTMB.py 1.5.0"
+                },
+                "Workflow": {
+                    "fulcrumgenomics/twistcgp": "v1.1.0dev"
+                }
+            },
+            [
+                "baits",
+                "baits/baits.bed",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/consequences_all__plot_Coding_consequences.txt",
+                "multiqc/multiqc_data/consequences_all__plot_Consequences_most_severe_.txt",
+                "multiqc/multiqc_data/fastp-insert-size-plot.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-content-n-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_After_filtering.txt",
+                "multiqc/multiqc_data/fastp-seq-quality-plot_Read_2_Before_filtering.txt",
+                "multiqc/multiqc_data/fastp_filtered_reads_plot.txt",
+                "multiqc/multiqc_data/fastqc-status-check-heatmap.txt",
+                "multiqc/multiqc_data/fastqc_adapter_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt",
+                "multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_counts_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt",
+                "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_fastp.txt",
+                "multiqc/multiqc_data/multiqc_fastqc.txt",
+                "multiqc/multiqc_data/multiqc_general_stats.txt",
+                "multiqc/multiqc_data/multiqc_picard_AlignmentSummaryMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_HsMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_QualityYieldMetrics.txt",
+                "multiqc/multiqc_data/multiqc_picard_baseContent.txt",
+                "multiqc/multiqc_data/multiqc_picard_dups.txt",
+                "multiqc/multiqc_data/multiqc_picard_gcbias.txt",
+                "multiqc/multiqc_data/multiqc_picard_insertSize.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/multiqc_picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_data/picard_MarkIlluminaAdapters_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram.txt",
+                "multiqc/multiqc_data/picard_MeanQualityByCycle_histogram_1.txt",
+                "multiqc/multiqc_data/picard_QualityScoreDistribution_histogram.txt",
+                "multiqc/multiqc_data/picard_alignment_readlength_plot.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Bases.txt",
+                "multiqc/multiqc_data/picard_alignment_summary_Aligned_Reads.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Adenine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Cytosine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Guanine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Thymine.txt",
+                "multiqc/multiqc_data/picard_base_distribution_by_cycle__Undetermined.txt",
+                "multiqc/multiqc_data/picard_deduplication.txt",
+                "multiqc/multiqc_data/picard_gcbias_plot.txt",
+                "multiqc/multiqc_data/picard_hsmetrics_table.txt",
+                "multiqc/multiqc_data/picard_insert_size_Counts.txt",
+                "multiqc/multiqc_data/picard_insert_size_Percentages.txt",
+                "multiqc/multiqc_data/picard_percentage_target_bases.txt",
+                "multiqc/multiqc_data/picard_quality_by_cycle.txt",
+                "multiqc/multiqc_data/picard_quality_score_distribution.txt",
+                "multiqc/multiqc_data/variant_classes_plot.txt",
+                "multiqc/multiqc_data/variants_by_chromosome_plot.txt",
+                "multiqc/multiqc_data/vep-general-stats.txt",
+                "multiqc/multiqc_data/vep.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/twistcgp_software_mqc_versions.yml",
+                "test",
+                "test/baits.antitarget.bed",
+                "test/baits.target.bed",
+                "test/reference.cnn",
+                "test/snpEff_summary.html",
+                "test/test.CollectHsMetrics.coverage_metrics",
+                "test/test.CollectHsMetrics.per_target_metrics",
+                "test/test.CollectMultipleMetrics.base_distribution_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.gc_bias.pdf",
+                "test/test.CollectMultipleMetrics.insert_size_histogram.pdf",
+                "test/test.CollectMultipleMetrics.quality_by_cycle.pdf",
+                "test/test.CollectMultipleMetrics.quality_distribution.pdf",
+                "test/test.CollectMultipleMetrics.read_length_histogram.pdf",
+                "test/test.MarkDuplicates.metrics.txt",
+                "test/test.bam",
+                "test/test.f1r2.tar.gz",
+                "test/test.fastp.html",
+                "test/test.fastp.json",
+                "test/test.fastp.log",
+                "test/test.labeled.vcf.gz",
+                "test/test.labeled.vcf.gz.filteringStats.tsv",
+                "test/test.labeled.vcf.gz.tbi",
+                "test/test.log",
+                "test/test.mapped.bam",
+                "test/test.mapped.bam.bai",
+                "test/test.mapped.dup_marked.antitargetcoverage.cnn",
+                "test/test.mapped.dup_marked.bai",
+                "test/test.mapped.dup_marked.bam",
+                "test/test.mapped.dup_marked.bintest.cns",
+                "test/test.mapped.dup_marked.call.cns",
+                "test/test.mapped.dup_marked.cnr",
+                "test/test.mapped.dup_marked.cns",
+                "test/test.mapped.dup_marked.targetcoverage.cnn",
+                "test/test.paired.fail.fastq.gz",
+                "test/test.pre_civic_filtered_export.vcf.gz",
+                "test/test.read_orientations.tar.gz",
+                "test/test.snpeff.csv",
+                "test/test.snpeff.genes.txt",
+                "test/test.snpeff.vcf.gz",
+                "test/test.snpeff.vcf.gz.tbi",
+                "test/test.vcf.gz",
+                "test/test.vcf.gz.stats",
+                "test/test.vcf.gz.tbi",
+                "test/test.vep.vcf.gz",
+                "test/test.vep.vcf.gz.tbi",
+                "test/test.vep.vcf.gz_summary.html",
+                "test/test_1.fail.fastq.gz",
+                "test/test_1.fastp.fastq.gz",
+                "test/test_1_fastqc.html",
+                "test/test_1_fastqc.zip",
+                "test/test_2.fail.fastq.gz",
+                "test/test_2.fastp.fastq.gz",
+                "test/test_2_fastqc.html",
+                "test/test_2_fastqc.zip"
+            ],
+            [
+                "baits.bed:md5,9046675d01199fbbee79f2bc1c5dce52",
+                "baits.antitarget.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                "baits.target.bed:md5,c51a2c66a976029571f53075e0fbe7d0",
+                "reference.cnn:md5,f2f451c5e57ca2a7f0c2133e770c9e92",
+                "test.CollectHsMetrics.per_target_metrics:md5,c263916cf167df9af5060cebfbd50c1a",
+                "test.fastp.json:md5,84ce51b96dc1f1b5da4dd693ef11b315",
+                "test.labeled.vcf.gz.filteringStats.tsv:md5,52716e3ec003c3f3e8e8a2c245106df1",
+                "test.mapped.dup_marked.antitargetcoverage.cnn:md5,203caf8cef6935bb50b4138097955cb8",
+                "test.mapped.dup_marked.bintest.cns:md5,bd0738a0477028e3778b1e67c9c2867b",
+                "test.mapped.dup_marked.call.cns:md5,b628e17c63c3f39f8f7c546521214171",
+                "test.mapped.dup_marked.cnr:md5,a79eb3b41c4a1f97117735383f3f701a",
+                "test.mapped.dup_marked.cns:md5,38246d6b97ce3d0b53b4212bc244d4fc",
+                "test.mapped.dup_marked.targetcoverage.cnn:md5,809d6f82780f9cd0ec9b0fb7d3c36658",
+                "test.snpeff.genes.txt:md5,130536bf0237d7f3f746d32aaa32840a",
+                "test.vcf.gz.stats:md5,5a28dcacee9317836ceb9e4b2d926c39"
+            ],
+            [
+                [
+                    "test.bam",
+                    "f62ffff8845cb5a4e61c349064a61843"
+                ],
+                [
+                    "test.mapped.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ],
+                [
+                    "test.mapped.dup_marked.bam",
+                    "e4cc3893fe45af557955d095aba3adea"
+                ]
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.2"
+        },
+        "timestamp": "2026-08-18T18:14:51.855014"
+    }
+}

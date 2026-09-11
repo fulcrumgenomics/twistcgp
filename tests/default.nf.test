@@ -1,20 +1,125 @@
 nextflow_pipeline {
 
-    name "Test Help"
+    name "Test pipeline"
     script "../main.nf"
+    tag "pipeline"
 
-    test("Should print help message") {
+    // Use the committed annotation caches (VEP subset + throwaway SnpEff DB under
+    // assets/test-data/) instead of conf/test.config's empty VEP stub + heavy S3
+    // SnpEff cache. Keeps every scenario CI-portable with no external cache deps.
+    config "../conf/test_annotation.config"
 
-        when {
-            params {
-                help = true
-            }
-        }
-
-        then {
-            assert workflow.success
-        }
-
+    def getStandardAssertionData = { String outputDir ->
+        def stable_name = getAllFilesFromDir(
+            outputDir,
+            relative: true,
+            includeDir: true,
+            ignore: [
+                'pipeline_info/*.{html,json,txt}',
+                // MultiQC renders these plot files only where its plotting backend
+                // works (amd64 CI), not under local arm64 emulation; the pdf/png/svg
+                // dirs themselves are listed, their contents excluded (also .nftignore'd).
+                'multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}',
+            ]
+        )
+        def stable_path = getAllFilesFromDir(
+            outputDir,
+            ignoreFile: 'tests/.nftignore'
+        )
+        def bam_files = getAllFilesFromDir(outputDir, relative: false, includeDir: false)
+            .findAll { it.toString().endsWith('.bam') }
+        return [
+            removeNextflowVersion("${outputDir}/pipeline_info/twistcgp_software_mqc_versions.yml"),
+            stable_name,
+            stable_path,
+            bam_files.collect { file -> [new File(file.toString()).name, bam(file.toString()).getReadsMD5()] },
+        ]
     }
 
+    // params is a closure receiving projectDir so local-file paths are resolved
+    // inside when{} where projectDir is in scope, not at suite-parse time.
+    // Feature flags (expectTmb, expectCivicpy, expectCnv, expectMsi) drive the
+    // presence/absence assertions in then{} and must match the effective params.
+    def testScenarios = [
+        // straight run: no optional params given
+        [
+            name         : "straight_run",
+            params       : { dir -> [:] },
+            expectTmb    : false,
+            expectCivicpy: false,
+            expectCnv    : true,
+            expectMsi    : false,
+        ],
+        // VEP cache: supplied as a pre-extracted directory (committed subset)
+        [
+            name         : "vep_cache_dir",
+            params       : { dir -> [
+                ensemblvep_cache:         "${dir}/assets/test-data/vep_cache",
+                ensemblvep_cache_version: '114',
+            ]},
+            expectTmb    : false,
+            expectCivicpy: false,
+            expectCnv    : true,
+            expectMsi    : false,
+        ],
+        // TMB only: exercises BCFTOOLS_VIEW → TMB; bcftools reads VEP output directly (no CIVICpy)
+        [
+            name         : "tmb_only",
+            params       : { dir -> [
+                skip_tmb    : false,
+                skip_civicpy: true,
+            ]},
+            expectTmb    : true,
+            expectCivicpy: false,
+            expectCnv    : true,
+            expectMsi    : false,
+        ],
+        // NB: civicpy_only / tmb_with_civicpy (CIViCpy update is unrunnable in the test
+        // environment) and msi_msisensor2 (msisensor2 segfaults on the chr21 test data)
+        // are intentionally omitted — see docs; run those paths manually against real data.
+        // skip_cnv and cnv_with_bed_baits are deferred until their snapshots can be
+        // recorded on native amd64 (they stall under local arm64 emulation) — see docs.
+    ]
+
+    testScenarios.each { scenario ->
+        test(scenario.name) {
+            tag scenario.name
+            when {
+                params {
+                    outdir = "$outputDir"
+                    scenario.params(projectDir).each { key, value ->
+                        delegate."$key" = value
+                    }
+                }
+            }
+            then {
+                def oDir = params.outdir
+                def sid  = "test"   // sample ID from assets/test-data/samplesheet.csv
+                assertAll(
+                    { assert workflow.success },
+                    { assert snapshot(*getStandardAssertionData(oDir)).match(scenario.name) },
+                    // TMB: log file is published by TMB_PYTMB (nf-core), named <id>.log
+                    { assert scenario.expectTmb
+                          ? new File("${oDir}/${sid}/${sid}.log").exists()
+                          : !new File("${oDir}/${sid}/${sid}.log").exists() },
+                    // CIVICpy: uncompressed VCF published by CIVICPY_ANNOTATE_VCF
+                    { assert scenario.expectCivicpy
+                          ? new File("${oDir}/${sid}/${sid}.civic.vcf").exists()
+                          : !new File("${oDir}/${sid}/${sid}.civic.vcf").exists() },
+                    // civic.vcf.gz: only produced by TABIX_BGZIPTABIX when both TMB and CIVICpy run
+                    { assert (scenario.expectCivicpy && scenario.expectTmb)
+                          ? new File("${oDir}/${sid}/${sid}.civic.vcf.gz").exists()
+                          : !new File("${oDir}/${sid}/${sid}.civic.vcf.gz").exists() },
+                    // CNV: cnr file is a representative CNVKIT_BATCH output
+                    { assert scenario.expectCnv
+                          ? new File("${oDir}/${sid}/${sid}.mapped.dup_marked.cnr").exists()
+                          : !new File("${oDir}/${sid}/${sid}.mapped.dup_marked.cnr").exists() },
+                    // MSI: summary file published by MSISENSOR2_MSI or MSISENSORPRO_PRO
+                    { assert scenario.expectMsi
+                          ? new File("${oDir}/${sid}/${sid}.msi").exists()
+                          : !new File("${oDir}/${sid}/${sid}.msi").exists() },
+                )
+            }
+        }
+    }
 }
