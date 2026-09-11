@@ -1,5 +1,7 @@
 # twistcgp
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21445696.svg)](https://doi.org/10.5281/zenodo.21445696)
+
 A bioinformatics pipeline for processing data from [Twist Bioscience's](https://www.twistbioscience.com/) TwistCGP product for targeted enrichment of cancer-associated genes.
 
 <p>
@@ -295,8 +297,17 @@ Public sponsors include:
 
 ## Citations
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use fulcrumgenomics/twistcgp for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+If you use fulcrumgenomics/twistcgp for your analysis, please cite it using the following doi: [10.5281/zenodo.21445696](https://doi.org/10.5281/zenodo.21445696)
+
+The pipeline is described in the following poster:
+
+> **Twistcgp pipeline: A portable, open-source workflow for comprehensive genomic profiling in translational oncology.**
+>
+> Nils Homer, Erin McAuley, Zach Norgaard, James Flynn, Rebecca Barnard & Tina Han.
+>
+> _American Association for Cancer Research (AACR) Annual Meeting._ 2026 Apr 17-22. doi: [10.1158/1538-7445.AM2026-LB162](https://doi.org/10.1158/1538-7445.AM2026-LB162).
+
+We also gratefully acknowledge Jimi Rosenkrantz for her contributions to the pipeline following the abstract submission.
 
 This pipeline uses code and infrastructure developed and maintained by the [nf-core](https://nf-co.re) community, reused here under the [MIT license](https://github.com/nf-core/tools/blob/main/LICENSE).
 
