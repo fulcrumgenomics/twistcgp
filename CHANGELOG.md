@@ -23,9 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ALIGNBAM stub now reports the `bwa-mem2` version, matching the container and the `script:` block; previously it shelled out to `bwa` and emitted stderr into `versions.yml` (#99)
 - Bumped pinned `picard/markduplicates` to nf-core/modules `2b5333d3d` so the stub emits a `.bai` alongside the `.bam`; previously the join with `.bai` was empty under `-stub` and downstream MSI / GATK steps were silently skipped (#101)
 - VEP `--custom` now references the staged file's basename, fixing failures when `--cosmic_vcf` is a remote URL (e.g. `s3://`) on Lifebit/Fusion (#95)
+- Reference-preparation subworkflow tool versions (`PREPARE_GENOME`/`PREPARE_INDICES`/`PREPARE_ANNOTATION_DB`) are now collated into the software-versions report; previously they were emitted but never captured
+- Local per-sample channel joins now use `failOnMismatch`/`failOnDuplicate` so a missing or duplicated sample fails loudly instead of being silently dropped; the optional `GATK4_CALCULATECONTAMINATION` joins intentionally stay lenient (`remainder: true`)
+- Miscellaneous refinements: `fasta_gzi` is now a channel rather than a Groovy closure; removed an unused `PICARD_INTERVALLISTTOBED` import; the CNVkit reference tuple uses an empty meta map `[:]` instead of `[]`; tightened the `pon_cnn` schema pattern (`.cnn?` → `.cnn`, was accepting `.cn`); and corrected stale template boilerplate (the `save_reference` help referenced a STAR index; aligned the `pipelines_testdata_base_path` default between `nextflow.config` and the schema)
+- Added the missing `gnomADg_REMAINING_AF` population to the pyTMB gnomAD genome polymorphism list in `assets/pytmb_vep.yml` (the exome list already had `gnomADe_REMAINING_AF`); this gnomAD genome population is now excluded during TMB germline filtering
 
 ### Changed
 
+- Replaced the local `TMB` module with the nf-core `tmb/pytmb` module (tmb pinned to 1.5.0 in both conda and container; correct `-stub` outputs; upstream nf-test). The `--export` VCF of the variants that fed the TMB calculation is now published alongside the log. Note: the published TMB log is now named `<id>.log` (previously `<id>.tmb.log`).
+- **Fix:** Removed the unused `--gnomad_vcf` / `--gnomad_tbi` parameters and the gnomAD `TABIX` staging step. The staged gnomAD VCF was handed to VEP but never referenced (VEP only adds `--custom` for COSMIC); gnomAD allele frequencies come from the VEP cache via `--af_gnomade`/`--af_gnomadg`. Also removed the now-orphaned `docs/gnomad_vcf.md`.
 - Updated nf-core template to v3.5.2
 - Bumped minimum Nextflow version to 25.04.0
 - Upgraded nf-schema plugin from 2.4.2 to 2.5.1

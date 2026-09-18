@@ -106,6 +106,7 @@ polymDb:
     - gnomADg_FIN_AF
     - gnomADg_MID_AF
     - gnomADg_NFE_AF
+    - gnomADg_REMAINING_AF
     - gnomADg_SAS_AF
   1k:
     - AF
