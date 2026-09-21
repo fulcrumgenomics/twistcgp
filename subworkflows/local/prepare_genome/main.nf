@@ -8,7 +8,7 @@
 // Condition is based on params.step and params.tools
 // If and extra condition exists, it's specified in comments
 
-include { BWAMEM2_INDEX } from '../../../modules/nf-core/bwamem2/index/main'
+include { BWAMEM3_INDEX } from '../../../modules/nf-core/bwamem3/index/main'
 include { SAMTOOLS_FAIDX } from '../../../modules/nf-core/samtools/faidx/main'
 include { SAMTOOLS_DICT } from '../../../modules/nf-core/samtools/dict/main'
 include { MSISENSORPRO_SCAN } from '../../../modules/nf-core/msisensorpro/scan/main'
@@ -21,7 +21,7 @@ workflow PREPARE_GENOME {
     main:
     versions = channel.empty()
 
-    BWAMEM2_INDEX(fasta)
+    BWAMEM3_INDEX(fasta)
     // If aligner is bwa-mem
     SAMTOOLS_FAIDX(fasta, [[id: 'no_fai'], []], false)
     SAMTOOLS_DICT(fasta)
@@ -34,11 +34,12 @@ workflow PREPARE_GENOME {
         : channel.empty()
 
     // Gather versions of all tools used
-    versions = versions.mix(BWAMEM2_INDEX.out.versions)
+    // NB: BWAMEM3_INDEX emits its version via the `versions` topic channel, which is
+    // collected globally in workflows/twistcgp.nf, so it is not mixed in here.
     versions = versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     emit:
-    bwa = BWAMEM2_INDEX.out.index.collect() // path: bwa/*
+    bwa = BWAMEM3_INDEX.out.index.collect() // path: bwa/*
     dict = SAMTOOLS_DICT.out.dict.collect() // path: genome.fasta.dict
     fasta_fai = SAMTOOLS_FAIDX.out.fai.collect() // path: genome.fasta.fai
     fasta_gzi = SAMTOOLS_FAIDX.out.gzi.collect() // path: genome.fasta.gz.gzi

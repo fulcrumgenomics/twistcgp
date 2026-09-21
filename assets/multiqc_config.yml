@@ -8,6 +8,19 @@ report_section_order:
   "fulcrumgenomics-twistcgp-summary":
     order: -1002
 
+module_order:
+  # fgumi dedup's histogram is parsed by MultiQC's fgbio module.
+  - fgbio:
+      name: "fgumi dedup"
+      info: "Family size histogram produced by fgumi dedup."
+
 export_plots: true
 
 disable_version_detection: true
+
+extra_fn_clean_exts:
+  - ".chelae"
+  # DEDUPBAM names its metrics off the BAM (`<id>.mapped.dup_marked.*`), so both are
+  # trimmed to leave `<id>`, matching the `meta.id` names the other modules emit.
+  - ".mapped"
+  - ".dup_marked"

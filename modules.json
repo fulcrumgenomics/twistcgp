@@ -10,11 +10,16 @@
                         "git_sha": "6383d8fe58f9498eecd5aa303e71a4a932d1e9f6",
                         "installed_by": ["modules"]
                     },
-                    "bwamem2/index": {
+                    "bwamem3/index": {
                         "branch": "master",
-                        "git_sha": "a29f18660f5e3748d44d6f716241e70c942c065d",
+                        "git_sha": "d38f40ca73e22a520ad4bb56eed2906219696ccc",
                         "installed_by": ["modules"],
-                        "patch": "modules/nf-core/bwamem2/index/bwamem2-index.diff"
+                        "patch": "modules/nf-core/bwamem3/index/bwamem3-index.diff"
+                    },
+                    "chelae/trim": {
+                        "branch": "master",
+                        "git_sha": "22edd7ce9462025093b25e3b55006f7720ff0d8e",
+                        "installed_by": ["modules"]
                     },
                     "civicpy/annotate": {
                         "branch": "master",
@@ -37,20 +42,14 @@
                         "git_sha": "a96f42708b631dfc736f48980dbf2be418dd784b",
                         "installed_by": ["modules", "vcf_annotate_ensemblvep"]
                     },
-                    "fastp": {
-                        "branch": "master",
-                        "git_sha": "d082103d7976a2804f21225446cc110cbd822f4c",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/fastp/fastp.diff"
-                    },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
                         "installed_by": ["modules"]
                     },
-                    "fgbio/fastqtobam": {
+                    "fgumi/extract": {
                         "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "git_sha": "bbf80cf36f51c04771feacc3ce7c4e485032a344",
                         "installed_by": ["modules"]
                     },
                     "gatk4/calculatecontamination": {
@@ -99,29 +98,17 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "82a79183037a403ad1b6714e5dbcff25500efaf6",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/multiqc/multiqc.diff"
+                        "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
+                        "installed_by": ["modules"]
                     },
                     "perbase": {
                         "branch": "master",
                         "git_sha": "be5b19747298e30ca21270ce40abb3bb16b11475",
                         "installed_by": ["modules"]
                     },
-                    "picard/collecthsmetrics": {
+                    "riker/multi": {
                         "branch": "master",
-                        "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/picard/collecthsmetrics/picard-collecthsmetrics.diff"
-                    },
-                    "picard/collectmultiplemetrics": {
-                        "branch": "master",
-                        "git_sha": "81880787133db07d9b4c1febd152c090eb8325dc",
-                        "installed_by": ["modules"]
-                    },
-                    "picard/markduplicates": {
-                        "branch": "master",
-                        "git_sha": "2b5333d3d47617b2bbf425deb30a2d4f707b5ef4",
+                        "git_sha": "89b094a1b914b1e0844b4c0cc901cda5eddd569b",
                         "installed_by": ["modules"]
                     },
                     "samtools/dict": {
